@@ -1,0 +1,7 @@
+{
+  "name": "haciendo_cuentas_app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
