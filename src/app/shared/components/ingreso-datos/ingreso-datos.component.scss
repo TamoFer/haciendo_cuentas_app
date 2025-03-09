@@ -1,13 +1,19 @@
-.input-email {
-    display: flex;
-    flex-direction: row;
-    width: 100vh;
-    align-items: center;
+ ion-item {
+     padding: 1rem;
+
+ }
+
+ .input-email {
+     display: flex;
+     flex-direction: row;
+     width: 50vw;
+     align-items: center;
 
 
-    ion-icon {
-        width: 2rem;
-        height: 2rem;
-        padding-right: 1rem;
-    }
-}
+     ion-icon {
+         width: 2rem;
+         height: 2rem;
+         padding-right: 1rem;
+     }
+
+ }

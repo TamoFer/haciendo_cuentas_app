@@ -4,6 +4,11 @@
     <form [formGroup]="formulario">
         <app-ingreso-datos icon="mail-outline" autocomplete="email" label="Correo electrónico"
             [control]="formulario.controls.email" type="email"></app-ingreso-datos>
-        <!-- <app-ingreso-datos icon="lock-closed-outline"></app-ingreso-datos> -->
+
+        <app-ingreso-datos icon="lock-closed-outline" autocomplete="password" label="Contraseña"
+            [control]="formulario.controls.password" type="password"></app-ingreso-datos>
+
+        <!-- {{formulario.value.password}} para chequear los datos de los input del form-->
+
     </form>
 </ion-content>
