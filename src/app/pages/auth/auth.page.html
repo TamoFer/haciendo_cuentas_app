@@ -1,13 +1,9 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>auth</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header title="login"></app-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">auth</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+    <form [formGroup]="formulario">
+        <app-ingreso-datos icon="mail-outline" autocomplete="email" label="Correo electrónico"
+            [control]="formulario.controls.email" type="email"></app-ingreso-datos>
+        <!-- <app-ingreso-datos icon="lock-closed-outline"></app-ingreso-datos> -->
+    </form>
 </ion-content>

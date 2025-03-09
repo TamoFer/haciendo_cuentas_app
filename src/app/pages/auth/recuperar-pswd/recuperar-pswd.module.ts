@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { AuthPageRoutingModule } from './auth-routing.module';
+import { RecuperarPswdPageRoutingModule } from './recuperar-pswd-routing.module';
 
-import { AuthPage } from './auth.page';
+import { RecuperarPswdPage } from './recuperar-pswd.page';
 import { SharedModule } from 'src/app/shared/shared.module';
 
 @NgModule({
@@ -14,11 +14,9 @@ import { SharedModule } from 'src/app/shared/shared.module';
     CommonModule,
     FormsModule,
     IonicModule,
-    AuthPageRoutingModule,
-    AuthPage,
-    ReactiveFormsModule,
+    RecuperarPswdPageRoutingModule,
     SharedModule
   ],
 
 })
-export class AuthPageModule { }
+export class RecuperarPswdPageModule { }

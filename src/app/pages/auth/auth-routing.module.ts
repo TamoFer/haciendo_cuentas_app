@@ -7,7 +7,15 @@ const routes: Routes = [
   {
     path: '',
     component: AuthPage
+  },  {
+    path: 'registro-usuario',
+    loadChildren: () => import('./registro-usuario/registro-usuario.module').then( m => m.RegistroUsuarioPageModule)
   },
+  {
+    path: 'recuperar-pswd',
+    loadChildren: () => import('./recuperar-pswd/recuperar-pswd.module').then( m => m.RecuperarPswdPageModule)
+  },
+
 
 
 ];
