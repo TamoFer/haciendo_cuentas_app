@@ -1,7 +1,7 @@
 <app-header title="Inicio de Sesion">
 </app-header>
 <ion-content>
-    <form [formGroup]="formulario">
+    <form [formGroup]="formulario" (ngSubmit)="submit()">
         <app-ingreso-datos icon="mail-outline" autocomplete="email" label="Correo electrónico"
             [control]="formulario.controls.email" type="email"></app-ingreso-datos>
 
@@ -11,7 +11,8 @@
         <p routerLink="recuperar-pswd">¿Olvidaste la contraseña?</p>
 
 
-        <ion-button expand="block" mode="ios" type="submit" [disabled]="!formulario.valid"> Ingresar
+        <ion-button expand="block" mode="ios" type="submit" [disabled]="!formulario.valid">
+            Ingresar
             <ion-icon slot="end" name="log-in-outline"></ion-icon>
         </ion-button>
 
