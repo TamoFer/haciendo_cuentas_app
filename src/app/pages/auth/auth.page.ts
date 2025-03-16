@@ -3,12 +3,13 @@ import { IonicModule } from '@ionic/angular';
 import { HeaderComponent } from "../../shared/components/header/header.component";
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/ingreso-datos.component';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.page.html',
   styleUrls: ['./auth.page.scss'],
-  imports: [IonicModule, HeaderComponent, IngresoDatosComponent, ReactiveFormsModule]
+  imports: [IonicModule, HeaderComponent, IngresoDatosComponent, ReactiveFormsModule, RouterLink]
 })
 export class AuthPage implements OnInit {
 

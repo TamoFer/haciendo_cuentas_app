@@ -1,5 +1,5 @@
-<app-header title="login"></app-header>
-
+<app-header title="Inicio de Sesion">
+</app-header>
 <ion-content>
     <form [formGroup]="formulario">
         <app-ingreso-datos icon="mail-outline" autocomplete="email" label="Correo electrónico"
@@ -7,6 +7,19 @@
 
         <app-ingreso-datos icon="lock-closed-outline" autocomplete="password" label="Contraseña"
             [control]="formulario.controls.password" type="password"></app-ingreso-datos>
+
+        <p routerLink="recuperar-pswd">¿Olvidaste la contraseña?</p>
+
+
+        <ion-button expand="block" mode="ios" type="submit" [disabled]="!formulario.valid"> Ingresar
+            <ion-icon slot="end" name="log-in-outline"></ion-icon>
+        </ion-button>
+
+
+        <ion-button expand="block" mode="ios" routerLink="registro-usuario">
+            Registrarme
+            <ion-icon slot="end" name="person-add-outline"></ion-icon>
+        </ion-button>
 
         <!-- {{formulario.value.password}} para chequear los datos de los input del form-->
 
