@@ -7,12 +7,13 @@ import { RouterLink } from '@angular/router';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { User } from 'src/app/models/user.model';
 import { UtilsService } from 'src/app/services/utils.service';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.page.html',
   styleUrls: ['./auth.page.scss'],
-  imports: [IonicModule, HeaderComponent, IngresoDatosComponent, ReactiveFormsModule, RouterLink]
+  imports: [IonicModule, HeaderComponent, IngresoDatosComponent, ReactiveFormsModule, RouterLink, NgIf]
 })
 
 export class AuthPage implements OnInit {

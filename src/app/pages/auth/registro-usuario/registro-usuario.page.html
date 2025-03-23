@@ -1,13 +1,52 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>registro_usuario</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header title="Registro">
+</app-header>
+<ion-content>
+  <form [formGroup]="formulario" (ngSubmit)="submit()">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">registro_usuario</ion-title>
-    </ion-toolbar>
-  </ion-header>
+    <!-- Ingreso de nombre -->
+    <app-ingreso-datos icon="person-outline" autocomplete="name" label="Nombre" [control]="formulario.controls.name"
+      type="text"></app-ingreso-datos>
+
+    <div *ngIf="formulario.controls.name.errors && formulario.controls.name.touched">
+      <div class="errores" *ngIf="formulario.controls.name.errors?.['required']">El nombre es necesario</div>
+      <div class="errores" *ngIf="formulario.controls.name.errors?.['minlength']">El nombre debe tener al menos 4
+        caracteres</div>
+    </div>
+
+    <!-- Ingreso de email -->
+    <app-ingreso-datos icon="mail-outline" autocomplete="email" label="Correo electrónico"
+      [control]="formulario.controls.email" type="email"></app-ingreso-datos>
+
+    <div *ngIf="formulario.controls.email.errors && formulario.controls.email.touched">
+      <div class="errores" *ngIf="formulario.controls.email.errors?.['required']">El correo es necesario</div>
+      <div class="errores" *ngIf="formulario.controls.email.errors?.['email']">Ingrese un correo valido</div>
+    </div>
+
+
+    <!-- Ingreso de contraseña -->
+    <app-ingreso-datos icon="lock-closed-outline" autocomplete="password" label="Contraseña"
+      [control]="formulario.controls.password" type="password"></app-ingreso-datos>
+
+    <div *ngIf="formulario.controls.password.errors && formulario.controls.password.touched">
+      <div class="errores" *ngIf="formulario.controls.password.errors?.['required']">El contraseña es necesaria</div>
+
+      <div class="errores" *ngIf="formulario.controls.password.errors?.['minlength']">El contraseña debe tener al menos
+        6
+        caracteres</div>
+    </div>
+
+
+    <ion-button expand="block" mode="ios" type="submit" [disabled]="!formulario.valid">
+      Registrarme
+      <ion-icon slot="end" name="log-in-outline"></ion-icon>
+    </ion-button>
+
+    <ion-button expand="block" mode="ios" type="submit" (click)='retroceder()'>
+      Retroceder
+      <ion-icon slot="end" name="arrow-back"></ion-icon>
+    </ion-button>
+
+    <!-- {{formulario.value.password}} para chequear los datos de los input del form-->
+
+  </form>
 </ion-content>

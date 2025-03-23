@@ -1,12 +1,30 @@
-<app-header title="Inicio de Sesion">
+<app-header title="Registro">
 </app-header>
 <ion-content>
     <form [formGroup]="formulario" (ngSubmit)="submit()">
+
+
+        <!-- Ingreso de email -->
         <app-ingreso-datos icon="mail-outline" autocomplete="email" label="Correo electrónico"
             [control]="formulario.controls.email" type="email"></app-ingreso-datos>
 
+        <div *ngIf="formulario.controls.email.errors && formulario.controls.email.touched">
+            <div class="errores" *ngIf="formulario.controls.email.errors?.['required']">El correo es necesario</div>
+            <div class="errores" *ngIf="formulario.controls.email.errors?.['email']">Ingrese un correo valido</div>
+        </div>
+
+        <!-- Ingreso de contraseña -->
         <app-ingreso-datos icon="lock-closed-outline" autocomplete="password" label="Contraseña"
             [control]="formulario.controls.password" type="password"></app-ingreso-datos>
+
+        <div *ngIf="formulario.controls.password.errors && formulario.controls.password.touched">
+            <div class="errores" *ngIf="formulario.controls.password.errors?.['required']">El contraseña es necesaria
+            </div>
+            <div class="errores" *ngIf="formulario.controls.password.errors?.['minlength']">El contraseña debe tener al
+                menos
+                6
+                caracteres</div>
+        </div>
 
         <p routerLink="recuperar-pswd">¿Olvidaste la contraseña?</p>
 
