@@ -10,6 +10,7 @@ form {
     }
 
 
+
     @media screen and (max-width: 768px) {
         padding: 5%;
 
@@ -28,7 +29,21 @@ form {
             margin-top: 5px;
         }
 
+        .recuperar-pswd {
+            color: red;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 5px;
+        }
 
     }
 
+}
+
+.recuperar-pswd {
+    // color: red;
+    text-align: center;
+    font-weight: bold;
+    margin: 15px;
+    font-size: 15px;
 }

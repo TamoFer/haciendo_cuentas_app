@@ -1,13 +1,9 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>HOME</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header title="Home"></app-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">HOME</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+
+  <ion-button (click)="signOut()">
+    Deslogearse
+  </ion-button>
+
 </ion-content>
