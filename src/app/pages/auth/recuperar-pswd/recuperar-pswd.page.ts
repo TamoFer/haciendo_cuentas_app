@@ -1,7 +1,12 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FirebaseService } from 'src/app/services/firebase.service';
+import { User } from 'src/app/models/user.model';
+import { UtilsService } from 'src/app/services/utils.service';
+import { CommonModule, NgIf } from '@angular/common';
+import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/ingreso-datos.component';
+import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 
 @Component({
   selector: 'app-recuperar-pswd',
@@ -10,15 +15,50 @@ import { IonicModule } from '@ionic/angular';
   imports: [
     IonicModule,
     CommonModule,
-    FormsModule
+    FormsModule,
+    IngresoDatosComponent,
+    HeaderComponent,
+    ReactiveFormsModule
   ],
   standalone: true
 })
+
 export class RecuperarPswdPage implements OnInit {
 
-  constructor() { }
+  formulario = new FormGroup({
+    email: new FormControl('', [Validators.required, Validators.email]),
+  });
+
+  firebaseSv = inject(FirebaseService);
+  utilsSv = inject(UtilsService);
 
   ngOnInit() {
+  }
+
+  async submit() {
+    if (this.formulario.valid) {
+
+      const loading = await this.utilsSv.loading();
+      await loading.present();
+
+
+      this.firebaseSv.enviarRecuperacion(this.formulario.value.email).then(res => {
+
+      }).catch(error => {
+        console.log(error);
+
+        this.utilsSv.presentToast({
+          message: error.message,
+          duration: 2500,
+          color: 'primary',
+          position: 'middle',
+          icon: 'alert-circle-outline'
+        })
+
+      }).finally(() => {
+        loading.dismiss();
+      })
+    }
   }
 
 }

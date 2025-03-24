@@ -6,7 +6,6 @@ import { IonicModule } from '@ionic/angular';
 
 import { RecuperarPswdPageRoutingModule } from './recuperar-pswd-routing.module';
 
-import { RecuperarPswdPage } from './recuperar-pswd.page';
 import { SharedModule } from 'src/app/shared/shared.module';
 
 @NgModule({

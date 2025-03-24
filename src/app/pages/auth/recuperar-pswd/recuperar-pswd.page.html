@@ -1,13 +1,22 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>recuperar_pswd</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header title="Recuperar contraseña">
+</app-header>
+<ion-content>
+  <form [formGroup]="formulario" (ngSubmit)="submit()">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">recuperar_pswd</ion-title>
-    </ion-toolbar>
-  </ion-header>
+
+    <!-- Ingreso de email -->
+    <app-ingreso-datos icon="mail-outline" autocomplete="email" label="Correo electrónico"
+      [control]="formulario.controls.email" type="email"></app-ingreso-datos>
+
+    <div *ngIf="formulario.controls.email.errors && formulario.controls.email.touched">
+      <div class="errores" *ngIf="formulario.controls.email.errors?.['required']">El correo es necesario</div>
+      <div class="errores" *ngIf="formulario.controls.email.errors?.['email']">Ingrese un correo valido</div>
+    </div>
+
+    <ion-button expand="block" mode="ios" type="submit" [disabled]="!formulario.valid">
+      Recuperar
+      <ion-icon slot="end" name="arrow-forward"></ion-icon>
+    </ion-button>
+
+  </form>
 </ion-content>

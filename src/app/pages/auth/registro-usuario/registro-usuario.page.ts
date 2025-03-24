@@ -83,7 +83,7 @@ export class RegistroUsuarioPage implements OnInit {
       this.firebaseSv.setDocument(path, this.formulario.value).then(async res => {
 
         await this.utilsSv.guardarDatosLS('user', this.formulario.value);
-        this.utilsSv.routerLink('/src/app/pages/main/home');
+        this.utilsSv.routerLink('/main/home');
         this.formulario.reset();
 
       }).catch(error => {
