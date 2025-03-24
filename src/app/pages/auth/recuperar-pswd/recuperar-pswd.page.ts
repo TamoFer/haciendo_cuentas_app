@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, NavController } from '@ionic/angular';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { User } from 'src/app/models/user.model';
@@ -32,8 +32,15 @@ export class RecuperarPswdPage implements OnInit {
   firebaseSv = inject(FirebaseService);
   utilsSv = inject(UtilsService);
 
+  constructor(private navCtrl: NavController) { }
+
   ngOnInit() {
   }
+
+  retroceder() {
+    this.navCtrl.back();
+  }
+
 
   async submit() {
     if (this.formulario.valid) {
@@ -43,6 +50,14 @@ export class RecuperarPswdPage implements OnInit {
 
 
       this.firebaseSv.enviarRecuperacion(this.formulario.value.email).then(res => {
+
+        this.utilsSv.presentToast({
+          message: `Se ha enviado un link de recuperacion al correo: ${this.formulario.value.email}`,
+          duration: 1500,
+          color: 'primary',
+          position: 'middle',
+          icon: 'alert-circle-outline'
+        })
 
       }).catch(error => {
         console.log(error);

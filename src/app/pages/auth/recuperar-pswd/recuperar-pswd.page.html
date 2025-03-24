@@ -1,4 +1,4 @@
-<app-header title="Recuperar contraseña">
+<app-header title="Recuperar cuenta">
 </app-header>
 <ion-content>
   <form [formGroup]="formulario" (ngSubmit)="submit()">
@@ -16,6 +16,11 @@
     <ion-button expand="block" mode="ios" type="submit" [disabled]="!formulario.valid">
       Recuperar
       <ion-icon slot="end" name="arrow-forward"></ion-icon>
+    </ion-button>
+
+    <ion-button expand="block" mode="ios" type="submit" (click)='retroceder()'>
+      Volver
+      <ion-icon slot="end" name="arrow-back"></ion-icon>
     </ion-button>
 
   </form>
