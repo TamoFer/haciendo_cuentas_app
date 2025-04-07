@@ -1,3 +1,4 @@
+import { NgIf } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { FirebaseService } from 'src/app/services/firebase.service';
@@ -9,7 +10,7 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent]
+  imports: [IonicModule, HeaderComponent, FooterComponent, NgIf]
 
 })
 export class HomePage implements OnInit {
@@ -18,6 +19,8 @@ export class HomePage implements OnInit {
   utilsSVC = inject(UtilsService);
   nombreUser: string = '';
   usuarioLogeado: boolean = false;
+  mostrarDetalle: boolean = false;
+
 
 
   ngOnInit() {
