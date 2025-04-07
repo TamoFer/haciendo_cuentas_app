@@ -70,15 +70,6 @@ export class AuthPage implements OnInit {
         this.utilsSv.guardarDatosLS('user', user);
         this.utilsSv.routerLink('/main/home');
         this.formulario.reset();
-
-        this.utilsSv.presentToast({
-          message: `Bienvenido/a ${user.name}`,
-          duration: 1500,
-          color: 'primary',
-          position: 'middle',
-          icon: 'person-circle-outline'
-        })
-
       }).catch(error => {
         console.log(error);
 

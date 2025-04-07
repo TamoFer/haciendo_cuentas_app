@@ -3,9 +3,10 @@ import { AngularFireAuth } from "@angular/fire/compat/auth";
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, updateProfile, sendPasswordResetEmail } from 'firebase/auth';
 import { User } from '../models/user.model';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { getFirestore, setDoc, doc, getDoc } from '@angular/fire/firestore';
+import { getFirestore, setDoc, doc, getDoc, addDoc, collection } from '@angular/fire/firestore';
 import { UtilsService } from './utils.service';
-
+import { AngularFireStorage } from '@angular/fire/compat/storage';
+import { getStorage, uploadString, ref, getDownloadURL } from "firebase/storage";
 
 
 
@@ -17,6 +18,7 @@ export class FirebaseService {
   auth = inject(AngularFireAuth);
   firestore = inject(AngularFirestore);
   utilsSvs = inject(UtilsService);
+  storage = inject(AngularFireStorage);
 
   getAuth() {
     return getAuth();
@@ -59,6 +61,8 @@ export class FirebaseService {
     return (await getDoc(doc(getFirestore(), path))).data();
   }
 
-
-
+  //agregar datos a la BD
+  addDocument(path: string, data: any) {
+    return addDoc(collection(getFirestore(), path), data);
+  }
 }

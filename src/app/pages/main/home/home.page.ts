@@ -20,6 +20,7 @@ export class HomePage implements OnInit {
   nombreUser: string = '';
   usuarioLogeado: boolean = false;
   mostrarDetalle: boolean = false;
+  mostrarOpciones: boolean = false;
 
 
 
@@ -40,7 +41,6 @@ export class HomePage implements OnInit {
           text: 'Cancelar',
           role: 'cancel',
           handler: () => {
-            console.log('Cancelado');
           }
         },
         {
@@ -55,8 +55,6 @@ export class HomePage implements OnInit {
 
     await alert.present();
   }
-
-
 
   signOut() {
     this.firebaseSVC.signOut();
