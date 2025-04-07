@@ -1,5 +1,10 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-title>{{title}}</ion-title>
+    <ion-buttons slot="start" *ngIf="mostrarVolver">
+      <ion-button (click)="volver()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>

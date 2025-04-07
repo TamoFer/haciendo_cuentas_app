@@ -13,9 +13,18 @@ const routes: Routes = [
     path: 'auth',
     loadChildren: () => import('./pages/auth/auth.module').then(m => m.AuthPageModule), canActivate: [noAuthGuard]
   },
+
   {
-    path: 'main',
-    loadChildren: () => import('./pages/main/main.module').then(m => m.MainPageModule), canActivate: [AuthGuard]
+    path: 'home',
+    loadChildren: () => import('./pages/main/home/home.module').then(m => m.HomePageModule), canActivate: [AuthGuard]
+  },
+  {
+    path: 'gastos',
+    loadChildren: () => import('./pages/main/gastos/gastos.module').then(m => m.GastosPageModule), canActivate: [AuthGuard]
+  },
+  {
+    path: 'ingresos',
+    loadChildren: () => import('./pages/main/ingresos/ingresos.module').then(m => m.IngresosPageModule), canActivate: [AuthGuard]
   },
 
 

@@ -1,9 +1,6 @@
-<app-header title="Home"></app-header>
-
+<app-header [title]="'Bienvenido ' + nombreUser" [mostrarVolver]="usuarioLogeado"
+  (volverAccion)="confirmarSignOut()"></app-header>
 <ion-content>
 
-  <ion-button (click)="signOut()">
-    Deslogearse
-  </ion-button>
-
 </ion-content>
+<app-footer></app-footer>
