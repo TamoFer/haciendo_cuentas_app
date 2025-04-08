@@ -28,6 +28,10 @@ export class RegistroUsuarioPage implements OnInit {
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required, Validators.minLength(6)]),
     name: new FormControl('', [Validators.required, Validators.minLength(4)]),
+    saldo_banco: new FormControl(0),
+    saldo_efectivo: new FormControl(0),
+    gastos: new FormControl([]),
+    ingresos: new FormControl([]),
 
   });
 

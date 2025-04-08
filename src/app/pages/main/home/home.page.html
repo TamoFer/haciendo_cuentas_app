@@ -4,7 +4,7 @@
   <ion-card>
     <!-- Saldo -->
     <ion-card-header>
-      <ion-card-title>$1000000</ion-card-title>
+      <ion-card-title>$ {{saldo_total}} </ion-card-title>
       <ion-card-subtitle>Saldo en cuenta</ion-card-subtitle>
     </ion-card-header>
 
@@ -20,13 +20,13 @@
             <ion-icon name="business-outline" style="font-size: 1.5rem;" color="primary"></ion-icon>
           </ion-label>
 
-          <ion-text>$1500</ion-text>
+          <ion-text>$ {{saldo_bco}}</ion-text>
         </ion-item>
         <ion-item>
           <ion-label>
             <ion-icon name="CASH-outline" style="font-size: 1.5rem;" color="success"></ion-icon>
           </ion-label>
-          <ion-text>$2000</ion-text>
+          <ion-text>$ {{saldo_efe}}</ion-text>
         </ion-item>
       </ion-list>
     </ion-card-content>
@@ -38,9 +38,11 @@
     </ion-fab-button>
     <ion-fab-list side="top">
       <ion-fab-button>
+        <ion-icon name="remove-circle-outline" color="danger" style="font-size: 2rem;"></ion-icon>
         <ion-icon name="card-outline" color="danger" style="font-size: 2rem;"></ion-icon>
       </ion-fab-button>
       <ion-fab-button>
+        <ion-icon name="add-circle-outline" color="success" style="font-size: 2rem;"></ion-icon>
         <ion-icon name="wallet-outline" color="success" style="font-size: 2rem;"></ion-icon>
       </ion-fab-button>
     </ion-fab-list>

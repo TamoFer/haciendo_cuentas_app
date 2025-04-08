@@ -56,6 +56,7 @@ export class FirebaseService {
   setDocument(path: string, data: any) {
     return setDoc(doc(getFirestore(), path), data);
   }
+
   // obtener datos de firebase bd
   async getDocument(path: string) {
     return (await getDoc(doc(getFirestore(), path))).data();
