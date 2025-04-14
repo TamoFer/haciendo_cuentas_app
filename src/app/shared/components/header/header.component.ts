@@ -13,6 +13,7 @@ export class HeaderComponent implements OnInit {
   @Input() title!: string;
   @Input() mostrarVolver: boolean = false;
   @Output() volverAccion = new EventEmitter<void>();
+  @Input() isModal!: boolean;
 
   ngOnInit() { }
 

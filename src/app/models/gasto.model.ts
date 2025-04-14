@@ -1,6 +1,7 @@
 export interface Gasto {
     fecha: Date;
     importe: number;
-    rubro: string;
     detalle: string;
+    rubro: string;
+    tipo: string;
 }

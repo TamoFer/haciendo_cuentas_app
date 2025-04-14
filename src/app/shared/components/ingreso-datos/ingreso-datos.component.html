@@ -2,8 +2,21 @@
   <div>
     <div class="input-email">
       <ion-icon *ngIf="icon" color="primary" slot="start" [name]="icon"></ion-icon>
-      <ion-input [type]="type" [autocomplete]="autocomplete" [label]="label" [formControl]="control"
-        label-placement="floating" [clearInput]="true" fill="outline"></ion-input>
+
+      <!-- INPUT normal -->
+      <ion-input *ngIf="type !== 'select'" [type]="type" [autocomplete]="autocomplete" [label]="label"
+        [formControl]="control" label-placement="floating" [clearInput]="true" fill="outline">
+      </ion-input>
+
+      <!-- SELECT (cuando el tipo es 'select') -->
+      <ion-select *ngIf="type === 'select'" [formControl]="control" [label]="label" label-placement="floating"
+        interface="popover" fill="outline">
+
+        <ion-select-option *ngFor="let opcion of options" [value]="opcion">
+          {{ opcion }}
+        </ion-select-option>
+
+      </ion-select>
     </div>
   </div>
   <ion-button *ngIf="contrasenia" (click)="hideShowPassword()" slot="end" fill="clear" shape="round">

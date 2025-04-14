@@ -7,6 +7,8 @@ import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
+import { AddUpdtDeleteGastoComponent } from '../gastos/add-updt-delete-gasto/add-updt-delete-gasto.component';
+import { AddUpdtDeleteIngresosComponent } from '../ingresos/add-updt-delete-ingresos/add-updt-delete-ingresos.component';
 
 @Component({
   selector: 'app-home',
@@ -79,5 +81,18 @@ export class HomePage implements OnInit {
     this.firebaseSVC.signOut();
   }
 
+  //agregar gastos
+  agregarGastos() {
+    this.utilsSVC.presentModal({
+      component: AddUpdtDeleteGastoComponent
+    })
+  }
+
+  //agergas ingresos
+  agregarIngresos() {
+    this.utilsSVC.presentModal({
+      component: AddUpdtDeleteIngresosComponent
+    })
+  }
 
 }

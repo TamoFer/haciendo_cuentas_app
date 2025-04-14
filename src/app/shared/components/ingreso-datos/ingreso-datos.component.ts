@@ -1,4 +1,4 @@
-import { NgIf } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -8,7 +8,7 @@ import { IonicModule } from '@ionic/angular';
   selector: 'app-ingreso-datos',
   templateUrl: './ingreso-datos.component.html',
   styleUrls: ['./ingreso-datos.component.scss'],
-  imports: [IonicModule, NgIf, ReactiveFormsModule],
+  imports: [IonicModule, NgIf, ReactiveFormsModule, NgFor],
   // standalone: true
 })
 export class IngresoDatosComponent implements OnInit {
@@ -17,10 +17,11 @@ export class IngresoDatosComponent implements OnInit {
   ocultarVer: boolean = true;
 
   @Input() control!: FormControl;
-  @Input() type!: string;
+  @Input() type: string = 'text';
   @Input() label!: string;
   @Input() autocomplete!: string;
   @Input() icon!: string;
+  @Input() options: string[] = [];
 
   constructor() { }
   ngOnInit() {

@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, LoadingController, ToastController, ToastOptions } from '@ionic/angular';
+import { AlertController, LoadingController, ModalController, ModalOptions, ToastController, ToastOptions } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,10 @@ export class UtilsService {
   loadingCtrl = inject(LoadingController);
   toastCtrl = inject(ToastController);
   router = inject(Router);
-  alertasCtrl = inject(AlertController)
+  alertasCtrl = inject(AlertController);
+  modalsCtrl = inject(ModalController);
+
+
 
   // creacion de spinner loading 
   loading() {
@@ -37,6 +40,21 @@ export class UtilsService {
   obtenerDatosLS(key: string) {
     return JSON.parse(localStorage.getItem(key))
   }
+
+
+  //crear modal default
+  async presentModal(opts: ModalOptions) {
+    const modal = await this.modalsCtrl.create(opts);
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+    if (data) return data;
+  }
+
+  dismissModal(data?: any) {
+    return this.modalsCtrl.dismiss(data);
+  }
+
 
 }
 

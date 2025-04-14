@@ -1,3 +1,62 @@
-<p>
-  add-updt-delete-ingresos works!
-</p>
+<app-header title="Nuevo Ingreso" [isModal]="mostrarBack" (volverAccion)="cerrarModal()"></app-header>
+<ion-content>
+    <form [formGroup]="formulario" (ngSubmit)="submit()">
+
+
+        <!-- fecha  -->
+        <app-ingreso-datos icon="calendar-outline" autocomplete="detail" label="Fecha"
+            [control]="formulario.controls.fecha" type="date"></app-ingreso-datos>
+
+        <div *ngIf="formulario.controls.fecha.errors && formulario.controls.fecha.touched">
+            <div class="errores" *ngIf="formulario.controls.fecha.errors?.['required']">La fecha es necesario</div>
+        </div>
+
+        <!-- importe  -->
+        <app-ingreso-datos icon="logo-usd" autocomplete="detail" label="Importe" [control]="formulario.controls.importe"
+            type="number"></app-ingreso-datos>
+
+        <div *ngIf="formulario.controls.importe.errors && formulario.controls.importe.touched">
+            <div class="errores" *ngIf="formulario.controls.importe.errors?.['required']">El importe es necesario</div>
+            <div class="errores" *ngIf="formulario.controls.importe.errors?.['min']">El importe debe ser mayor a 0
+            </div>
+        </div>
+
+        <!-- detalle  -->
+        <app-ingreso-datos icon="document-text-outline" autocomplete="detail" label="Detalle"
+            [control]="formulario.controls.detalle" type="text"></app-ingreso-datos>
+
+        <div *ngIf="formulario.controls.detalle.errors && formulario.controls.detalle.touched">
+            <div class="errores" *ngIf="formulario.controls.detalle.errors?.['required']">El detalle es necesario</div>
+            <div class="errores" *ngIf="formulario.controls.detalle.errors?.['minlength']">El detalle debe tener al
+                menos 1
+                caracteres</div>
+        </div>
+
+        <!-- rubro  -->
+        <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Rubro" [type]="'select'"
+            [options]="opcionesRubro" [control]="formulario.controls.rubro">
+        </app-ingreso-datos>
+
+        <div *ngIf="formulario.controls.rubro.errors && formulario.controls.rubro.touched">
+            <div class="errores" *ngIf="formulario.controls.rubro.errors?.['required']">El rubro es necesario</div>
+
+        </div>
+
+
+        <!-- tipo-->
+        <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Tipo" [type]="'select'"
+            [options]="opcionesTipo" [control]="formulario.controls.tipo">
+        </app-ingreso-datos>
+
+        <div *ngIf="formulario.controls.tipo.errors && formulario.controls.tipo.touched">
+            <div class="errores" *ngIf="formulario.controls.tipo.errors?.['required']">El tipo es necesario</div>
+        </div>
+
+        <ion-button expand="block" mode="ios" type="submit" [disabled]="!formulario.valid">
+            Completo
+            <ion-icon slot="end" name="log-in-outline"></ion-icon>
+        </ion-button>
+
+    </form>
+</ion-content>
+<app-footer></app-footer>
