@@ -2,6 +2,7 @@ import { NgFor, NgIf } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
+import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
@@ -15,12 +16,15 @@ import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/i
   imports: [IonicModule, HeaderComponent, FooterComponent, IngresoDatosComponent, NgIf, ReactiveFormsModule]
 })
 export class AddUpdtDeleteIngresosComponent {
+
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
   mostrarBack: boolean = true;
 
   opcionesRubro = ['Sueldo', 'Venta', 'Prestamo'];
   opcionesTipo = ['Efectivo', 'Tarjeta'];
+  usuarioActual = this.utilsSVC.obtenerDatosLS('user');
+
 
   formulario = new FormGroup({
     fecha: new FormControl('', [Validators.required, Validators.min(0)]),
@@ -31,42 +35,47 @@ export class AddUpdtDeleteIngresosComponent {
   });
 
   ngOnInit() {
+    console.log(this.usuarioActual);
+
   }
 
-  async submit() {
+  async nuevoIngreso() {
     if (this.formulario.valid) {
 
       const loading = await this.utilsSVC.loading();
       await loading.present();
 
+      const path = `users/${this.usuarioActual.uid}`;
 
-      //   this.firebaseSVC.signUp(this.formulario.value as Ingreso).then(async res => {
+      const usuarioData = await this.firebaseSVC.getDocument(path);
+      const ingresosActuales = usuarioData?.['ingresos'] || [];
 
-      //     await this.firebaseSVC.updateUser(this.formulario.value.detalle);
+      const nuevoIngreso = this.formulario.value;
+      const nuevosIngresos = [...ingresosActuales, nuevoIngreso];
 
-      //     let uid = res.user.uid;
-      //     // this.formulario.controls.uid.setValue(uid);
+      await this.firebaseSVC.setDocument(path, {
+        ...usuarioData,
+        gastos: nuevosIngresos
+      });
 
-      //   }).catch(error => {
-      //     console.log(error);
+      // this.actualizarDatosLS(this.usuarioActual.uid);
 
-      //     this.utilsSVC.presentToast({
-      //       message: error.message,
-      //       duration: 2500,
-      //       color: 'primary',
-      //       position: 'middle',
-      //       icon: 'alert-circle-outline'
-      //     })
 
-      //   }).finally(() => {
-      //     loading.dismiss();
-      //   })
     }
   }
 
+  async actualizarDatosLS(uid: string) {
+    const path = `users/${uid}`;
+
+    this.firebaseSVC.getDocument(path).then((user: User) => {
+      this.utilsSVC.guardarDatosLS('user', user);
+    });
+
+    this.utilsSVC.obtenerDatosLS('user');
+
+  }
   cerrarModal() {
     this.utilsSVC.dismissModal();
   }
-
 
 }

@@ -6,7 +6,6 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { getFirestore, setDoc, doc, getDoc, addDoc, collection } from '@angular/fire/firestore';
 import { UtilsService } from './utils.service';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
-import { getStorage, uploadString, ref, getDownloadURL } from "firebase/storage";
 
 
 
