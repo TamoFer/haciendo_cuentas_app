@@ -1,4 +1,4 @@
-import { NgIf } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { Gasto } from 'src/app/models/gasto.model';
@@ -9,12 +9,13 @@ import { FooterComponent } from 'src/app/shared/components/footer/footer.compone
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { AddUpdtDeleteGastoComponent } from '../gastos/add-updt-delete-gasto/add-updt-delete-gasto.component';
 import { AddUpdtDeleteIngresosComponent } from '../ingresos/add-updt-delete-ingresos/add-updt-delete-ingresos.component';
+import { User } from 'src/app/models/user.model';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, NgIf]
+  imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor]
 
 })
 export class HomePage implements OnInit {
@@ -29,8 +30,6 @@ export class HomePage implements OnInit {
   nombreUser: string = '';
   saldo_bco: number;
   saldo_efe: number;
-  ingresos: Ingreso[] = [];
-  gastos: Gasto[] = [];
   saldo_total: number;
 
   // condicionales para mostrar info
@@ -38,20 +37,56 @@ export class HomePage implements OnInit {
   mostrarDetalle: boolean = false;
   mostrarOpciones: boolean = false;
 
+  user(): User {
+    return this.utilsSVC.obtenerDatosLS('user')
+  }
 
+  gastos: Gasto[] = [];
+  ingresos: Ingreso[] = [];
 
   ngOnInit() {
-    const usuario = this.utilsSVC.obtenerDatosLS('user');
-    if (usuario) {
-      this.nombreUser = usuario.name;
-      this.saldo_bco = usuario.saldo_banco;
-      this.saldo_efe = usuario.saldo_efectivo;
-      this.gastos = usuario.gastos;
-      this.ingresos = usuario.ingresos;
+    if (this.user()) {
+      this.nombreUser = this.user().name;
+      this.saldo_bco = this.user().saldo_banco;
+      this.saldo_efe = this.user().saldo_efectivo;
       this.saldo_total = this.saldo_bco + this.saldo_efe;
       this.usuarioLogeado = true;
     }
   }
+
+  ionViewWillEnter() {
+    this.obtenerGastos();
+    this.obtenerIngresos();
+  }
+
+  obtenerGastos() {
+    let path = `users/${this.user().uid}/gastos`;
+
+    let sub = this.firebaseSVC.getCollectionData(path).subscribe({
+      next: (res: any) => {
+        console.log(res);
+        this.gastos = res;
+        sub.unsubscribe();
+
+      }
+    })
+  }
+
+  obtenerIngresos() {
+    let path = `users/${this.user().uid}/ingresos`;
+
+    let sub = this.firebaseSVC.getCollectionData(path).subscribe({
+      next: (res: any) => {
+        console.log(res);
+        this.ingresos = res;
+        sub.unsubscribe();
+
+      }
+    })
+  }
+
+
+
 
   async confirmarSignOut() {
     const alert = await this.utilsSVC.alertasCtrl.create({

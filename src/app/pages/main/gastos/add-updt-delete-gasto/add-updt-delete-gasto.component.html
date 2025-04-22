@@ -33,18 +33,21 @@
                 caracteres</div>
         </div>
 
-        <!-- rubro del ingreso -->
-        <app-ingreso-datos icon="grid-outline" autocomplete="detail" label="Rubro" [control]="formulario.controls.rubro"
-            type="text"></app-ingreso-datos>
+        <!-- rubro  -->
+        <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Rubro" [type]="'select'"
+            [options]="opcionesRubro" [control]="formulario.controls.rubro">
+        </app-ingreso-datos>
 
         <div *ngIf="formulario.controls.rubro.errors && formulario.controls.rubro.touched">
             <div class="errores" *ngIf="formulario.controls.rubro.errors?.['required']">El rubro es necesario</div>
 
         </div>
 
-        <!-- tipo de ingreso -->
-        <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Tipo" [control]="formulario.controls.tipo"
-            type="text"></app-ingreso-datos>
+
+        <!-- tipo-->
+        <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Tipo" [type]="'select'"
+            [options]="opcionesTipo" [control]="formulario.controls.tipo">
+        </app-ingreso-datos>
 
         <div *ngIf="formulario.controls.tipo.errors && formulario.controls.tipo.touched">
             <div class="errores" *ngIf="formulario.controls.tipo.errors?.['required']">El tipo es necesario</div>

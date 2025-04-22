@@ -2,6 +2,7 @@ import { NgFor, NgIf } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
+import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
@@ -17,10 +18,13 @@ import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/i
 export class AddUpdtDeleteIngresosComponent {
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
-  mostrarBack: boolean = true;
+
+  mostrarBack: boolean;
 
   opcionesRubro = ['Sueldo', 'Venta', 'Prestamo'];
   opcionesTipo = ['Efectivo', 'Tarjeta'];
+
+  user = {} as User;
 
   formulario = new FormGroup({
     fecha: new FormControl('', [Validators.required, Validators.min(0)]),
@@ -31,36 +35,46 @@ export class AddUpdtDeleteIngresosComponent {
   });
 
   ngOnInit() {
+    this.user = this.utilsSVC.obtenerDatosLS('user');
+
   }
 
   async submit() {
     if (this.formulario.valid) {
 
+      let path = `users/${this.user.uid}/ingresos`;
+
       const loading = await this.utilsSVC.loading();
       await loading.present();
 
 
-      //   this.firebaseSVC.signUp(this.formulario.value as Ingreso).then(async res => {
 
-      //     await this.firebaseSVC.updateUser(this.formulario.value.detalle);
+      this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
-      //     let uid = res.user.uid;
-      //     // this.formulario.controls.uid.setValue(uid);
+        this.utilsSVC.dismissModal({ success: true });
 
-      //   }).catch(error => {
-      //     console.log(error);
+        this.utilsSVC.presentToast({
+          message: 'Ingreso cargado con exito',
+          duration: 1500,
+          color: 'success',
+          position: 'middle',
+          icon: 'checkmark-circle-outline'
+        })
 
-      //     this.utilsSVC.presentToast({
-      //       message: error.message,
-      //       duration: 2500,
-      //       color: 'primary',
-      //       position: 'middle',
-      //       icon: 'alert-circle-outline'
-      //     })
+      }).catch(error => {
+        console.log(error);
 
-      //   }).finally(() => {
-      //     loading.dismiss();
-      //   })
+        this.utilsSVC.presentToast({
+          message: error.message,
+          duration: 2500,
+          color: 'primary',
+          position: 'middle',
+          icon: 'alert-circle-outline'
+        })
+
+      }).finally(() => {
+        loading.dismiss();
+      })
     }
   }
 
