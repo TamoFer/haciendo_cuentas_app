@@ -33,6 +33,7 @@ export class AddUpdtDeleteGastoComponent {
     detalle: new FormControl('', [Validators.required, Validators.minLength(1)]),
     rubro: new FormControl('', [Validators.required, Validators.minLength(6)]),
     tipo: new FormControl('', [Validators.required, Validators.minLength(6)]),
+    genero: new FormControl('gasto')
   });
 
   ngOnInit() {
@@ -47,7 +48,7 @@ export class AddUpdtDeleteGastoComponent {
       await loading.present();
 
 
-      let path = `users/${this.user.uid}/gastos`;
+      let path = `users/${this.user.uid}/movimientos`;
 
       this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 

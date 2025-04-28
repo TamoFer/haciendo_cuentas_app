@@ -1,8 +1,7 @@
 import { NgFor, NgIf } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { Gasto } from 'src/app/models/gasto.model';
-import { Ingreso } from 'src/app/models/ingreso.model';
+import { Movimiento } from 'src/app/models/movimiento.mode';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
@@ -41,8 +40,7 @@ export class HomePage implements OnInit {
     return this.utilsSVC.obtenerDatosLS('user')
   }
 
-  gastos: Gasto[] = [];
-  ingresos: Ingreso[] = [];
+  movimientosCuenta: Movimiento[];
 
   ngOnInit() {
     if (this.user()) {
@@ -52,39 +50,31 @@ export class HomePage implements OnInit {
       this.saldo_total = this.saldo_bco + this.saldo_efe;
       this.usuarioLogeado = true;
     }
+
   }
 
   ionViewWillEnter() {
-    this.obtenerGastos();
-    this.obtenerIngresos();
+    this.obtenerMovimientosCuenta()
   }
 
-  obtenerGastos() {
-    let path = `users/${this.user().uid}/gastos`;
+
+  obtenerMovimientosCuenta() {
+    let path = `users/${this.user().uid}/movimientos`;
 
     let sub = this.firebaseSVC.getCollectionData(path).subscribe({
       next: (res: any) => {
         console.log(res);
-        this.gastos = res;
+        this.movimientosCuenta = res;
+        this.ordenarMovimientosPorFecha();
         sub.unsubscribe();
 
       }
     })
   }
 
-  obtenerIngresos() {
-    let path = `users/${this.user().uid}/ingresos`;
-
-    let sub = this.firebaseSVC.getCollectionData(path).subscribe({
-      next: (res: any) => {
-        console.log(res);
-        this.ingresos = res;
-        sub.unsubscribe();
-
-      }
-    })
+  ordenarMovimientosPorFecha() {
+    this.movimientosCuenta.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
   }
-
 
 
 

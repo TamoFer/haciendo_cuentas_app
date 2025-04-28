@@ -32,6 +32,8 @@ export class AddUpdtDeleteIngresosComponent {
     detalle: new FormControl('', [Validators.required, Validators.minLength(1)]),
     rubro: new FormControl(null, Validators.required),
     tipo: new FormControl(null, Validators.required),
+    genero: new FormControl('ingreso')
+
   });
 
   ngOnInit() {
@@ -42,7 +44,7 @@ export class AddUpdtDeleteIngresosComponent {
   async submit() {
     if (this.formulario.valid) {
 
-      let path = `users/${this.user.uid}/ingresos`;
+      let path = `users/${this.user.uid}/movimientos`;
 
       const loading = await this.utilsSVC.loading();
       await loading.present();
