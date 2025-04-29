@@ -27,9 +27,9 @@ export class HomePage implements OnInit {
   //defino variables que uso en html
 
   nombreUser: string = '';
-  saldo_bco: number;
-  saldo_efe: number;
-  saldo_total: number;
+  saldo_bco: number = 0;
+  saldo_efe: number = 0;
+  saldo_total: number = 0;
 
   // condicionales para mostrar info
   usuarioLogeado: boolean = false;
@@ -47,29 +47,51 @@ export class HomePage implements OnInit {
       this.nombreUser = this.user().name;
       this.saldo_bco = this.user().saldo_banco;
       this.saldo_efe = this.user().saldo_efectivo;
-      this.saldo_total = this.saldo_bco + this.saldo_efe;
       this.usuarioLogeado = true;
     }
-
+    this.obtenerMovimientosCuenta();
   }
 
   ionViewWillEnter() {
-    this.obtenerMovimientosCuenta()
+    // this.obtenerMovimientosCuenta();
+
   }
 
+  obtenerSaldoTotal() {
+    for (let movimiento of this.movimientosCuenta) {
+      this.saldo_total = this.sumarSaldos(movimiento);
+
+    }
+  }
 
   obtenerMovimientosCuenta() {
     let path = `users/${this.user().uid}/movimientos`;
 
     let sub = this.firebaseSVC.getCollectionData(path).subscribe({
       next: (res: any) => {
-        console.log(res);
         this.movimientosCuenta = res;
         this.ordenarMovimientosPorFecha();
+        this.obtenerSaldoTotal();
         sub.unsubscribe();
-
       }
     })
+  }
+
+  sumarSaldos(movimiento) {
+    if (movimiento.tipo == 'Efectivo') {
+      if (movimiento.genero == 'ingreso') {
+        this.saldo_efe += movimiento.importe
+      } else {
+        this.saldo_efe -= movimiento.importe
+      }
+    } else {
+      if (movimiento.genero == 'ingreso') {
+        this.saldo_bco += movimiento.importe
+      } else {
+        this.saldo_bco -= movimiento.importe
+      }
+    }
+    return this.saldo_bco + this.saldo_efe
   }
 
   ordenarMovimientosPorFecha() {
@@ -121,3 +143,4 @@ export class HomePage implements OnInit {
   }
 
 }
+

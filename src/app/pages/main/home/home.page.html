@@ -43,10 +43,18 @@
 
     <ion-item-sliding *ngFor="let mov of movimientosCuenta">
       <ion-item *ngIf="mov.genero == 'gasto' ">
-        <ion-label color="danger" class=""> {{mov.fecha}} {{mov.rubro}} - ${{mov.importe}} </ion-label>
+        <div class="detalle-style">
+          <ion-label color="dark" class=""> {{mov.fecha}} </ion-label>
+          <ion-label color="dark" class=""> {{mov.rubro}} </ion-label>
+          <ion-label color="danger" class=""> - ${{mov.importe}} </ion-label>
+        </div>
       </ion-item>
       <ion-item *ngIf="mov.genero != 'gasto' ">
-        <ion-label color="success"> + ${{mov.importe}} </ion-label>
+        <div class="detalle-style">
+          <ion-label color="dark" class=""> {{mov.fecha}} </ion-label>
+          <ion-label color="dark" class=""> {{mov.rubro}} </ion-label>
+          <ion-label color="success" class=""> + ${{mov.importe}} </ion-label>
+        </div>
       </ion-item>
       <ion-item-options>
         <ion-item-option color="warning">
@@ -70,6 +78,9 @@
       <ion-icon name="menu-outline"></ion-icon>
     </ion-fab-button>
     <ion-fab-list side="top">
+      <ion-fab-button>
+        <ion-icon name="swap-horizontal-outline" color="primary" style="font-size: 2rem;"></ion-icon>
+      </ion-fab-button>
       <ion-fab-button (click)="agregarGastos()">
         <ion-icon name="remove-circle-outline" color="danger" style="font-size: 2rem;"></ion-icon>
         <ion-icon name="card-outline" color="danger" style="font-size: 2rem;"></ion-icon>

@@ -1,9 +1,12 @@
-.item-sliding-limit {
-    // width: 75%;
-
+.movimientos-detalles {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    margin-top: 2rem;
+    justify-content: space-around;
 }
 
-.movimientos-detalles {
+.detalle-style {
     display: flex;
     flex-direction: row;
     width: 100%;

@@ -19,16 +19,16 @@ export class AddUpdtDeleteIngresosComponent {
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
 
-  mostrarBack: boolean;
+  mostrarBack: boolean = true;
 
-  opcionesRubro = ['Sueldo', 'Venta', 'Prestamo'];
-  opcionesTipo = ['Efectivo', 'Tarjeta'];
+  opcionesRubro = ['Sueldo', 'Venta', 'Prestamo', 'Apuesta', 'Changa'];
+  opcionesTipo = ['Efectivo', 'Dinero en cuenta'];
 
   user = {} as User;
 
   formulario = new FormGroup({
     fecha: new FormControl('', [Validators.required, Validators.min(0)]),
-    importe: new FormControl('', [Validators.required, Validators.min(0)]),
+    importe: new FormControl(null, [Validators.required, Validators.min(0)]),
     detalle: new FormControl('', [Validators.required, Validators.minLength(1)]),
     rubro: new FormControl(null, Validators.required),
     tipo: new FormControl(null, Validators.required),

@@ -25,14 +25,14 @@ export class AddUpdtDeleteGastoComponent {
   user = {} as User;
 
   opcionesRubro = ['Compra', 'Regalo', 'Deudas', 'Servicios'];
-  opcionesTipo = ['Efectivo', 'Tarjeta'];
+  opcionesTipo = ['Efectivo', 'Dinero en cuenta'];
 
   formulario = new FormGroup({
     fecha: new FormControl('', [Validators.required, Validators.min(0)]),
-    importe: new FormControl('', [Validators.required, Validators.min(0)]),
+    importe: new FormControl(null, [Validators.required, Validators.min(0)]),
     detalle: new FormControl('', [Validators.required, Validators.minLength(1)]),
-    rubro: new FormControl('', [Validators.required, Validators.minLength(6)]),
-    tipo: new FormControl('', [Validators.required, Validators.minLength(6)]),
+    rubro: new FormControl(null, Validators.required),
+    tipo: new FormControl(null, Validators.required),
     genero: new FormControl('gasto')
   });
 
