@@ -4,6 +4,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { IonicModule } from '@ionic/angular';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
+import { RefreshService } from 'src/app/services/refresh.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
@@ -20,6 +21,8 @@ export class AddUpdtDeleteGastoComponent {
 
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
+  dataSyncService = inject(RefreshService);
+
 
   mostrarBack: boolean = true;
   user = {} as User;
@@ -52,6 +55,8 @@ export class AddUpdtDeleteGastoComponent {
 
       this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
+        this.restarSaldos(this.formulario.value);
+
         this.utilsSVC.dismissModal({ success: true });
 
         this.utilsSVC.presentToast({
@@ -76,8 +81,36 @@ export class AddUpdtDeleteGastoComponent {
       }).finally(() => {
         loading.dismiss();
       })
+
+      this.dataSyncService.triggerActualizar();
+
     }
   }
+
+
+  restarSaldos(movimiento) {
+    const path = `users/${this.user.uid}`;
+
+    let nuevoSaldoBco = this.user.saldo_banco;
+    let nuevoSaldoEfe = this.user.saldo_efectivo;
+
+    movimiento.tipo === 'Efectivo' ?
+      nuevoSaldoEfe -= Number(this.formulario.value.importe) :
+      nuevoSaldoBco -= Number(this.formulario.value.importe);
+
+    this.firebaseSVC.updateDocument(path, {
+      ...this.user,
+      saldo_banco: nuevoSaldoBco,
+      saldo_efectivo: nuevoSaldoEfe
+    })
+
+    this.utilsSVC.guardarDatosLS('user', {
+      ... this.user,
+      saldo_banco: nuevoSaldoBco,
+      saldo_efectivo: nuevoSaldoEfe
+    })
+  }
+
 
   cerrarModal() {
     this.utilsSVC.dismissModal();

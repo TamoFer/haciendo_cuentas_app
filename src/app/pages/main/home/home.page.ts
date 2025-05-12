@@ -1,5 +1,5 @@
 import { NgFor, NgIf } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, Inject, inject, OnDestroy, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { Movimiento } from 'src/app/models/movimiento.mode';
 import { FirebaseService } from 'src/app/services/firebase.service';
@@ -9,6 +9,8 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
 import { AddUpdtDeleteGastoComponent } from '../gastos/add-updt-delete-gasto/add-updt-delete-gasto.component';
 import { AddUpdtDeleteIngresosComponent } from '../ingresos/add-updt-delete-ingresos/add-updt-delete-ingresos.component';
 import { User } from 'src/app/models/user.model';
+import { Subscription } from 'rxjs';
+import { RefreshService } from 'src/app/services/refresh.service';
 
 @Component({
   selector: 'app-home',
@@ -17,52 +19,89 @@ import { User } from 'src/app/models/user.model';
   imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor]
 
 })
-export class HomePage implements OnInit {
+export class HomePage implements OnInit, OnDestroy {
 
 
   //importo servicios
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
+  dataSyncService = inject(RefreshService);
 
   //defino variables que uso en html
-
   nombreUser: string = '';
-  saldo_bco: number = 0;
-  saldo_efe: number = 0;
-  saldo_total: number = 0;
+  saldo_bco: number;
+  saldo_efe: number;
+  saldo_total: number;
+  hora: Date = new Date();
+  private refreshSub: Subscription;
+
+
 
   // condicionales para mostrar info
   usuarioLogeado: boolean = false;
   mostrarDetalle: boolean = false;
-  mostrarOpciones: boolean = false;
+  mostrarMovimientos: boolean;
+  movimientosCuenta: Movimiento[];
+
+  private opciones: Intl.DateTimeFormatOptions = {
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  };
+
+  fechaFormateada = new Intl.DateTimeFormat('es-AR', this.opciones).format(this.hora);
+
 
   user(): User {
     return this.utilsSVC.obtenerDatosLS('user')
   }
 
-  movimientosCuenta: Movimiento[];
 
   ngOnInit() {
     if (this.user()) {
-      this.nombreUser = this.user().name;
-      this.saldo_bco = this.user().saldo_banco;
-      this.saldo_efe = this.user().saldo_efectivo;
-      this.usuarioLogeado = true;
+      this.obtenerDatosUsuario(this.user())
     }
+    this.chequearCambios();
+
+  }
+
+  ngOnDestroy() {
+    this.refreshSub.unsubscribe();
+  }
+
+  chequearCambios() {
+    this.refreshSub = this.dataSyncService.actualizarDatos.subscribe((refrescar) => {
+      if (refrescar) {
+        this.obtenerMovimientosCuenta();
+        this.obtenerDatosUsuario(this.user());
+      }
+    })
+  }
+
+  obtenerDatosUsuario(user) {
+    this.nombreUser = user.name;
+    this.saldo_bco = user?.saldo_banco || 0;
+    this.saldo_efe = user?.saldo_efectivo || 0;
+    this.saldo_total = this.saldo_bco + this.saldo_efe;
+    this.usuarioLogeado = true;
     this.obtenerMovimientosCuenta();
   }
 
-  ionViewWillEnter() {
-    // this.obtenerMovimientosCuenta();
+  // obtenerSaldoTotal() {
+  //   if (this.saldo_total == 0) {
+  //     for (let movimiento of this.movimientosCuenta) {
+  //       this.sumarSaldos(movimiento);
+  //     }
 
-  }
+  //   } else {
+  //     const ultimoMov = this.movimientosCuenta[this.movimientosCuenta.length - 1];
+  //     this.sumarSaldos(ultimoMov);
+  //   }
 
-  obtenerSaldoTotal() {
-    for (let movimiento of this.movimientosCuenta) {
-      this.saldo_total = this.sumarSaldos(movimiento);
-
-    }
-  }
+  //   return this.saldo_total = this.saldo_bco + this.saldo_efe;
+  // }
 
   obtenerMovimientosCuenta() {
     let path = `users/${this.user().uid}/movimientos`;
@@ -71,28 +110,27 @@ export class HomePage implements OnInit {
       next: (res: any) => {
         this.movimientosCuenta = res;
         this.ordenarMovimientosPorFecha();
-        this.obtenerSaldoTotal();
+        // this.obtenerSaldoTotal();
         sub.unsubscribe();
       }
     })
   }
 
-  sumarSaldos(movimiento) {
-    if (movimiento.tipo == 'Efectivo') {
-      if (movimiento.genero == 'ingreso') {
-        this.saldo_efe += movimiento.importe
-      } else {
-        this.saldo_efe -= movimiento.importe
-      }
-    } else {
-      if (movimiento.genero == 'ingreso') {
-        this.saldo_bco += movimiento.importe
-      } else {
-        this.saldo_bco -= movimiento.importe
-      }
-    }
-    return this.saldo_bco + this.saldo_efe
-  }
+  // sumarSaldos(movimiento) {
+  //   if (movimiento.tipo == 'Efectivo') {
+  //     if (movimiento.genero == 'ingreso') {
+  //       this.saldo_efe += Number(movimiento.importe)
+  //     } else {
+  //       this.saldo_efe -= Number(movimiento.importe)
+  //     }
+  //   } else {
+  //     if (movimiento.genero == 'ingreso') {
+  //       this.saldo_bco += Number(movimiento.importe)
+  //     } else {
+  //       this.saldo_bco -= Number(movimiento.importe)
+  //     }
+  //   }
+  // }
 
   ordenarMovimientosPorFecha() {
     this.movimientosCuenta.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
@@ -125,7 +163,17 @@ export class HomePage implements OnInit {
   }
 
   signOut() {
-    this.firebaseSVC.signOut();
+    const path = `users/${this.user().uid}`;
+    const data = {
+      ... this.user(),
+      saldo_banco: this.saldo_bco,
+      saldo_efectivo: this.saldo_efe
+    };
+
+    this.firebaseSVC.setDocument(path, data).then(() => {
+      this.firebaseSVC.signOut();
+    })
+
   }
 
   //agregar gastos

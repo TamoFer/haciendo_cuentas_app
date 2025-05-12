@@ -2,11 +2,9 @@ import { inject, Injectable } from '@angular/core';
 import { AngularFireAuth } from "@angular/fire/compat/auth";
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, updateProfile, sendPasswordResetEmail } from 'firebase/auth';
 import { User } from '../models/user.model';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { getFirestore, setDoc, doc, getDoc, addDoc, collection, collectionData, query } from '@angular/fire/firestore';
+import { getFirestore, setDoc, doc, getDoc, addDoc, collection, collectionData, query, updateDoc, Firestore } from '@angular/fire/firestore';
 import { UtilsService } from './utils.service';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
-import { getStorage, uploadString, ref, getDownloadURL } from "firebase/storage";
 
 
 
@@ -16,9 +14,9 @@ import { getStorage, uploadString, ref, getDownloadURL } from "firebase/storage"
 export class FirebaseService {
 
   auth = inject(AngularFireAuth);
-  firestore = inject(AngularFirestore);
   utilsSvs = inject(UtilsService);
   storage = inject(AngularFireStorage);
+  firestore = inject(Firestore)
 
   getAuth() {
     return getAuth();
@@ -56,6 +54,13 @@ export class FirebaseService {
   setDocument(path: string, data: any) {
     return setDoc(doc(getFirestore(), path), data);
   }
+
+
+  updateDocument(path: string, data: any) {
+    const ref = doc(this.firestore, path);
+    return updateDoc(ref, data)
+  }
+
 
   // obtener datos de firebase bd
   async getDocument(path: string) {
