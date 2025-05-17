@@ -1,5 +1,5 @@
 import { NgIf } from '@angular/common';
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { Movimiento } from 'src/app/models/movimiento.mode';
@@ -22,6 +22,12 @@ export class AddUpdtDeleteGastoComponent {
 
   @Input() gasto: Movimiento
 
+  ngOnInit() {
+    this.user = this.utilsSVC.obtenerDatosLS('user');
+    this.gasto ? this.formulario.patchValue(this.gasto) : this.formulario;
+    this.user.movimientos ? this.idContador = this.user.movimientos.length + 1 : this.idContador = 1;
+  }
+
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
 
@@ -43,11 +49,7 @@ export class AddUpdtDeleteGastoComponent {
     genero: new FormControl('gasto')
   });
 
-  ngOnInit() {
-    this.user = this.utilsSVC.obtenerDatosLS('user');
-    this.gasto ? this.formulario.setValue(this.gasto) : this.formulario;
-    this.user.movimientos ? this.idContador = this.user.movimientos.length + 1 : this.idContador = 1;
-  }
+
 
 
 
@@ -70,6 +72,17 @@ export class AddUpdtDeleteGastoComponent {
 
       this.restarSaldos(this.formulario.value);
 
+      const movimiento: Movimiento = {
+        id: this.gasto.id,
+        fecha: this.formulario.value.fecha!,
+        importe: this.formulario.value.importe!,
+        detalle: this.formulario.value.detalle!,
+        rubro: this.formulario.value.rubro!,
+        tipo: this.formulario.value.tipo!,
+        genero: this.formulario.value.genero!
+      };
+
+      this.utilsSVC.actualizarMovimiento(movimiento);
       this.utilsSVC.dismissModal({ success: true });
 
       this.utilsSVC.presentToast({
@@ -109,6 +122,18 @@ export class AddUpdtDeleteGastoComponent {
     this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
       this.restarSaldos(this.formulario.value);
+
+      const movimiento: Movimiento = {
+        id: res.id,
+        fecha: this.formulario.value.fecha!,
+        importe: this.formulario.value.importe!,
+        detalle: this.formulario.value.detalle!,
+        rubro: this.formulario.value.rubro!,
+        tipo: this.formulario.value.tipo!,
+        genero: this.formulario.value.genero!
+      };
+
+      this.utilsSVC.agregarMovimiento(movimiento);
 
       this.utilsSVC.dismissModal({ success: true });
 
@@ -155,7 +180,7 @@ export class AddUpdtDeleteGastoComponent {
       saldo_efectivo: nuevoSaldoEfe
     })
 
-    this.utilsSVC.guardarDatosLS('user', {
+    this.utilsSVC.setUser({
       ... this.user,
       saldo_banco: nuevoSaldoBco,
       saldo_efectivo: nuevoSaldoEfe

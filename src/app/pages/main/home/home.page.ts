@@ -9,8 +9,7 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
 import { AddUpdtDeleteGastoComponent } from '../gastos/add-updt-delete-gasto/add-updt-delete-gasto.component';
 import { AddUpdtDeleteIngresosComponent } from '../ingresos/add-updt-delete-ingresos/add-updt-delete-ingresos.component';
 import { User } from 'src/app/models/user.model';
-import { filter, Subscription } from 'rxjs';
-import { NavigationEnd, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -25,7 +24,6 @@ export class HomePage implements OnInit, OnDestroy {
   //importo servicios
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
-  // ruta = inject(Router);
 
 
   //defino variables que uso en html
@@ -35,7 +33,6 @@ export class HomePage implements OnInit, OnDestroy {
   saldo_total: number;
   hora: Date = new Date();
 
-  // private rutaSubscripcion!: Subscription;
 
 
   // condicionales para mostrar info
@@ -43,6 +40,8 @@ export class HomePage implements OnInit, OnDestroy {
   mostrarDetalle: boolean = false;
   mostrarMovimientos: boolean;
   movimientosCuenta: Movimiento[] = [];
+  user: User;
+  subscripcionUser: Subscription;
 
   private opciones: Intl.DateTimeFormatOptions = {
     day: '2-digit',
@@ -55,23 +54,25 @@ export class HomePage implements OnInit, OnDestroy {
   fechaFormateada = new Intl.DateTimeFormat('es-AR', this.opciones).format(this.hora);
 
 
-  user(): User {
-    return this.utilsSVC.obtenerDatosLS('user')
-  }
-
-
   ngOnInit() {
-    this.obtenerDatosUsuario(this.user());
-    // this.rutaSubscripcion = this.ruta.events
-    //   .pipe(filter(event => event instanceof NavigationEnd))
-    //   .subscribe(() => {
-    //     this.user()
-    //     this.obtenerDatosUsuario(this.user())
-    //   })
+    this.subscripcionUser = this.utilsSVC.user$.subscribe((user) => {
+      if (user) {
+        this.user = user;
+        this.obtenerDatosUsuario(user);
+      }
+    });
 
+    this.utilsSVC.movimientos$.subscribe(movs => {
+      this.movimientosCuenta = movs.sort((a, b) =>
+        new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+      );
+    });
+
+    // Cargar movimientos una vez (al iniciar)
+    this.obtenerMovimientosCuenta();
   }
 
-  obtenerDatosUsuario(user) {
+  obtenerDatosUsuario(user: User) {
 
     this.nombreUser = user.name;
     this.saldo_bco = user?.saldo_banco || 0;
@@ -81,16 +82,19 @@ export class HomePage implements OnInit, OnDestroy {
     this.obtenerMovimientosCuenta();
   }
 
-  obtenerMovimientosCuenta() {
-    let path = `users/${this.user().uid}/movimientos`;
 
-    let sub = this.firebaseSVC.getCollectionData(path).subscribe({
-      next: (res: any) => {
-        this.movimientosCuenta = res;
-        this.ordenarMovimientosPorFecha();
-        sub.unsubscribe();
+
+  obtenerMovimientosCuenta() {
+    const path = `users/${this.user.uid}/movimientos`;
+
+    this.firebaseSVC.getCollectionData(path).subscribe({
+      next: (res: Movimiento[]) => {
+        this.utilsSVC.setMovimientos(res);
+      },
+      error: err => {
+        console.error('Error obteniendo movimientos', err);
       }
-    })
+    });
   }
 
   ordenarMovimientosPorFecha() {
@@ -123,9 +127,9 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   signOut() {
-    const path = `users/${this.user().uid}`;
+    const path = `users/${this.user.uid}`;
     const data = {
-      ... this.user(),
+      ... this.user,
       saldo_banco: this.saldo_bco,
       saldo_efectivo: this.saldo_efe
     };
@@ -139,24 +143,32 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   //agregar gastos o actualizar 
-  agregarGastos(gasto?: Movimiento) {
-    this.utilsSVC.presentModal({
+  async agregarGastos(movimiento?: Movimiento) {
+    const modal = await this.utilsSVC.modalsCtrl.create({
       component: AddUpdtDeleteGastoComponent,
-      componentProps: (gasto)
-    })
+      componentProps: {
+        gasto: movimiento // ✅ PASA el movimiento si existe
+      }
+    });
+
+    await modal.present();
   }
 
   //agregar ingresos o actualizar 
-  agregarIngresos(ingreso?: Movimiento) {
-    this.utilsSVC.presentModal({
+  async agregarIngresos(movimiento?: Movimiento) {
+    const modal = await this.utilsSVC.modalsCtrl.create({
       component: AddUpdtDeleteIngresosComponent,
-      componentProps: (ingreso)
-    })
+      componentProps: {
+        ingreso: movimiento // Aunque sea ingreso, lo tratás como Movimiento
+      }
+    });
+
+    await modal.present();
   }
 
 
   ngOnDestroy() {
-    // this.rutaSubscripcion?.unsubscribe();
+    this.subscripcionUser?.unsubscribe();
   }
 }
 

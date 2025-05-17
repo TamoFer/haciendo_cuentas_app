@@ -46,10 +46,8 @@ export class AddUpdtDeleteIngresosComponent {
 
   ngOnInit() {
     this.user = this.utilsSVC.obtenerDatosLS('user');
-    console.log(this.ingreso);
 
     if (this.ingreso) this.formulario.setValue(this.ingreso);
-    console.log(this.user.movimientos.length);
 
     this.user.movimientos ? this.idContador += this.user.movimientos.length + 1 : this.idContador = 1;
   }
@@ -72,6 +70,17 @@ export class AddUpdtDeleteIngresosComponent {
 
       this.sumarSaldos(this.formulario.value);
 
+      const movimiento: Movimiento = {
+        id: this.ingreso.id,
+        fecha: this.formulario.value.fecha!,
+        importe: this.formulario.value.importe!,
+        detalle: this.formulario.value.detalle!,
+        rubro: this.formulario.value.rubro!,
+        tipo: this.formulario.value.tipo!,
+        genero: this.formulario.value.genero!
+      };
+
+      this.utilsSVC.actualizarMovimiento(movimiento);
       this.utilsSVC.dismissModal({ success: true });
 
       this.utilsSVC.presentToast({
@@ -112,6 +121,18 @@ export class AddUpdtDeleteIngresosComponent {
     this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
       this.sumarSaldos(this.formulario.value);
+
+      const movimiento: Movimiento = {
+        id: res.id,
+        fecha: this.formulario.value.fecha!,
+        importe: this.formulario.value.importe!,
+        detalle: this.formulario.value.detalle!,
+        rubro: this.formulario.value.rubro!,
+        tipo: this.formulario.value.tipo!,
+        genero: this.formulario.value.genero!
+      };
+
+      this.utilsSVC.agregarMovimiento(movimiento);
 
       this.utilsSVC.dismissModal({ success: true });
 
@@ -156,7 +177,7 @@ export class AddUpdtDeleteIngresosComponent {
       saldo_efectivo: nuevoSaldoEfe
     })
 
-    this.utilsSVC.guardarDatosLS('user', {
+    this.utilsSVC.setUser({
       ... this.user,
       saldo_banco: nuevoSaldoBco,
       saldo_efectivo: nuevoSaldoEfe

@@ -1,5 +1,5 @@
 export interface Movimiento {
-    id: number;
+    id: string;
     fecha: Date;
     importe: number;
     detalle: string;
