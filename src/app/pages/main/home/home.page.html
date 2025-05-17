@@ -75,11 +75,22 @@
           </ion-label>
         </div>
       </ion-item>
-      <ion-item-options>
+      <ion-item-options *ngIf="mov.genero == 'gasto' ">
         <ion-item-option color="warning">
           <ion-icon name="information-circle-outline"></ion-icon>
         </ion-item-option>
-        <ion-item-option color="secondary">
+        <ion-item-option color="secondary" (click)="agregarGastos(mov)">
+          <ion-icon name="create-outline"></ion-icon>
+        </ion-item-option>
+        <ion-item-option color="danger">
+          <ion-icon name="trash-outline"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+      <ion-item-options *ngIf="mov.genero != 'gasto' ">
+        <ion-item-option color="warning">
+          <ion-icon name="information-circle-outline"></ion-icon>
+        </ion-item-option>
+        <ion-item-option color="secondary" (click)="agregarIngresos(mov)">
           <ion-icon name="create-outline"></ion-icon>
         </ion-item-option>
         <ion-item-option color="danger">

@@ -1,10 +1,10 @@
 import { NgIf } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
+import { Movimiento } from 'src/app/models/movimiento.mode';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
-import { RefreshService } from 'src/app/services/refresh.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
@@ -19,19 +19,23 @@ import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/i
 })
 export class AddUpdtDeleteGastoComponent {
 
+
+  @Input() gasto: Movimiento
+
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
-  dataSyncService = inject(RefreshService);
 
 
   mostrarBack: boolean = true;
   user = {} as User;
+  idContador: number;
 
   opcionesRubro = ['Compra', 'Regalo', 'Deudas', 'Servicios'];
   opcionesTipo = ['Efectivo', 'Dinero en cuenta'];
 
   formulario = new FormGroup({
-    fecha: new FormControl('', [Validators.required, Validators.min(0)]),
+    id: new FormControl(null,),
+    fecha: new FormControl(null, [Validators.required, Validators.min(0)]),
     importe: new FormControl(null, [Validators.required, Validators.min(0)]),
     detalle: new FormControl('', [Validators.required, Validators.minLength(1)]),
     rubro: new FormControl(null, Validators.required),
@@ -41,50 +45,97 @@ export class AddUpdtDeleteGastoComponent {
 
   ngOnInit() {
     this.user = this.utilsSVC.obtenerDatosLS('user');
+    this.gasto ? this.formulario.setValue(this.gasto) : this.formulario;
+    this.user.movimientos ? this.idContador = this.user.movimientos.length + 1 : this.idContador = 1;
+  }
+
+
+
+
+  submit() {
+    if (this.formulario.valid) {
+      this.gasto ? this.editarGasto() : this.crearGasto();
+    }
+  }
+
+  async editarGasto() {
+
+    const loading = await this.utilsSVC.loading();
+    await loading.present();
+
+
+    let path = `users/${this.user.uid}/movimientos/${this.gasto.id}`;
+
+    this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
+
+      this.restarSaldos(this.formulario.value);
+
+      this.utilsSVC.dismissModal({ success: true });
+
+      this.utilsSVC.presentToast({
+        message: 'Gasto actualizado con exito',
+        duration: 1500,
+        color: 'success',
+        position: 'middle',
+        icon: 'checkmark-circle-outline'
+      })
+
+    }).catch(error => {
+      console.log(error);
+
+      this.utilsSVC.presentToast({
+        message: error.message,
+        duration: 2500,
+        color: 'primary',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      })
+
+    }).finally(() => {
+      loading.dismiss();
+    })
+
 
   }
 
-  async submit() {
-    if (this.formulario.valid) {
+  async crearGasto() {
 
-      const loading = await this.utilsSVC.loading();
-      await loading.present();
+    const loading = await this.utilsSVC.loading();
+    await loading.present();
 
 
-      let path = `users/${this.user.uid}/movimientos`;
+    let path = `users/${this.user.uid}/movimientos`;
 
-      this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
+    this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
-        this.restarSaldos(this.formulario.value);
+      this.restarSaldos(this.formulario.value);
 
-        this.utilsSVC.dismissModal({ success: true });
+      this.utilsSVC.dismissModal({ success: true });
 
-        this.utilsSVC.presentToast({
-          message: 'Gasto ingresado con exito',
-          duration: 1500,
-          color: 'success',
-          position: 'middle',
-          icon: 'checkmark-circle-outline'
-        })
-
-      }).catch(error => {
-        console.log(error);
-
-        this.utilsSVC.presentToast({
-          message: error.message,
-          duration: 2500,
-          color: 'primary',
-          position: 'middle',
-          icon: 'alert-circle-outline'
-        })
-
-      }).finally(() => {
-        loading.dismiss();
+      this.utilsSVC.presentToast({
+        message: 'Gasto ingresado con exito',
+        duration: 1500,
+        color: 'success',
+        position: 'middle',
+        icon: 'checkmark-circle-outline'
       })
 
-      this.dataSyncService.triggerActualizar();
+    }).catch(error => {
+      console.log(error);
 
-    }
+      this.utilsSVC.presentToast({
+        message: error.message,
+        duration: 2500,
+        color: 'primary',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      })
+
+    }).finally(() => {
+      loading.dismiss();
+    })
+
+
   }
 
 

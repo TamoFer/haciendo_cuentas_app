@@ -1,5 +1,5 @@
 import { NgFor, NgIf } from '@angular/common';
-import { Component, Inject, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { Movimiento } from 'src/app/models/movimiento.mode';
 import { FirebaseService } from 'src/app/services/firebase.service';
@@ -9,8 +9,8 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
 import { AddUpdtDeleteGastoComponent } from '../gastos/add-updt-delete-gasto/add-updt-delete-gasto.component';
 import { AddUpdtDeleteIngresosComponent } from '../ingresos/add-updt-delete-ingresos/add-updt-delete-ingresos.component';
 import { User } from 'src/app/models/user.model';
-import { Subscription } from 'rxjs';
-import { RefreshService } from 'src/app/services/refresh.service';
+import { filter, Subscription } from 'rxjs';
+import { NavigationEnd, Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -25,7 +25,8 @@ export class HomePage implements OnInit, OnDestroy {
   //importo servicios
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
-  dataSyncService = inject(RefreshService);
+  // ruta = inject(Router);
+
 
   //defino variables que uso en html
   nombreUser: string = '';
@@ -33,15 +34,15 @@ export class HomePage implements OnInit, OnDestroy {
   saldo_efe: number;
   saldo_total: number;
   hora: Date = new Date();
-  private refreshSub: Subscription;
 
+  // private rutaSubscripcion!: Subscription;
 
 
   // condicionales para mostrar info
   usuarioLogeado: boolean = false;
   mostrarDetalle: boolean = false;
   mostrarMovimientos: boolean;
-  movimientosCuenta: Movimiento[];
+  movimientosCuenta: Movimiento[] = [];
 
   private opciones: Intl.DateTimeFormatOptions = {
     day: '2-digit',
@@ -60,27 +61,18 @@ export class HomePage implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    if (this.user()) {
-      this.obtenerDatosUsuario(this.user())
-    }
-    this.chequearCambios();
+    this.obtenerDatosUsuario(this.user());
+    // this.rutaSubscripcion = this.ruta.events
+    //   .pipe(filter(event => event instanceof NavigationEnd))
+    //   .subscribe(() => {
+    //     this.user()
+    //     this.obtenerDatosUsuario(this.user())
+    //   })
 
-  }
-
-  ngOnDestroy() {
-    this.refreshSub.unsubscribe();
-  }
-
-  chequearCambios() {
-    this.refreshSub = this.dataSyncService.actualizarDatos.subscribe((refrescar) => {
-      if (refrescar) {
-        this.obtenerMovimientosCuenta();
-        this.obtenerDatosUsuario(this.user());
-      }
-    })
   }
 
   obtenerDatosUsuario(user) {
+
     this.nombreUser = user.name;
     this.saldo_bco = user?.saldo_banco || 0;
     this.saldo_efe = user?.saldo_efectivo || 0;
@@ -89,20 +81,6 @@ export class HomePage implements OnInit, OnDestroy {
     this.obtenerMovimientosCuenta();
   }
 
-  // obtenerSaldoTotal() {
-  //   if (this.saldo_total == 0) {
-  //     for (let movimiento of this.movimientosCuenta) {
-  //       this.sumarSaldos(movimiento);
-  //     }
-
-  //   } else {
-  //     const ultimoMov = this.movimientosCuenta[this.movimientosCuenta.length - 1];
-  //     this.sumarSaldos(ultimoMov);
-  //   }
-
-  //   return this.saldo_total = this.saldo_bco + this.saldo_efe;
-  // }
-
   obtenerMovimientosCuenta() {
     let path = `users/${this.user().uid}/movimientos`;
 
@@ -110,32 +88,14 @@ export class HomePage implements OnInit, OnDestroy {
       next: (res: any) => {
         this.movimientosCuenta = res;
         this.ordenarMovimientosPorFecha();
-        // this.obtenerSaldoTotal();
         sub.unsubscribe();
       }
     })
   }
 
-  // sumarSaldos(movimiento) {
-  //   if (movimiento.tipo == 'Efectivo') {
-  //     if (movimiento.genero == 'ingreso') {
-  //       this.saldo_efe += Number(movimiento.importe)
-  //     } else {
-  //       this.saldo_efe -= Number(movimiento.importe)
-  //     }
-  //   } else {
-  //     if (movimiento.genero == 'ingreso') {
-  //       this.saldo_bco += Number(movimiento.importe)
-  //     } else {
-  //       this.saldo_bco -= Number(movimiento.importe)
-  //     }
-  //   }
-  // }
-
   ordenarMovimientosPorFecha() {
-    this.movimientosCuenta.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+    this.movimientosCuenta = this.movimientosCuenta.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
   }
-
 
 
   async confirmarSignOut() {
@@ -171,24 +131,32 @@ export class HomePage implements OnInit, OnDestroy {
     };
 
     this.firebaseSVC.setDocument(path, data).then(() => {
+      this.movimientosCuenta = [];
       this.firebaseSVC.signOut();
     })
 
+
   }
 
-  //agregar gastos
-  agregarGastos() {
+  //agregar gastos o actualizar 
+  agregarGastos(gasto?: Movimiento) {
     this.utilsSVC.presentModal({
-      component: AddUpdtDeleteGastoComponent
+      component: AddUpdtDeleteGastoComponent,
+      componentProps: (gasto)
     })
   }
 
-  //agergas ingresos
-  agregarIngresos() {
+  //agregar ingresos o actualizar 
+  agregarIngresos(ingreso?: Movimiento) {
     this.utilsSVC.presentModal({
-      component: AddUpdtDeleteIngresosComponent
+      component: AddUpdtDeleteIngresosComponent,
+      componentProps: (ingreso)
     })
   }
 
+
+  ngOnDestroy() {
+    // this.rutaSubscripcion?.unsubscribe();
+  }
 }
 
