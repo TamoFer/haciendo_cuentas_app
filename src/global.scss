@@ -129,3 +129,25 @@ ion-button {
 //         --height: 680px;
 //     }
 // }
+
+:root {
+    --ion-safe-area-top: env(safe-area-inset-top);
+    --ion-safe-area-bottom: env(safe-area-inset-bottom);
+    --ion-safe-area-left: env(safe-area-inset-left);
+    --ion-safe-area-right: env(safe-area-inset-right);
+}
+
+ion-content {
+    padding-top: var(--ion-safe-area-top);
+    padding-bottom: var(--ion-safe-area-bottom);
+}
+
+
+ion-header {
+    margin-top: env(safe-area-inset-top);
+}
+
+
+ion-fab {
+    bottom: calc(16px + env(safe-area-inset-bottom));
+}
