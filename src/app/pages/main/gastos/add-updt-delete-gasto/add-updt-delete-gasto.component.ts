@@ -50,10 +50,6 @@ export class AddUpdtDeleteGastoComponent {
   });
 
 
-
-
-
-
   submit() {
     if (this.formulario.valid) {
       this.gasto ? this.editarGasto() : this.crearGasto();
@@ -65,49 +61,50 @@ export class AddUpdtDeleteGastoComponent {
     const loading = await this.utilsSVC.loading();
     await loading.present();
 
+    if (this.saldoNegativoAlert(this.formulario.value)) {
 
-    let path = `users/${this.user.uid}/movimientos/${this.gasto.id}`;
+      let path = `users/${this.user.uid}/movimientos/${this.gasto.id}`;
 
-    this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
+      this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
 
-      this.restarSaldos(this.formulario.value);
+        this.restarSaldos(this.formulario.value);
 
-      const movimiento: Movimiento = {
-        id: this.gasto.id,
-        fecha: this.formulario.value.fecha!,
-        importe: this.formulario.value.importe!,
-        detalle: this.formulario.value.detalle!,
-        rubro: this.formulario.value.rubro!,
-        tipo: this.formulario.value.tipo!,
-        genero: this.formulario.value.genero!
-      };
+        const movimiento: Movimiento = {
+          id: this.gasto.id,
+          fecha: this.formulario.value.fecha!,
+          importe: this.formulario.value.importe!,
+          detalle: this.formulario.value.detalle!,
+          rubro: this.formulario.value.rubro!,
+          tipo: this.formulario.value.tipo!,
+          genero: this.formulario.value.genero!
+        };
 
-      this.utilsSVC.actualizarMovimiento(movimiento);
-      this.utilsSVC.dismissModal({ success: true });
+        this.utilsSVC.actualizarMovimiento(movimiento);
+        this.utilsSVC.dismissModal({ success: true });
 
-      this.utilsSVC.presentToast({
-        message: 'Gasto actualizado con exito',
-        duration: 1500,
-        color: 'success',
-        position: 'middle',
-        icon: 'checkmark-circle-outline'
+        this.utilsSVC.presentToast({
+          message: 'Gasto actualizado con exito',
+          duration: 1500,
+          color: 'success',
+          position: 'middle',
+          icon: 'checkmark-circle-outline'
+        })
+
+      }).catch(error => {
+        console.log(error);
+
+        this.utilsSVC.presentToast({
+          message: error.message,
+          duration: 2500,
+          color: 'primary',
+          position: 'middle',
+          icon: 'alert-circle-outline'
+        })
+
+      }).finally(() => {
+        loading.dismiss();
       })
-
-    }).catch(error => {
-      console.log(error);
-
-      this.utilsSVC.presentToast({
-        message: error.message,
-        duration: 2500,
-        color: 'primary',
-        position: 'middle',
-        icon: 'alert-circle-outline'
-      })
-
-    }).finally(() => {
-      loading.dismiss();
-    })
-
+    }
 
   }
 
@@ -116,51 +113,53 @@ export class AddUpdtDeleteGastoComponent {
     const loading = await this.utilsSVC.loading();
     await loading.present();
 
+    if (this.saldoNegativoAlert(this.formulario.value)) {
+      let path = `users/${this.user.uid}/movimientos`;
+      this.formulario.get('id').setValue(this.idContador);
 
-    let path = `users/${this.user.uid}/movimientos`;
 
-    this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
-      this.restarSaldos(this.formulario.value);
+      this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
-      const movimiento: Movimiento = {
-        id: res.id,
-        fecha: this.formulario.value.fecha!,
-        importe: this.formulario.value.importe!,
-        detalle: this.formulario.value.detalle!,
-        rubro: this.formulario.value.rubro!,
-        tipo: this.formulario.value.tipo!,
-        genero: this.formulario.value.genero!
-      };
+        this.restarSaldos(this.formulario.value);
 
-      this.utilsSVC.agregarMovimiento(movimiento);
+        const movimiento: Movimiento = {
+          id: this.formulario.value.id!,
+          fecha: this.formulario.value.fecha!,
+          importe: this.formulario.value.importe!,
+          detalle: this.formulario.value.detalle!,
+          rubro: this.formulario.value.rubro!,
+          tipo: this.formulario.value.tipo!,
+          genero: this.formulario.value.genero!
+        };
 
-      this.utilsSVC.dismissModal({ success: true });
+        this.utilsSVC.agregarMovimiento(movimiento);
 
-      this.utilsSVC.presentToast({
-        message: 'Gasto ingresado con exito',
-        duration: 1500,
-        color: 'success',
-        position: 'middle',
-        icon: 'checkmark-circle-outline'
+        this.utilsSVC.dismissModal({ success: true });
+
+        this.utilsSVC.presentToast({
+          message: 'Gasto ingresado con exito',
+          duration: 1500,
+          color: 'success',
+          position: 'middle',
+          icon: 'checkmark-circle-outline'
+        })
+
+      }).catch(error => {
+        console.log(error);
+
+        this.utilsSVC.presentToast({
+          message: error.message,
+          duration: 2500,
+          color: 'primary',
+          position: 'middle',
+          icon: 'alert-circle-outline'
+        })
+
+      }).finally(() => {
+        loading.dismiss();
       })
-
-    }).catch(error => {
-      console.log(error);
-
-      this.utilsSVC.presentToast({
-        message: error.message,
-        duration: 2500,
-        color: 'primary',
-        position: 'middle',
-        icon: 'alert-circle-outline'
-      })
-
-    }).finally(() => {
-      loading.dismiss();
-    })
-
-
+    }
   }
 
 
@@ -187,6 +186,28 @@ export class AddUpdtDeleteGastoComponent {
     })
   }
 
+  saldoNegativoAlert(movimiento) {
+
+    const importe = Number(movimiento.importe);
+    const tipo = movimiento.tipo;
+    let condicional: boolean = false
+
+    const saldoDisponible = tipo === 'Efectivo' ? this.user.saldo_efectivo : this.user.saldo_banco;
+
+    if (importe > saldoDisponible) {
+      this.utilsSVC.loadingCtrl.dismiss()
+      this.utilsSVC.presentToast({
+        message: `Saldo insuficiente en ${tipo.toLowerCase()}`,
+        duration: 2000,
+        color: 'danger',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      });
+      return condicional
+    } else {
+      return condicional = true
+    }
+  }
 
   cerrarModal() {
     this.utilsSVC.dismissModal();

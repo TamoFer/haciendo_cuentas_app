@@ -123,7 +123,7 @@ export class AddUpdtDeleteIngresosComponent {
       this.sumarSaldos(this.formulario.value);
 
       const movimiento: Movimiento = {
-        id: res.id,
+        id: this.formulario.value.id!,
         fecha: this.formulario.value.fecha!,
         importe: this.formulario.value.importe!,
         detalle: this.formulario.value.detalle!,
@@ -161,6 +161,7 @@ export class AddUpdtDeleteIngresosComponent {
 
 
   }
+
   sumarSaldos(movimiento) {
     const path = `users/${this.user.uid}`;
 

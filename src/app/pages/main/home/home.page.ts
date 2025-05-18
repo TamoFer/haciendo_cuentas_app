@@ -1,6 +1,6 @@
-import { NgFor, NgIf } from '@angular/common';
+import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { IonAlert, IonButton, IonicModule } from '@ionic/angular';
 import { Movimiento } from 'src/app/models/movimiento.mode';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
@@ -15,7 +15,7 @@ import { Subscription } from 'rxjs';
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor]
+  imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor, CommonModule,]
 
 })
 export class HomePage implements OnInit, OnDestroy {
@@ -81,7 +81,6 @@ export class HomePage implements OnInit, OnDestroy {
     this.usuarioLogeado = true;
     this.obtenerMovimientosCuenta();
   }
-
 
 
   obtenerMovimientosCuenta() {
@@ -166,6 +165,123 @@ export class HomePage implements OnInit, OnDestroy {
     await modal.present();
   }
 
+  //alerta notificacion
+  async infoMovimiento(movimiento) {
+    if (movimiento.genero == 'gasto') {
+      const alert = await this.utilsSVC.alertasCtrl.create({
+
+        header: movimiento.rubro,
+        subHeader: 'Costo $ ' + movimiento.importe,
+        message: movimiento.detalle,
+        buttons: ['OK']
+      })
+      await alert.present();
+    } else {
+      const alert = await this.utilsSVC.alertasCtrl.create({
+
+        header: movimiento.detalle,
+        subHeader: movimiento.tipo,
+        message: 'Ganancia: $' + movimiento.importe,
+        buttons: ['OK'],
+      })
+      await alert.present();
+    }
+  }
+
+
+  async confirmarDelete(movimiento) {
+
+    const alert = await this.utilsSVC.alertasCtrl.create({
+      header: 'Eliminar Movimiento',
+      message: '¿Estás seguro que deseas eliminarlo?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Si',
+          role: 'destructive',
+          handler: () => {
+            this.eliminarMovimiento(movimiento)
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async eliminarMovimiento(movimiento: Movimiento) {
+
+    const loading = await this.utilsSVC.loading();
+    await loading.present();
+
+
+    let path = `users/${this.user.uid}/movimientos/${movimiento.id}`;
+
+    this.restarSaldos(movimiento);
+
+    this.firebaseSVC.deleteDocument(path).then(async res => {
+
+
+      this.utilsSVC.presentToast({
+        message: 'Movimiento eliminado con exito',
+        duration: 1500,
+        color: 'success',
+        position: 'middle',
+        icon: 'checkmark-circle-outline'
+      })
+
+    }).catch(error => {
+      console.log(error);
+
+      this.utilsSVC.presentToast({
+        message: error.message,
+        duration: 2500,
+        color: 'primary',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      })
+
+    }).finally(() => {
+      loading.dismiss();
+    })
+
+    this.obtenerMovimientosCuenta()
+
+  }
+
+  restarSaldos(movimiento) {
+    const path = `users/${this.user.uid}`;
+
+    let nuevoSaldoBco = this.user.saldo_banco;
+    let nuevoSaldoEfe = this.user.saldo_efectivo;
+
+    if (movimiento.genero === 'gasto') {
+      movimiento.tipo === 'Efectivo' ?
+        nuevoSaldoEfe += Number(movimiento.importe) :
+        nuevoSaldoBco += Number(movimiento.importe);
+    } else {
+      movimiento.tipo === 'Efectivo' ?
+        nuevoSaldoEfe -= Number(movimiento.importe) :
+        nuevoSaldoBco -= Number(movimiento.importe);
+    }
+
+    this.firebaseSVC.updateDocument(path, {
+      ...this.user,
+      saldo_banco: nuevoSaldoBco,
+      saldo_efectivo: nuevoSaldoEfe
+    })
+
+    this.utilsSVC.setUser({
+      ... this.user,
+      saldo_banco: nuevoSaldoBco,
+      saldo_efectivo: nuevoSaldoEfe
+    })
+  }
 
   ngOnDestroy() {
     this.subscripcionUser?.unsubscribe();

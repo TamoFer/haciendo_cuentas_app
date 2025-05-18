@@ -50,10 +50,10 @@
       <div>FORMA</div>
     </div>
 
-    <ion-item-sliding *ngFor="let mov of movimientosCuenta">
+    <ion-item-sliding *ngFor="let mov of movimientosCuenta | slice:0:5">
       <ion-item *ngIf="mov.genero == 'gasto' ">
         <div class="detalle-style">
-          <ion-label color="dark"> {{mov.fecha}} </ion-label>
+          <ion-label color="dark"> {{ mov.fecha | date:'dd/MM'}} </ion-label>
           <ion-label color="dark"> {{mov.rubro}} </ion-label>
           <ion-label color="danger"> - ${{mov.importe}} </ion-label>
           <ion-label *ngIf="mov.tipo == 'Efectivo'">
@@ -66,7 +66,7 @@
       </ion-item>
       <ion-item *ngIf="mov.genero != 'gasto' ">
         <div class="detalle-style">
-          <ion-label color="dark" class=""> {{mov.fecha}} </ion-label>
+          <ion-label color="dark" class=""> {{ mov.fecha | date:'dd/MM'}} </ion-label>
           <ion-label color="dark"> {{mov.rubro}} </ion-label>
           <ion-label color="success" class=""> + ${{mov.importe}} </ion-label>
           <ion-label *ngIf="mov.tipo == 'Efectivo'"> <ion-icon name="cash-outline" color="dark"></ion-icon>
@@ -76,29 +76,29 @@
         </div>
       </ion-item>
       <ion-item-options *ngIf="mov.genero == 'gasto' ">
-        <ion-item-option color="warning">
+        <ion-item-option color="warning" (click)="infoMovimiento(mov)">
           <ion-icon name="information-circle-outline"></ion-icon>
         </ion-item-option>
+
         <ion-item-option color="secondary" (click)="agregarGastos(mov)">
           <ion-icon name="create-outline"></ion-icon>
         </ion-item-option>
-        <ion-item-option color="danger">
+        <ion-item-option color="danger" (click)="confirmarDelete(mov)">
           <ion-icon name="trash-outline"></ion-icon>
         </ion-item-option>
       </ion-item-options>
       <ion-item-options *ngIf="mov.genero != 'gasto' ">
         <ion-item-option color="warning">
-          <ion-icon name="information-circle-outline"></ion-icon>
+          <ion-icon name="information-circle-outline" (click)="infoMovimiento(mov)"></ion-icon>
         </ion-item-option>
         <ion-item-option color="secondary" (click)="agregarIngresos(mov)">
           <ion-icon name="create-outline"></ion-icon>
         </ion-item-option>
-        <ion-item-option color="danger">
+        <ion-item-option color="danger" (click)="confirmarDelete(mov)">
           <ion-icon name="trash-outline"></ion-icon>
         </ion-item-option>
       </ion-item-options>
     </ion-item-sliding>
-
   </ion-list>
 
 
@@ -123,4 +123,5 @@
   </ion-fab>
 
 </ion-content>
+
 <app-footer></app-footer>

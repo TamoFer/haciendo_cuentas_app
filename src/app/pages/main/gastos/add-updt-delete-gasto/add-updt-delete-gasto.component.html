@@ -1,9 +1,11 @@
-<app-header title="Nuevo Gasto" [isModal]="mostrarBack" (volverAccion)="cerrarModal()"></app-header>
+<app-header [title]="gasto ? 'Modificar Gasto': 'Nuevo Gasto'" [isModal]="mostrarBack"
+    (volverAccion)="cerrarModal()"></app-header>
 <ion-content>
     <form [formGroup]="formulario" (ngSubmit)="submit()">
 
 
         <!-- fecha del ingreso -->
+
         <app-ingreso-datos icon="calendar-outline" autocomplete="detail" label="Fecha"
             [control]="formulario.controls.fecha" type="date"></app-ingreso-datos>
 
@@ -54,14 +56,10 @@
         </div>
 
         <ion-button expand="block" mode="ios" type="submit" [disabled]="!formulario.valid">
-            Completo
-            <ion-icon slot="end" name="log-in-outline"></ion-icon>
+            {{gasto ? 'Modificar ': 'Agregar'}}
+            <ion-icon slot="end" [name]="gasto? 'pencil' : 'checkmark-circle'"></ion-icon>
         </ion-button>
-        <!-- 
-        <ion-button expand="block" mode="ios" type="submit" (click)='retroceder()'>
-            Retroceder
-            <ion-icon slot="end" name="arrow-back"></ion-icon>
-        </ion-button> -->
+
 
     </form>
 </ion-content>

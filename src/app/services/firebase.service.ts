@@ -12,6 +12,7 @@ import {
   addDoc,
   collectionData,
   query,
+  deleteDoc,
 } from '@angular/fire/firestore';
 import {
   createUserWithEmailAndPassword,
@@ -66,6 +67,10 @@ export class FirebaseService {
 
   updateDocument(path: string, data: any) {
     return updateDoc(doc(this.firestore, path), data);
+  }
+
+  deleteDocument(path: string) {
+    return deleteDoc(doc(this.firestore, path));
   }
 
   async getDocument(path: string) {
