@@ -37,11 +37,14 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- <p *ngIf="mostrarMovimientos !=true" style="text-align: center; font-weight: bold;">¡EMPIEZA A CARGAR TU ACTIVIDAD
-    FINANCIERA!</p> -->
-  <ion-list>
-    <div style="margin-bottom: 1rem; padding: 1rem; text-decoration: underline;">
-      <ion-label>ULTIMOS MOVIMIENTOS DE LA CUENTA</ion-label>
+  <p *ngIf='movimientosCuenta.length===0'
+    style="text-align: center; font-weight: bold;text-transform: uppercase;font-size: 2rem;">
+    EMPEZA HACER CUENTAS PARA LLEGAR A FIN DE MES {{nombreUser}}
+  </p>
+
+  <ion-list *ngIf='movimientosCuenta.length!=0'>
+    <div style="margin-bottom: 1rem; padding: 1rem; font-size: 1.5rem;text-align: center;">
+      <ion-label>ULTIMOS MOVIMIENTOS FINANCIEROS</ion-label>
     </div>
     <div class="movimientos-detalles">
       <div>FECHA</div>
@@ -108,9 +111,9 @@
       <ion-icon name="menu-outline"></ion-icon>
     </ion-fab-button>
     <ion-fab-list side="top">
-      <ion-fab-button>
+      <!-- <ion-fab-button (click)="intercambioSaldos()">
         <ion-icon name="swap-horizontal-outline" color="secondary" style="font-size: 2rem;"></ion-icon>
-      </ion-fab-button>
+      </ion-fab-button> -->
       <ion-fab-button (click)="agregarGastos()">
         <ion-icon name="remove-circle-outline" color="danger" style="font-size: 2rem;"></ion-icon>
         <ion-icon name="card-outline" color="danger" style="font-size: 2rem;"></ion-icon>

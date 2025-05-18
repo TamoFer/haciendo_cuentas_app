@@ -1,6 +1,6 @@
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { IonAlert, IonButton, IonicModule } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 import { Movimiento } from 'src/app/models/movimiento.mode';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
@@ -10,12 +10,13 @@ import { AddUpdtDeleteGastoComponent } from '../gastos/add-updt-delete-gasto/add
 import { AddUpdtDeleteIngresosComponent } from '../ingresos/add-updt-delete-ingresos/add-updt-delete-ingresos.component';
 import { User } from 'src/app/models/user.model';
 import { Subscription } from 'rxjs';
+import { CambioDivisaComponent } from '../intercambio/cambio-divisa/cambio-divisa.component';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor, CommonModule,]
+  imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor, CommonModule]
 
 })
 export class HomePage implements OnInit, OnDestroy {
@@ -38,7 +39,6 @@ export class HomePage implements OnInit, OnDestroy {
   // condicionales para mostrar info
   usuarioLogeado: boolean = false;
   mostrarDetalle: boolean = false;
-  mostrarMovimientos: boolean;
   movimientosCuenta: Movimiento[] = [];
   user: User;
   subscripcionUser: Subscription;
@@ -281,6 +281,14 @@ export class HomePage implements OnInit, OnDestroy {
       saldo_banco: nuevoSaldoBco,
       saldo_efectivo: nuevoSaldoEfe
     })
+  }
+
+  async intercambioSaldos() {
+    const modal = await this.utilsSVC.modalsCtrl.create({
+      component: CambioDivisaComponent
+    })
+    await modal.present();
+
   }
 
   ngOnDestroy() {
