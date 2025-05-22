@@ -4,7 +4,7 @@
   <ion-card color="dark">
     <!-- Saldo -->
     <ion-card-header>
-      <ion-card-title>$ {{saldo_total}} </ion-card-title>
+      <ion-card-title>{{saldo_total | currency}} </ion-card-title>
       <ion-card-subtitle>Saldo en cuenta</ion-card-subtitle>
       <p style="font-size: 10px;">Actualizado {{fechaFormateada}}</p>
 
@@ -24,14 +24,14 @@
             En el Banco
           </ion-label>
 
-          <ion-text style="font-weight: bold;">$ {{saldo_bco}}</ion-text>
+          <ion-text style="font-weight: bold;">{{saldo_bco | currency}}</ion-text>
         </ion-item>
         <ion-item color="dark">
           <ion-label>
             <ion-icon name="cash-outline" style="font-size: 1.5rem;" color="success"></ion-icon>
             En efectivo
           </ion-label>
-          <ion-text style="font-weight: bold;">$ {{saldo_efe}}</ion-text>
+          <ion-text style="font-weight: bold;">{{saldo_efe | currency}}</ion-text>
         </ion-item>
       </ion-list>
     </ion-card-content>
@@ -58,7 +58,7 @@
         <div class="detalle-style">
           <ion-label color="dark"> {{ mov.fecha | date:'dd/MM'}} </ion-label>
           <ion-label color="dark"> {{mov.rubro}} </ion-label>
-          <ion-label color="danger"> - ${{mov.importe}} </ion-label>
+          <ion-label color="danger">-{{mov.importe | currency}} </ion-label>
           <ion-label *ngIf="mov.tipo == 'Efectivo'">
             <ion-icon name="cash-outline" color="dark"></ion-icon>
           </ion-label>
@@ -71,7 +71,7 @@
         <div class="detalle-style">
           <ion-label color="dark" class=""> {{ mov.fecha | date:'dd/MM'}} </ion-label>
           <ion-label color="dark"> {{mov.rubro}} </ion-label>
-          <ion-label color="success" class=""> + ${{mov.importe}} </ion-label>
+          <ion-label color="success" class="">+{{mov.importe | currency}} </ion-label>
           <ion-label *ngIf="mov.tipo == 'Efectivo'"> <ion-icon name="cash-outline" color="dark"></ion-icon>
           </ion-label>
           <ion-label *ngIf="mov.tipo != 'Efectivo'"> <ion-icon name="card-outline" color="dark"></ion-icon>
