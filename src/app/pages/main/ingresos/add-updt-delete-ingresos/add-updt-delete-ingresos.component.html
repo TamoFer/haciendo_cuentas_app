@@ -1,7 +1,7 @@
 <app-header [title]="ingreso ? 'Modificar Ingreso':'Nuevo Ingreso'" [isModal]="mostrarBack"
     (volverAccion)="cerrarModal()"></app-header>
 <ion-content>
-    <form [formGroup]="formulario" (ngSubmit)="nuevoIngreso()">
+    <form [formGroup]="formulario" (ngSubmit)="submit()">
 
 
         <!-- fecha  -->
