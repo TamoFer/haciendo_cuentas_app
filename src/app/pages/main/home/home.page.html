@@ -52,18 +52,19 @@
       <div>IMPORTE</div>
       <div>FORMA</div>
     </div>
+    <!-- <ion-item-sliding *ngFor="let mov of movimientosCuenta | slice:0:5"> SOLO MUESTRA 5 ELEMENTOS EN HOME-->
 
-    <ion-item-sliding *ngFor="let mov of movimientosCuenta | slice:0:5">
+    <ion-item-sliding *ngFor="let mov of movimientosCuenta ">
       <ion-item *ngIf="mov.genero == 'gasto' ">
         <div class="detalle-style">
           <ion-label color="dark"> {{ mov.fecha | date:'dd/MM'}} </ion-label>
           <ion-label color="dark"> {{mov.rubro}} </ion-label>
           <ion-label color="danger">-{{mov.importe | currency}} </ion-label>
           <ion-label *ngIf="mov.tipo == 'Efectivo'">
-            <ion-icon name="cash-outline" color="dark"></ion-icon>
+            <ion-icon name="cash" color="dark"></ion-icon>
           </ion-label>
           <ion-label *ngIf="mov.tipo != 'Efectivo'">
-            <ion-icon name="card-outline" color="dark"></ion-icon>
+            <ion-icon name="card" color="dark"></ion-icon>
           </ion-label>
         </div>
       </ion-item>
@@ -72,9 +73,9 @@
           <ion-label color="dark" class=""> {{ mov.fecha | date:'dd/MM'}} </ion-label>
           <ion-label color="dark"> {{mov.rubro}} </ion-label>
           <ion-label color="success" class="">+{{mov.importe | currency}} </ion-label>
-          <ion-label *ngIf="mov.tipo == 'Efectivo'"> <ion-icon name="cash-outline" color="dark"></ion-icon>
+          <ion-label *ngIf="mov.tipo == 'Efectivo'"> <ion-icon name="cash" color="dark"></ion-icon>
           </ion-label>
-          <ion-label *ngIf="mov.tipo != 'Efectivo'"> <ion-icon name="card-outline" color="dark"></ion-icon>
+          <ion-label *ngIf="mov.tipo != 'Efectivo'"> <ion-icon name="business" color="dark"></ion-icon>
           </ion-label>
         </div>
       </ion-item>
