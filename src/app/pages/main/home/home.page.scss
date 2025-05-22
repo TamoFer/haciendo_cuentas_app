@@ -1,0 +1,23 @@
+.movimientos-detalles {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    font-weight: bold;
+
+    div {
+        width: 25%;
+        text-align: center;
+    }
+}
+
+.detalle-style {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+
+
+    ion-label {
+        width: 25%;
+        text-align: center;
+    }
+}

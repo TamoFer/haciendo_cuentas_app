@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
+import { UtilsService } from 'src/app/services/utils.service';
 
 @Component({
   selector: 'app-footer',
@@ -10,8 +11,19 @@ import { IonicModule } from '@ionic/angular';
 })
 export class FooterComponent implements OnInit {
 
-  constructor() { }
+  utilsSV = inject(UtilsService);
 
   ngOnInit() { }
+
+  async enDesarrollo() {
+    const alert = await this.utilsSV.alertasCtrl.create({
+      header: 'Trabajando',
+      message: 'Momentaneamente esta seccion esta en desarrollo',
+      buttons: ['Gracias']
+    });
+
+    await alert.present();
+  }
+
 
 }

@@ -1,4 +1,5 @@
-<app-header title="Nuevo Ingreso" [isModal]="mostrarBack" (volverAccion)="cerrarModal()"></app-header>
+<app-header [title]="ingreso ? 'Modificar Ingreso':'Nuevo Ingreso'" [isModal]="mostrarBack"
+    (volverAccion)="cerrarModal()"></app-header>
 <ion-content>
     <form [formGroup]="formulario" (ngSubmit)="nuevoIngreso()">
 
@@ -53,8 +54,9 @@
         </div>
 
         <ion-button expand="block" mode="ios" type="submit" [disabled]="!formulario.valid">
-            Completo
-            <ion-icon slot="end" name="log-in-outline"></ion-icon>
+            {{ingreso ? 'Modificar ': 'Agregar'}}
+
+            <ion-icon slot="end" [name]="ingreso? 'pencil' : 'checkmark-circle'"></ion-icon>
         </ion-button>
 
     </form>

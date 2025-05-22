@@ -1,7 +1,8 @@
-import { NgFor, NgIf } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { NgIf } from '@angular/common';
+import { Component, inject, Input } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
+import { Movimiento } from 'src/app/models/movimiento.mode';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
@@ -17,63 +18,173 @@ import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/i
 })
 export class AddUpdtDeleteIngresosComponent {
 
+  @Input() ingreso: Movimiento;
+
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
+
   mostrarBack: boolean = true;
 
-  opcionesRubro = ['Sueldo', 'Venta', 'Prestamo'];
-  opcionesTipo = ['Efectivo', 'Tarjeta'];
-  usuarioActual = this.utilsSVC.obtenerDatosLS('user');
+  opcionesRubro = ['Sueldo', 'Venta', 'Prestamo', 'Apuesta', 'Changa', 'Saldo'];
+  opcionesTipo = ['Efectivo', 'Dinero en cuenta'];
+
+  user = {} as User;
+  idContador: number;
 
 
   formulario = new FormGroup({
-    fecha: new FormControl('', [Validators.required, Validators.min(0)]),
-    importe: new FormControl('', [Validators.required, Validators.min(0)]),
-    detalle: new FormControl('', [Validators.required, Validators.minLength(1)]),
+    id: new FormControl(null),
+    fecha: new FormControl(null, [Validators.required, Validators.min(0)]),
+    importe: new FormControl(null, [Validators.required, Validators.min(0)]),
+    detalle: new FormControl(null, [Validators.required, Validators.minLength(1)]),
     rubro: new FormControl(null, Validators.required),
     tipo: new FormControl(null, Validators.required),
+    genero: new FormControl('ingreso')
+
   });
 
-  ngOnInit() {
-    console.log(this.usuarioActual);
 
+  ngOnInit() {
+    this.user = this.utilsSVC.obtenerDatosLS('user');
+
+    if (this.ingreso) this.formulario.setValue(this.ingreso);
+
+    this.user.movimientos ? this.idContador += this.user.movimientos.length + 1 : this.idContador = 1;
   }
 
-  async nuevoIngreso() {
+  submit() {
     if (this.formulario.valid) {
-
-      const loading = await this.utilsSVC.loading();
-      await loading.present();
-
-      const path = `users/${this.usuarioActual.uid}`;
-
-      const usuarioData = await this.firebaseSVC.getDocument(path);
-      const ingresosActuales = usuarioData?.['ingresos'] || [];
-
-      const nuevoIngreso = this.formulario.value;
-      const nuevosIngresos = [...ingresosActuales, nuevoIngreso];
-
-      await this.firebaseSVC.setDocument(path, {
-        ...usuarioData,
-        gastos: nuevosIngresos
-      });
-
-      // this.actualizarDatosLS(this.usuarioActual.uid);
-
-
+      this.ingreso ? this.editarIngreso() : this.crearIngreso();
     }
   }
 
-  async actualizarDatosLS(uid: string) {
-    const path = `users/${uid}`;
+  async editarIngreso() {
 
-    this.firebaseSVC.getDocument(path).then((user: User) => {
-      this.utilsSVC.guardarDatosLS('user', user);
-    });
+    const loading = await this.utilsSVC.loading();
+    await loading.present();
 
-    this.utilsSVC.obtenerDatosLS('user');
+
+    let path = `users/${this.user.uid}/movimientos/${this.ingreso.id}`;
+
+    this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
+
+      this.sumarSaldos(this.formulario.value);
+
+      const movimiento: Movimiento = {
+        id: this.ingreso.id,
+        fecha: this.formulario.value.fecha!,
+        importe: this.formulario.value.importe!,
+        detalle: this.formulario.value.detalle!,
+        rubro: this.formulario.value.rubro!,
+        tipo: this.formulario.value.tipo!,
+        genero: this.formulario.value.genero!
+      };
+
+      this.utilsSVC.actualizarMovimiento(movimiento);
+      this.utilsSVC.dismissModal({ success: true });
+
+      this.utilsSVC.presentToast({
+        message: 'Gasto actualizado con exito',
+        duration: 1500,
+        color: 'success',
+        position: 'middle',
+        icon: 'checkmark-circle-outline'
+      })
+
+    }).catch(error => {
+      console.log(error);
+
+      this.utilsSVC.presentToast({
+        message: error.message,
+        duration: 2500,
+        color: 'primary',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      })
+
+    }).finally(() => {
+      loading.dismiss();
+    })
+
 
   }
+
+  async crearIngreso() {
+
+    const loading = await this.utilsSVC.loading();
+    await loading.present();
+
+
+    let path = `users/${this.user.uid}/movimientos`;
+    this.formulario.get('id').setValue(this.idContador);
+
+    this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
+
+      this.sumarSaldos(this.formulario.value);
+
+      const movimiento: Movimiento = {
+        id: this.formulario.value.id!,
+        fecha: this.formulario.value.fecha!,
+        importe: this.formulario.value.importe!,
+        detalle: this.formulario.value.detalle!,
+        rubro: this.formulario.value.rubro!,
+        tipo: this.formulario.value.tipo!,
+        genero: this.formulario.value.genero!
+      };
+
+      this.utilsSVC.agregarMovimiento(movimiento);
+
+      this.utilsSVC.dismissModal({ success: true });
+
+      this.utilsSVC.presentToast({
+        message: 'Gasto ingresado con exito',
+        duration: 1500,
+        color: 'success',
+        position: 'middle',
+        icon: 'checkmark-circle-outline'
+      })
+
+    }).catch(error => {
+      console.log(error);
+
+      this.utilsSVC.presentToast({
+        message: error.message,
+        duration: 2500,
+        color: 'primary',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      })
+
+    }).finally(() => {
+      loading.dismiss();
+    })
+
+
+  }
+
+  sumarSaldos(movimiento) {
+    const path = `users/${this.user.uid}`;
+
+    let nuevoSaldoBco = this.user.saldo_banco;
+    let nuevoSaldoEfe = this.user.saldo_efectivo;
+
+    movimiento.tipo === 'Efectivo' ?
+      nuevoSaldoEfe += Number(this.formulario.value.importe) :
+      nuevoSaldoBco += Number(this.formulario.value.importe);
+
+    this.firebaseSVC.updateDocument(path, {
+      ...this.user,
+      saldo_banco: nuevoSaldoBco,
+      saldo_efectivo: nuevoSaldoEfe
+    })
+
+    this.utilsSVC.setUser({
+      ... this.user,
+      saldo_banco: nuevoSaldoBco,
+      saldo_efectivo: nuevoSaldoEfe
+    })
+  }
+
   cerrarModal() {
     this.utilsSVC.dismissModal();
   }

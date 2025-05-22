@@ -1,68 +1,89 @@
 import { inject, Injectable } from '@angular/core';
-import { AngularFireAuth } from "@angular/fire/compat/auth";
-import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, updateProfile, sendPasswordResetEmail } from 'firebase/auth';
-import { User } from '../models/user.model';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { getFirestore, setDoc, doc, getDoc, addDoc, collection } from '@angular/fire/firestore';
-import { UtilsService } from './utils.service';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
-
-
+import { User } from '../models/user.model';
+import {
+  Firestore,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  collection,
+  addDoc,
+  collectionData,
+  query,
+  deleteDoc,
+} from '@angular/fire/firestore';
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  signInWithEmailAndPassword,
+  updateProfile,
+  sendPasswordResetEmail
+} from 'firebase/auth';
+import { UtilsService } from './utils.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FirebaseService {
-
   auth = inject(AngularFireAuth);
-  firestore = inject(AngularFirestore);
   utilsSvs = inject(UtilsService);
   storage = inject(AngularFireStorage);
+  firestore = inject(Firestore); // API modular de @angular/fire
 
+
+  // 🔐 Autenticación
   getAuth() {
     return getAuth();
   }
 
-
-  // logearse
   signIn(user: User) {
-    return signInWithEmailAndPassword(getAuth(), user.email, user.password)
+    return signInWithEmailAndPassword(getAuth(), user.email, user.password);
   }
 
-  // deslogearse
   signOut() {
     getAuth().signOut();
     localStorage.removeItem('user');
     this.utilsSvs.routerLink('/auth');
   }
 
-  //crear usuario  
   signUp(user: User) {
-    return createUserWithEmailAndPassword(getAuth(), user.email, user.password)
+    return createUserWithEmailAndPassword(getAuth(), user.email, user.password);
   }
 
-  //actualizar usuario
   updateUser(displayName: string) {
-    return updateProfile(getAuth().currentUser, { displayName })
+    return updateProfile(getAuth().currentUser, { displayName });
   }
 
-  // recuperar contra con email
   enviarRecuperacion(email: string) {
     return sendPasswordResetEmail(getAuth(), email);
   }
 
-  //base de datos setear
+  // 📄 Base de datos - Firestore
   setDocument(path: string, data: any) {
-    return setDoc(doc(getFirestore(), path), data);
+    return setDoc(doc(this.firestore, path), data);
   }
 
-  // obtener datos de firebase bd
+  updateDocument(path: string, data: any) {
+    return updateDoc(doc(this.firestore, path), data);
+  }
+
+  deleteDocument(path: string) {
+    return deleteDoc(doc(this.firestore, path));
+  }
+
   async getDocument(path: string) {
-    return (await getDoc(doc(getFirestore(), path))).data();
+    const snapshot = await getDoc(doc(this.firestore, path));
+    return snapshot.data();
   }
 
-  //agregar datos a la BD
   addDocument(path: string, data: any) {
-    return addDoc(collection(getFirestore(), path), data);
+    return addDoc(collection(this.firestore, path), data);
+  }
+
+  getCollectionData(path: string, collectionQuery?: any) {
+    const ref = collection(this.firestore, path);
+    return collectionData(query(ref, collectionQuery), { idField: 'id' });
   }
 }

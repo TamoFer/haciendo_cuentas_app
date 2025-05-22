@@ -1,5 +1,4 @@
-import { Gasto } from "./gasto.model";
-import { Ingreso } from "./ingreso.model";
+import { Movimiento } from "./movimiento.mode";
 
 export interface User {
     uid: string;
@@ -8,7 +7,6 @@ export interface User {
     name: string;
     saldo_banco: number;
     saldo_efectivo: number;
-    gastos: Gasto[];
-    ingresos: Ingreso[];
+    movimientos: Movimiento[]
 }
 
