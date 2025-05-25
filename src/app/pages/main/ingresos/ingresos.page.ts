@@ -1,5 +1,7 @@
+import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { IonicModule, NavController } from '@ionic/angular';
+import { Movimiento } from 'src/app/models/movimiento.mode';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
@@ -9,7 +11,7 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
   selector: 'app-ingresos',
   templateUrl: './ingresos.page.html',
   styleUrls: ['./ingresos.page.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent]
+  imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor, CommonModule]
 
 })
 export class IngresosPage implements OnInit {
@@ -17,16 +19,55 @@ export class IngresosPage implements OnInit {
   utilsSVC = inject(UtilsService);
   nombreUser: string = '';
   usuarioLogeado: boolean = false;
+  movimientosCuenta: Movimiento[] = [];
+  usuario = this.utilsSVC.obtenerDatosLS('user');
+  totalIngresos: string;
+
+
 
   constructor(private navCtrl: NavController) { }
 
 
   ngOnInit() {
-    const usuario = this.utilsSVC.obtenerDatosLS('user');
-    if (usuario) {
-      this.nombreUser = usuario.name;
+    if (this.usuario) {
+      this.nombreUser = this.usuario.name;
       this.usuarioLogeado = true;
     }
+
+    this.utilsSVC.movimientos$.subscribe(movs => {
+      this.movimientosCuenta = movs.sort((a, b) =>
+        new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+      );
+    });
+
+    this.obtenerMovimientosCuenta();
+
+  }
+
+  obtenerMovimientosCuenta() {
+    const path = `users/${this.usuario.uid}/movimientos`;
+
+    this.firebaseSVC.getCollectionData(path).subscribe({
+      next: (res: Movimiento[]) => {
+        this.utilsSVC.setMovimientos(res);
+        this.totalIngresos = this.sumarTotalIngresos(this.movimientosCuenta)
+      },
+      error: err => {
+        console.error('Error obteniendo movimientos', err);
+      }
+    });
+
+
+  }
+
+  sumarTotalIngresos(movimientos) {
+    let total = 0;
+    for (let movimiento of movimientos) {
+      if (movimiento.genero === 'ingreso') {
+        total += Number(movimiento.importe)
+      }
+    }
+    return String(total)
   }
 
   retroceder() {

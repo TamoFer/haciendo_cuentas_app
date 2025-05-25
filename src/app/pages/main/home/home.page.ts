@@ -96,10 +96,6 @@ export class HomePage implements OnInit, OnDestroy {
     });
   }
 
-  ordenarMovimientosPorFecha() {
-    this.movimientosCuenta = this.movimientosCuenta.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
-  }
-
 
   async confirmarSignOut() {
     const alert = await this.utilsSVC.alertasCtrl.create({

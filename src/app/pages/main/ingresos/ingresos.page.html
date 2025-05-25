@@ -1,5 +1,21 @@
 <app-header title="Ingresos" [mostrarVolver]="usuarioLogeado" (volverAccion)="retroceder()"></app-header>
 <ion-content>
+    <p style="text-transform: uppercase; margin-left: 10px;">el listado de tus ingresos {{nombreUser}} </p>
+    <p style="text-transform: uppercase; margin-left: 10px;">ingresado hasta la fecha {{totalIngresos | currency:'ARS'}}
+    </p>
+    <ion-item-sliding *ngFor="let mov of movimientosCuenta ">
 
+        <ion-card color="success" *ngIf="mov.genero == 'ingreso' ">
+            <ion-card-header>
+                <ion-card-title> {{mov.importe | currency:'ARS'}}</ion-card-title>
+                <ion-card-subtitle>Realizada el {{ mov.fecha | date:'dd/MM'}} </ion-card-subtitle>
+                <ion-card-subtitle>Fue {{mov.rubro}}</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content style="text-align: center; text-transform: uppercase; font-weight: bold;">
+                {{mov.detalle}}
+            </ion-card-content>
+        </ion-card>
+
+    </ion-item-sliding>
 </ion-content>
 <app-footer></app-footer>
