@@ -48,7 +48,7 @@
 
         <!-- tipo-->
         <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Tipo" [type]="'select'"
-            [options]="opcionesTipo" [control]="formulario.controls.tipo">
+            [options]="opcionesTipo" [control]="formulario.controls.tipo" *ngIf="!gasto">
         </app-ingreso-datos>
 
         <div *ngIf="formulario.controls.tipo.errors && formulario.controls.tipo.touched">
