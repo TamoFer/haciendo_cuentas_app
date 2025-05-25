@@ -212,24 +212,24 @@ export class AddUpdtDeleteGastoComponent {
   editarSaldos(movimiento) {
     const path = `users/${this.user.uid}`;
 
-    let saldoBco = this.user.saldo_banco;
-    let saldoEfe = this.user.saldo_efectivo;
+    let saldoBco = Number(this.user.saldo_banco);
+    let saldoEfe = Number(this.user.saldo_efectivo);
+    let importeMov = Number(movimiento.importe)
+    let importFormulario = Number(this.formulario.value.importe)
 
     if (movimiento.tipo === 'Efectivo') {
-      if (saldoEfe > this.formulario.value.importe) {
-        saldoEfe -= saldoEfe - this.formulario.value.importe
+      if (importeMov - importFormulario < 0) {
+        saldoEfe -= importeMov - importFormulario
       } else {
-        saldoEfe += this.formulario.value.importe - saldoEfe
+        saldoEfe += importeMov - importFormulario
       }
-
     } else {
-      if (saldoBco > this.formulario.value.importe) {
-        saldoBco -= saldoBco - this.formulario.value.importe
+      if (importeMov - importFormulario < 0) {
+        saldoBco -= importeMov - importFormulario
       } else {
-        saldoBco += this.formulario.value.importe - saldoBco
+        saldoBco += importeMov - importFormulario
       }
     }
-
 
     this.firebaseSVC.updateDocument(path, {
       ...this.user,
@@ -244,8 +244,9 @@ export class AddUpdtDeleteGastoComponent {
     })
   }
 
+
   cerrarModal() {
     this.utilsSVC.dismissModal();
   }
-
 }
+
