@@ -64,10 +64,10 @@ export class AddUpdtDeleteGastoComponent {
     if (this.saldoNegativoAlert(this.formulario.value)) {
 
       let path = `users/${this.user.uid}/movimientos/${this.gasto.id}`;
+      this.editarSaldos(this.formulario.value);
 
       this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
 
-        this.restarSaldos(this.formulario.value);
 
         const movimiento: Movimiento = {
           id: this.gasto.id,
@@ -119,10 +119,10 @@ export class AddUpdtDeleteGastoComponent {
 
 
 
+
       this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
-        this.restarSaldos(this.formulario.value);
-
+        this.restarSaldos(this.formulario.value)
         const movimiento: Movimiento = {
           id: this.formulario.value.id!,
           fecha: this.formulario.value.fecha!,
@@ -207,6 +207,41 @@ export class AddUpdtDeleteGastoComponent {
     } else {
       return condicional = true
     }
+  }
+
+  editarSaldos(movimiento) {
+    const path = `users/${this.user.uid}`;
+
+    let saldoBco = this.user.saldo_banco;
+    let saldoEfe = this.user.saldo_efectivo;
+
+    if (movimiento.tipo === 'Efectivo') {
+      if (saldoEfe > this.formulario.value.importe) {
+        saldoEfe -= saldoEfe - this.formulario.value.importe
+      } else {
+        saldoEfe += this.formulario.value.importe - saldoEfe
+      }
+
+    } else {
+      if (saldoBco > this.formulario.value.importe) {
+        saldoBco -= saldoBco - this.formulario.value.importe
+      } else {
+        saldoBco += this.formulario.value.importe - saldoBco
+      }
+    }
+
+
+    this.firebaseSVC.updateDocument(path, {
+      ...this.user,
+      saldo_banco: saldoBco,
+      saldo_efectivo: saldoEfe
+    })
+
+    this.utilsSVC.setUser({
+      ... this.user,
+      saldo_banco: saldoBco,
+      saldo_efectivo: saldoEfe
+    })
   }
 
   cerrarModal() {

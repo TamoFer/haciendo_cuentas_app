@@ -42,6 +42,7 @@ export class HomePage implements OnInit, OnDestroy {
   movimientosCuenta: Movimiento[] = [];
   user: User;
   subscripcionUser: Subscription;
+  mostrarSaldos: boolean = true;
 
   private opciones: Intl.DateTimeFormatOptions = {
     day: '2-digit',

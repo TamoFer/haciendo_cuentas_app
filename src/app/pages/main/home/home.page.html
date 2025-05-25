@@ -4,7 +4,13 @@
   <ion-card color="dark">
     <!-- Saldo -->
     <ion-card-header>
-      <ion-card-title>{{saldo_total | currency:'ARS'}} </ion-card-title>
+
+      <div (click)="mostrarSaldos = !mostrarSaldos" class="datos_saldo">
+        <ion-card-title>{{ mostrarSaldos ? (saldo_total | currency:'ARS'): '******'}}
+        </ion-card-title>
+        <ion-icon [name]="mostrarSaldos? 'eye-outline' : 'eye-off-outline'" style="font-size: 2rem;"></ion-icon>
+      </div>
+
       <ion-card-subtitle>Saldo en cuenta</ion-card-subtitle>
       <p style="font-size: 10px;">Actualizado {{fechaFormateada}}</p>
 
@@ -24,14 +30,14 @@
             En el Banco
           </ion-label>
 
-          <ion-text style="font-weight: bold;">{{saldo_bco | currency:'ARS' }}</ion-text>
+          <ion-text style="font-weight: bold;">{{mostrarSaldos ? (saldo_bco | currency:'ARS'): '******' }}</ion-text>
         </ion-item>
         <ion-item color="dark">
           <ion-label>
             <ion-icon name="cash-outline" style="font-size: 1.5rem;" color="success"></ion-icon>
             En efectivo
           </ion-label>
-          <ion-text style="font-weight: bold;">{{saldo_efe | currency:'ARS'}}</ion-text>
+          <ion-text style="font-weight: bold;">{{mostrarSaldos ? (saldo_efe | currency:'ARS'): '******'}}</ion-text>
         </ion-item>
       </ion-list>
     </ion-card-content>
@@ -41,72 +47,73 @@
     style="text-align: center; font-weight: bold;text-transform: uppercase;font-size: 2rem;">
     EMPEZA HACER CUENTAS PARA LLEGAR A FIN DE MES {{nombreUser}}
   </p>
+  <div *ngIf="mostrarSaldos">
+    <ion-list *ngIf='movimientosCuenta.length!=0'>
+      <div style="margin-bottom: 1rem; padding: 1rem; font-size: 1.5rem;text-align: center;">
+        <ion-label>ULTIMOS MOVIMIENTOS FINANCIEROS</ion-label>
+      </div>
+      <div class="movimientos-detalles">
+        <div class="movimientos-detalles-fecha">FECHA</div>
+        <div class="movimientos-detalles-concepto">CONCEPTO</div>
+        <div class="movimientos-detalles-importe">IMPORTE</div>
+        <div class="movimientos-detalles-forma">FORMA</div>
+      </div>
+      <!-- <ion-item-sliding *ngFor="let mov of movimientosCuenta | slice:0:5"> SOLO MUESTRA 5 ELEMENTOS EN HOME-->
 
-  <ion-list *ngIf='movimientosCuenta.length!=0'>
-    <div style="margin-bottom: 1rem; padding: 1rem; font-size: 1.5rem;text-align: center;">
-      <ion-label>ULTIMOS MOVIMIENTOS FINANCIEROS</ion-label>
-    </div>
-    <div class="movimientos-detalles">
-      <div class="movimientos-detalles-fecha">FECHA</div>
-      <div class="movimientos-detalles-concepto">CONCEPTO</div>
-      <div class="movimientos-detalles-importe">IMPORTE</div>
-      <div class="movimientos-detalles-forma">FORMA</div>
-    </div>
-    <!-- <ion-item-sliding *ngFor="let mov of movimientosCuenta | slice:0:5"> SOLO MUESTRA 5 ELEMENTOS EN HOME-->
 
-    <ion-item-sliding *ngFor="let mov of movimientosCuenta | slice:0:5">
-      <ion-item *ngIf="mov.genero == 'gasto' ">
-        <div class="detalle-style">
-          <ion-label color="dark" class="detalle-style-fecha"> {{ mov.fecha | date:'dd/MM'}} </ion-label>
-          <ion-label color="dark" class="detalle-style-rubro"> {{mov.rubro}} </ion-label>
-          <ion-label color="danger" class="detalle-style-importe">- {{mov.importe | currency:'ARS'}} </ion-label>
-          <ion-label *ngIf="mov.tipo == 'Efectivo'" class="detalle-style-icono">
-            <ion-icon name="cash" color="dark"></ion-icon>
-          </ion-label>
-          <ion-label *ngIf="mov.tipo != 'Efectivo'" class="detalle-style-icono">
-            <ion-icon name="card" color="dark"></ion-icon>
-          </ion-label>
-        </div>
-      </ion-item>
-      <ion-item *ngIf="mov.genero != 'gasto' ">
-        <div class="detalle-style">
-          <ion-label color="dark" class="detalle-style-fecha"> {{ mov.fecha | date:'dd/MM'}} </ion-label>
-          <ion-label color="dark" class="detalle-style-rubro"> {{mov.rubro}} </ion-label>
-          <ion-label color="success" class="detalle-style-importe">+ {{mov.importe | currency:'ARS'}} </ion-label>
-          <ion-label *ngIf="mov.tipo == 'Efectivo'" class="detalle-style-icono"> <ion-icon name="cash"
-              color="dark"></ion-icon>
-          </ion-label>
-          <ion-label *ngIf="mov.tipo != 'Efectivo'" class="detalle-style-icono"> <ion-icon name="business"
-              color="dark"></ion-icon>
-          </ion-label>
-        </div>
-      </ion-item>
-      <ion-item-options *ngIf="mov.genero == 'gasto' ">
-        <ion-item-option color="warning" (click)="infoMovimiento(mov)">
-          <ion-icon name="information-circle-outline"></ion-icon>
-        </ion-item-option>
+      <ion-item-sliding *ngFor="let mov of movimientosCuenta | slice:0:5">
+        <ion-item *ngIf="mov.genero == 'gasto' ">
+          <div class="detalle-style">
+            <ion-label color="dark" class="detalle-style-fecha"> {{ mov.fecha | date:'dd/MM'}} </ion-label>
+            <ion-label color="dark" class="detalle-style-rubro"> {{mov.rubro}} </ion-label>
+            <ion-label color="danger" class="detalle-style-importe">- {{mov.importe | currency:'ARS'}} </ion-label>
+            <ion-label *ngIf="mov.tipo == 'Efectivo'" class="detalle-style-icono">
+              <ion-icon name="cash" color="dark"></ion-icon>
+            </ion-label>
+            <ion-label *ngIf="mov.tipo != 'Efectivo'" class="detalle-style-icono">
+              <ion-icon name="card" color="dark"></ion-icon>
+            </ion-label>
+          </div>
+        </ion-item>
+        <ion-item *ngIf="mov.genero != 'gasto' ">
+          <div class="detalle-style">
+            <ion-label color="dark" class="detalle-style-fecha"> {{ mov.fecha | date:'dd/MM'}} </ion-label>
+            <ion-label color="dark" class="detalle-style-rubro"> {{mov.rubro}} </ion-label>
+            <ion-label color="success" class="detalle-style-importe">+ {{mov.importe | currency:'ARS'}} </ion-label>
+            <ion-label *ngIf="mov.tipo == 'Efectivo'" class="detalle-style-icono"> <ion-icon name="cash"
+                color="dark"></ion-icon>
+            </ion-label>
+            <ion-label *ngIf="mov.tipo != 'Efectivo'" class="detalle-style-icono"> <ion-icon name="business"
+                color="dark"></ion-icon>
+            </ion-label>
+          </div>
+        </ion-item>
+        <ion-item-options *ngIf="mov.genero == 'gasto' ">
+          <ion-item-option color="warning" (click)="infoMovimiento(mov)">
+            <ion-icon name="information-circle-outline"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="secondary" (click)="agregarGastos(mov)">
+            <ion-icon name="create-outline"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="danger" (click)="confirmarDelete(mov)">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+        <ion-item-options *ngIf="mov.genero != 'gasto' ">
+          <ion-item-option color="warning">
+            <ion-icon name="information-circle-outline" (click)="infoMovimiento(mov)"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="secondary" (click)="agregarIngresos(mov)">
+            <ion-icon name="create-outline"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="danger" (click)="confirmarDelete(mov)">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
 
-        <ion-item-option color="secondary" (click)="agregarGastos(mov)">
-          <ion-icon name="create-outline"></ion-icon>
-        </ion-item-option>
-        <ion-item-option color="danger" (click)="confirmarDelete(mov)">
-          <ion-icon name="trash-outline"></ion-icon>
-        </ion-item-option>
-      </ion-item-options>
-      <ion-item-options *ngIf="mov.genero != 'gasto' ">
-        <ion-item-option color="warning">
-          <ion-icon name="information-circle-outline" (click)="infoMovimiento(mov)"></ion-icon>
-        </ion-item-option>
-        <ion-item-option color="secondary" (click)="agregarIngresos(mov)">
-          <ion-icon name="create-outline"></ion-icon>
-        </ion-item-option>
-        <ion-item-option color="danger" (click)="confirmarDelete(mov)">
-          <ion-icon name="trash-outline"></ion-icon>
-        </ion-item-option>
-      </ion-item-options>
-    </ion-item-sliding>
-  </ion-list>
-
+    </ion-list>
+  </div>
 
   <!-- Boton con acciones -->
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
