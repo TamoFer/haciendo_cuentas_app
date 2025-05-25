@@ -49,65 +49,6 @@ export class AddUpdtDeleteGastoComponent {
     genero: new FormControl('gasto')
   });
 
-
-  submit() {
-    if (this.formulario.valid) {
-      this.gasto ? this.editarGasto() : this.crearGasto();
-    }
-  }
-
-  async editarGasto() {
-
-    const loading = await this.utilsSVC.loading();
-    await loading.present();
-
-    if (this.saldoNegativoAlert(this.formulario.value)) {
-
-      let path = `users/${this.user.uid}/movimientos/${this.gasto.id}`;
-      this.actualizarMovimiento(this.gasto);
-
-      this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
-
-
-        const movimiento: Movimiento = {
-          id: this.gasto.id,
-          fecha: this.formulario.value.fecha!,
-          importe: this.formulario.value.importe!,
-          detalle: this.formulario.value.detalle!,
-          rubro: this.formulario.value.rubro!,
-          tipo: this.formulario.value.tipo!,
-          genero: this.formulario.value.genero!
-        };
-
-        this.utilsSVC.actualizarMovimiento(movimiento);
-        this.utilsSVC.dismissModal({ success: true });
-
-        this.utilsSVC.presentToast({
-          message: 'Gasto actualizado con exito',
-          duration: 1500,
-          color: 'success',
-          position: 'middle',
-          icon: 'checkmark-circle-outline'
-        })
-
-      }).catch(error => {
-        console.log(error);
-
-        this.utilsSVC.presentToast({
-          message: error.message,
-          duration: 2500,
-          color: 'primary',
-          position: 'middle',
-          icon: 'alert-circle-outline'
-        })
-
-      }).finally(() => {
-        loading.dismiss();
-      })
-    }
-
-  }
-
   async crearGasto() {
 
     const loading = await this.utilsSVC.loading();
@@ -163,50 +104,56 @@ export class AddUpdtDeleteGastoComponent {
   }
 
 
-  restarSaldos(movimiento) {
-    const path = `users/${this.user.uid}`;
+  async editarGasto() {
 
-    let nuevoSaldoBco = this.user.saldo_banco;
-    let nuevoSaldoEfe = this.user.saldo_efectivo;
+    const loading = await this.utilsSVC.loading();
+    await loading.present();
 
-    movimiento.tipo === 'Efectivo' ?
-      nuevoSaldoEfe -= Number(this.formulario.value.importe) :
-      nuevoSaldoBco -= Number(this.formulario.value.importe);
+    if (this.saldoNegativoAlert(this.formulario.value)) {
 
-    this.firebaseSVC.updateDocument(path, {
-      ...this.user,
-      saldo_banco: nuevoSaldoBco,
-      saldo_efectivo: nuevoSaldoEfe
-    })
+      let path = `users/${this.user.uid}/movimientos/${this.gasto.id}`;
+      this.actualizarMovimiento(this.gasto);
 
-    this.utilsSVC.setUser({
-      ... this.user,
-      saldo_banco: nuevoSaldoBco,
-      saldo_efectivo: nuevoSaldoEfe
-    })
-  }
+      this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
 
-  saldoNegativoAlert(movimiento) {
 
-    const importe = Number(movimiento.importe);
-    const tipo = movimiento.tipo;
-    let condicional: boolean = false
+        const movimiento: Movimiento = {
+          id: this.gasto.id,
+          fecha: this.formulario.value.fecha!,
+          importe: this.formulario.value.importe!,
+          detalle: this.formulario.value.detalle!,
+          rubro: this.formulario.value.rubro!,
+          tipo: this.formulario.value.tipo!,
+          genero: this.formulario.value.genero!
+        };
 
-    const saldoDisponible = tipo === 'Efectivo' ? this.user.saldo_efectivo : this.user.saldo_banco;
+        this.utilsSVC.actualizarMovimiento(movimiento);
+        this.utilsSVC.dismissModal({ success: true });
 
-    if (importe > saldoDisponible) {
-      this.utilsSVC.loadingCtrl.dismiss()
-      this.utilsSVC.presentToast({
-        message: `Saldo insuficiente en ${tipo.toLowerCase()}`,
-        duration: 2000,
-        color: 'danger',
-        position: 'middle',
-        icon: 'alert-circle-outline'
-      });
-      return condicional
-    } else {
-      return condicional = true
+        this.utilsSVC.presentToast({
+          message: 'Gasto actualizado con exito',
+          duration: 1500,
+          color: 'success',
+          position: 'middle',
+          icon: 'checkmark-circle-outline'
+        })
+
+      }).catch(error => {
+        console.log(error);
+
+        this.utilsSVC.presentToast({
+          message: error.message,
+          duration: 2500,
+          color: 'primary',
+          position: 'middle',
+          icon: 'alert-circle-outline'
+        })
+
+      }).finally(() => {
+        loading.dismiss();
+      })
     }
+
   }
 
   actualizarMovimiento(gasto) {
@@ -254,7 +201,57 @@ export class AddUpdtDeleteGastoComponent {
 
   }
 
+  restarSaldos(movimiento) {
+    const path = `users/${this.user.uid}`;
 
+    let nuevoSaldoBco = this.user.saldo_banco;
+    let nuevoSaldoEfe = this.user.saldo_efectivo;
+
+    movimiento.tipo === 'Efectivo' ?
+      nuevoSaldoEfe -= Number(this.formulario.value.importe) :
+      nuevoSaldoBco -= Number(this.formulario.value.importe);
+
+    this.firebaseSVC.updateDocument(path, {
+      ...this.user,
+      saldo_banco: nuevoSaldoBco,
+      saldo_efectivo: nuevoSaldoEfe
+    })
+
+    this.utilsSVC.setUser({
+      ... this.user,
+      saldo_banco: nuevoSaldoBco,
+      saldo_efectivo: nuevoSaldoEfe
+    })
+  }
+
+  saldoNegativoAlert(movimiento) {
+
+    const importe = Number(movimiento.importe);
+    const tipo = movimiento.tipo;
+    let condicional: boolean = false
+
+    const saldoDisponible = tipo === 'Efectivo' ? this.user.saldo_efectivo : this.user.saldo_banco;
+
+    if (importe > saldoDisponible) {
+      this.utilsSVC.loadingCtrl.dismiss()
+      this.utilsSVC.presentToast({
+        message: `Saldo insuficiente en ${tipo.toLowerCase()}`,
+        duration: 2000,
+        color: 'danger',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      });
+      return condicional
+    } else {
+      return condicional = true
+    }
+  }
+
+  submit() {
+    if (this.formulario.valid) {
+      this.gasto ? this.editarGasto() : this.crearGasto();
+    }
+  }
 
   cerrarModal() {
     this.utilsSVC.dismissModal();

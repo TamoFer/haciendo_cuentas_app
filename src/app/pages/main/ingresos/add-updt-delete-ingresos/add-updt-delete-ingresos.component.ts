@@ -52,11 +52,7 @@ export class AddUpdtDeleteIngresosComponent {
     this.user.movimientos ? this.idContador += this.user.movimientos.length + 1 : this.idContador = 1;
   }
 
-  submit() {
-    if (this.formulario.valid) {
-      this.ingreso ? this.editarIngreso() : this.crearIngreso();
-    }
-  }
+
 
   async editarIngreso() {
 
@@ -162,65 +158,6 @@ export class AddUpdtDeleteIngresosComponent {
 
   }
 
-  sumarSaldos(movimiento) {
-    const path = `users/${this.user.uid}`;
-
-    let nuevoSaldoBco = this.user.saldo_banco;
-    let nuevoSaldoEfe = this.user.saldo_efectivo;
-
-    movimiento.tipo === 'Efectivo' ?
-      nuevoSaldoEfe += Number(this.formulario.value.importe) :
-      nuevoSaldoBco += Number(this.formulario.value.importe);
-
-    this.firebaseSVC.updateDocument(path, {
-      ...this.user,
-      saldo_banco: nuevoSaldoBco,
-      saldo_efectivo: nuevoSaldoEfe
-    })
-
-    this.utilsSVC.setUser({
-      ... this.user,
-      saldo_banco: nuevoSaldoBco,
-      saldo_efectivo: nuevoSaldoEfe
-    })
-  }
-
-  editarSaldos(movimiento) {
-    const path = `users/${this.user.uid}`;
-
-    let saldoBco = this.user.saldo_banco;
-    let saldoEfe = this.user.saldo_efectivo;
-
-    if (movimiento.tipo === 'Efectivo') {
-      if (saldoEfe > this.formulario.value.importe) {
-        saldoEfe -= saldoEfe - this.formulario.value.importe
-      } else {
-        saldoEfe += this.formulario.value.importe - saldoEfe
-      }
-
-    } else {
-      if (saldoBco > this.formulario.value.importe) {
-        saldoBco -= saldoBco - this.formulario.value.importe
-      } else {
-        saldoBco += this.formulario.value.importe - saldoBco
-      }
-    }
-
-
-    this.firebaseSVC.updateDocument(path, {
-      ...this.user,
-      saldo_banco: saldoBco,
-      saldo_efectivo: saldoEfe
-    })
-
-    this.utilsSVC.setUser({
-      ... this.user,
-      saldo_banco: saldoBco,
-      saldo_efectivo: saldoEfe
-    })
-  }
-
-
   actualizarMovimiento(ingreso) {
     const path = `users/${this.user.uid}`;
 
@@ -264,6 +201,35 @@ export class AddUpdtDeleteIngresosComponent {
 
 
 
+  }
+
+  sumarSaldos(movimiento) {
+    const path = `users/${this.user.uid}`;
+
+    let nuevoSaldoBco = this.user.saldo_banco;
+    let nuevoSaldoEfe = this.user.saldo_efectivo;
+
+    movimiento.tipo === 'Efectivo' ?
+      nuevoSaldoEfe += Number(this.formulario.value.importe) :
+      nuevoSaldoBco += Number(this.formulario.value.importe);
+
+    this.firebaseSVC.updateDocument(path, {
+      ...this.user,
+      saldo_banco: nuevoSaldoBco,
+      saldo_efectivo: nuevoSaldoEfe
+    })
+
+    this.utilsSVC.setUser({
+      ... this.user,
+      saldo_banco: nuevoSaldoBco,
+      saldo_efectivo: nuevoSaldoEfe
+    })
+  }
+
+  submit() {
+    if (this.formulario.valid) {
+      this.ingreso ? this.editarIngreso() : this.crearIngreso();
+    }
   }
 
   cerrarModal() {
