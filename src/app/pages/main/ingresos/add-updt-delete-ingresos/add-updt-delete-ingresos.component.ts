@@ -65,7 +65,7 @@ export class AddUpdtDeleteIngresosComponent {
 
 
     let path = `users/${this.user.uid}/movimientos/${this.ingreso.id}`;
-    this.editarSaldos(this.formulario.value);
+    this.actualizarMovimiento(this.ingreso);
 
     this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
 
@@ -218,6 +218,52 @@ export class AddUpdtDeleteIngresosComponent {
       saldo_banco: saldoBco,
       saldo_efectivo: saldoEfe
     })
+  }
+
+
+  actualizarMovimiento(ingreso) {
+    const path = `users/${this.user.uid}`;
+
+    const nuevo = this.formulario.value;
+    const original = this.ingreso.importe;
+
+    let saldoEfectivoNuevo = this.user.saldo_efectivo
+    let saldoBancoNuevo = this.user.saldo_banco
+
+    const nuevoImporte = parseFloat(nuevo.importe);
+    const importeAnterior = original;
+
+    const diferencia = Math.abs(nuevoImporte - importeAnterior);
+
+    if (nuevo.tipo === 'Efectivo') {
+      if (nuevoImporte > importeAnterior) {
+        saldoEfectivoNuevo += diferencia
+      } else if (nuevoImporte < importeAnterior) {
+        saldoEfectivoNuevo -= diferencia
+      }
+    } else if (nuevo.tipo != 'Efectivo') {
+      if (nuevoImporte > importeAnterior) {
+        saldoBancoNuevo += diferencia
+
+      } else if (nuevoImporte < importeAnterior) {
+        saldoBancoNuevo -= diferencia
+      }
+    }
+
+    this.firebaseSVC.updateDocument(path, {
+      ...this.user,
+      saldo_banco: saldoBancoNuevo,
+      saldo_efectivo: saldoEfectivoNuevo
+    })
+
+    this.utilsSVC.setUser({
+      ... this.user,
+      saldo_banco: saldoBancoNuevo,
+      saldo_efectivo: saldoEfectivoNuevo
+    })
+
+
+
   }
 
   cerrarModal() {

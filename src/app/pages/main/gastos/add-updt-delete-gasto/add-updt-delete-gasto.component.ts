@@ -64,7 +64,7 @@ export class AddUpdtDeleteGastoComponent {
     if (this.saldoNegativoAlert(this.formulario.value)) {
 
       let path = `users/${this.user.uid}/movimientos/${this.gasto.id}`;
-      this.editarSaldos(this.formulario.value);
+      this.actualizarMovimiento(this.gasto);
 
       this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
 
@@ -209,40 +209,51 @@ export class AddUpdtDeleteGastoComponent {
     }
   }
 
-  editarSaldos(movimiento) {
+  actualizarMovimiento(gasto) {
     const path = `users/${this.user.uid}`;
 
-    let saldoBco = Number(this.user.saldo_banco);
-    let saldoEfe = Number(this.user.saldo_efectivo);
-    let importeMov = Number(movimiento.importe)
-    let importFormulario = Number(this.formulario.value.importe)
+    const nuevo = this.formulario.value;
+    const original = this.gasto.importe;
 
-    if (movimiento.tipo === 'Efectivo') {
-      if (importeMov - importFormulario < 0) {
-        saldoEfe -= importeMov - importFormulario
-      } else {
-        saldoEfe += importeMov - importFormulario
+    let saldoEfectivoNuevo = this.user.saldo_efectivo
+    let saldoBancoNuevo = this.user.saldo_banco
+
+    const nuevoImporte = parseFloat(nuevo.importe);
+    const importeAnterior = original;
+
+    const diferencia = Math.abs(nuevoImporte - importeAnterior);
+
+    if (nuevo.tipo === 'Efectivo') {
+      if (nuevoImporte > importeAnterior) {
+        saldoEfectivoNuevo -= diferencia
+      } else if (nuevoImporte < importeAnterior) {
+        saldoEfectivoNuevo += diferencia
       }
-    } else {
-      if (importeMov - importFormulario < 0) {
-        saldoBco -= importeMov - importFormulario
-      } else {
-        saldoBco += importeMov - importFormulario
+    } else if (nuevo.tipo != 'Efectivo') {
+      if (nuevoImporte > importeAnterior) {
+        saldoBancoNuevo -= diferencia
+
+      } else if (nuevoImporte < importeAnterior) {
+        saldoBancoNuevo += diferencia
       }
     }
 
     this.firebaseSVC.updateDocument(path, {
       ...this.user,
-      saldo_banco: saldoBco,
-      saldo_efectivo: saldoEfe
+      saldo_banco: saldoBancoNuevo,
+      saldo_efectivo: saldoEfectivoNuevo
     })
 
     this.utilsSVC.setUser({
       ... this.user,
-      saldo_banco: saldoBco,
-      saldo_efectivo: saldoEfe
+      saldo_banco: saldoBancoNuevo,
+      saldo_efectivo: saldoEfectivoNuevo
     })
+
+
+
   }
+
 
 
   cerrarModal() {
