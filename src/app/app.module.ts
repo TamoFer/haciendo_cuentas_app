@@ -1,4 +1,4 @@
-import { NgModule, LOCALE_ID } from '@angular/core';
+import { NgModule, LOCALE_ID, inject } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { Router, RouteReuseStrategy } from '@angular/router';
 import { AlertController, IonicModule, IonicRouteStrategy, Platform } from '@ionic/angular';
@@ -17,6 +17,7 @@ import { CommonModule, registerLocaleData } from '@angular/common';
 
 // 🌎 Locale imports
 import localeEsAR from '@angular/common/locales/es-AR';
+import { FirebaseService } from './services/firebase.service';
 registerLocaleData(localeEsAR); // <-- Esto registra el locale
 
 @NgModule({
@@ -48,6 +49,8 @@ export class AppModule {
 
   private backButtonPressedOnce = false;
   private backButtonTimer: any;
+  firebaseSVC = inject(FirebaseService);
+
 
   constructor(
     private platform: Platform,
@@ -88,6 +91,7 @@ export class AppModule {
   }
 
   async presentLogoutConfirm() {
+
     const alert = await this.alertController.create({
       header: 'Cerrar sesión',
       message: '¿Querés cerrar sesión?',
@@ -100,6 +104,7 @@ export class AppModule {
           text: 'Sí',
           handler: () => {
             // Aquí ponés tu función de logout
+            this.firebaseSVC.signOut();
             console.log('Usuario deslogueado');
             this.router.navigate(['/login']);
           },
