@@ -1,5 +1,6 @@
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { IonicModule, NavController } from '@ionic/angular';
 import { Movimiento } from 'src/app/models/movimiento.mode';
 import { FirebaseService } from 'src/app/services/firebase.service';
@@ -11,7 +12,7 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
   selector: 'app-gastos',
   templateUrl: './gastos.page.html',
   styleUrls: ['./gastos.page.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor, CommonModule]
+  imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor, CommonModule, RouterLink]
 })
 export class GastosPage implements OnInit {
 
@@ -23,7 +24,7 @@ export class GastosPage implements OnInit {
   usuario = this.utilsSVC.obtenerDatosLS('user');
   totalGastos: string;
 
-  constructor(private navCtrl: NavController) { }
+  constructor() { }
 
 
 
@@ -70,8 +71,6 @@ export class GastosPage implements OnInit {
   }
 
 
-  retroceder() {
-    this.navCtrl.back();
-  }
+
 
 }

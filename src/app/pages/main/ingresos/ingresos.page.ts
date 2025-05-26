@@ -1,5 +1,6 @@
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { IonicModule, NavController } from '@ionic/angular';
 import { Movimiento } from 'src/app/models/movimiento.mode';
 import { FirebaseService } from 'src/app/services/firebase.service';
@@ -11,7 +12,7 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
   selector: 'app-ingresos',
   templateUrl: './ingresos.page.html',
   styleUrls: ['./ingresos.page.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor, CommonModule]
+  imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor, CommonModule, RouterLink]
 
 })
 export class IngresosPage implements OnInit {
@@ -25,7 +26,7 @@ export class IngresosPage implements OnInit {
 
 
 
-  constructor(private navCtrl: NavController) { }
+  constructor() { }
 
 
   ngOnInit() {
@@ -70,7 +71,4 @@ export class IngresosPage implements OnInit {
     return String(total)
   }
 
-  retroceder() {
-    this.navCtrl.back();
-  }
 }
