@@ -1,7 +1,7 @@
 import { NgModule, LOCALE_ID } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { RouteReuseStrategy } from '@angular/router';
-import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
+import { Router, RouteReuseStrategy } from '@angular/router';
+import { AlertController, IonicModule, IonicRouteStrategy, Platform } from '@ionic/angular';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
@@ -44,4 +44,69 @@ registerLocaleData(localeEsAR); // <-- Esto registra el locale
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {
+
+  private backButtonPressedOnce = false;
+  private backButtonTimer: any;
+
+  constructor(
+    private platform: Platform,
+    private alertController: AlertController,
+    private router: Router,
+    // private location: Location
+  ) {
+    this.initializeApp();
+  }
+
+  initializeApp() {
+    this.platform.ready().then(() => {
+      this.handleBackButton();
+    });
+  }
+
+  handleBackButton() {
+    this.platform.backButton.subscribeWithPriority(10, () => {
+      const currentUrl = this.router.url;
+
+      if (currentUrl === '/home') {
+        // Estás en home → alerta de cerrar sesión con doble toque
+        if (this.backButtonPressedOnce) {
+          clearTimeout(this.backButtonTimer);
+          this.backButtonPressedOnce = false;
+          this.presentLogoutConfirm();
+        } else {
+          this.backButtonPressedOnce = true;
+          this.backButtonTimer = setTimeout(() => {
+            this.backButtonPressedOnce = false;
+          }, 2000);
+        }
+      } else {
+        // Estás en otra página → ir a /home
+        this.router.navigate(['/home']);
+      }
+    });
+  }
+
+  async presentLogoutConfirm() {
+    const alert = await this.alertController.create({
+      header: 'Cerrar sesión',
+      message: '¿Querés cerrar sesión?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+        },
+        {
+          text: 'Sí',
+          handler: () => {
+            // Aquí ponés tu función de logout
+            console.log('Usuario deslogueado');
+            this.router.navigate(['/login']);
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+}

@@ -11,6 +11,7 @@ import { AddUpdtDeleteIngresosComponent } from '../ingresos/add-updt-delete-ingr
 import { User } from 'src/app/models/user.model';
 import { Subscription } from 'rxjs';
 import { CambioDivisaComponent } from '../intercambio/cambio-divisa/cambio-divisa.component';
+import { IdleTimeoutService } from 'src/app/services/idle-timeout.service';
 
 @Component({
   selector: 'app-home',
@@ -54,6 +55,9 @@ export class HomePage implements OnInit, OnDestroy {
 
   fechaFormateada = new Intl.DateTimeFormat('es-AR', this.opciones).format(this.hora);
 
+  constructor(private idleService: IdleTimeoutService) {
+    this.idleService.startWatching();
+  }
 
   ngOnInit() {
     this.subscripcionUser = this.utilsSVC.user$.subscribe((user) => {
