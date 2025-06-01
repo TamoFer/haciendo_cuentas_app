@@ -1,5 +1,64 @@
 <app-header title="Tarjetas" [mostrarVolver]="usuarioLogeado" [routerLink]="['/home']"></app-header>
 <ion-content>
-  <p> contenido </p>
+  <div class="ion-page" #page>
+    <ion-content class="ion-padding">
+      <ion-button id="open-modal" expand="block">Agregar Nueva Tarjeta</ion-button>
+      <ion-modal #modal trigger="open-modal" [canDismiss]="canDismiss" [presentingElement]="page">
+        <ng-template>
+          <ion-header>
+            <ion-toolbar>
+              <ion-title>Tarjeta de Credito</ion-title>
+              <ion-buttons slot="start">
+                <ion-button>Agregar</ion-button>
+              </ion-buttons>
+              <ion-buttons slot="end">
+                <ion-button (click)="modal.dismiss()">Cancelar</ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content class="ion-padding">
+
+            <form>
+              <ion-item>
+                <ion-select justify="center" label="Banco" placeholder="Selecciona el banco">
+                  <ion-select-option value="Santander">Santander</ion-select-option>
+                  <ion-select-option value="Galicia">Galicia</ion-select-option>
+                  <ion-select-option value="Bbva">Bbva</ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-item>
+                <ion-select justify="center" label="Tipo" placeholder="Elegi que es tu tarjeta">
+                  <ion-select-option value="Visa">Visa</ion-select-option>
+                  <ion-select-option value="Mastercard">Mastercard</ion-select-option>
+                  <ion-select-option value="American Express">American Express</ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-item class="fecha-item">
+                <ion-label>Ultimos 4 digitos</ion-label>
+                <ion-input placeholder="**** **** **** 0000" [maskito]="cardMask"
+                  [maskitoElement]="maskPredicate"></ion-input>
+              </ion-item>
+
+              <ion-item class="fecha-item">
+                <ion-label>Fecha de vencimiento</ion-label>
+                <ion-input type="date"></ion-input>
+              </ion-item>
+
+              <ion-item class="fecha-item">
+                <ion-label>Fecha de cierre</ion-label>
+                <ion-input type="date"></ion-input>
+              </ion-item>
+
+
+            </form>
+
+          </ion-content>
+
+        </ng-template>
+      </ion-modal>
+    </ion-content>
+  </div>
 </ion-content>
 <app-footer></app-footer>

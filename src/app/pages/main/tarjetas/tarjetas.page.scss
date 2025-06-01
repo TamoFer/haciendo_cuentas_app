@@ -1,0 +1,13 @@
+.fecha-item {
+    display: flex;
+    justify-content: space-between;
+
+    ion-label {
+        width: 60%;
+    }
+
+    ion-input {
+        width: 40%;
+        text-align: end;
+    }
+}

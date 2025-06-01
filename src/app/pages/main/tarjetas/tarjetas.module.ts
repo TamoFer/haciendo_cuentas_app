@@ -6,7 +6,6 @@ import { IonicModule } from '@ionic/angular';
 
 import { TarjetasPageRoutingModule } from './tarjetas-routing.module';
 
-import { TarjetasPage } from './tarjetas.page';
 
 @NgModule({
   imports: [
@@ -14,7 +13,7 @@ import { TarjetasPage } from './tarjetas.page';
     FormsModule,
     IonicModule,
     TarjetasPageRoutingModule
-  ],
-  // declarations: [TarjetasPage]
+  ]
+
 })
 export class TarjetasPageModule { }
