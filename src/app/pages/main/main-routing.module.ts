@@ -22,6 +22,10 @@ const routes: Routes = [
   },  {
     path: 'tarjetas',
     loadChildren: () => import('./tarjetas/tarjetas.module').then( m => m.TarjetasPageModule)
+  },
+  {
+    path: 'balances',
+    loadChildren: () => import('./balances/balances.module').then( m => m.BalancesPageModule)
   }
 
 

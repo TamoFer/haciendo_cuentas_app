@@ -4,14 +4,6 @@
       <ion-icon name="home-outline" color="dark"></ion-icon>
       <ion-label>Inicio</ion-label>
     </ion-tab-button>
-    <!-- <ion-tab-button tab="gastos" (click)="enDesarrollo()">
-      <ion-icon name="bag-check" color="danger"></ion-icon>
-      <ion-label>Gastos</ion-label>
-    </ion-tab-button>
-    <ion-tab-button tab="ingresos" (click)="enDesarrollo()">
-      <ion-icon name="cash" color="success"></ion-icon>
-      <ion-label>Ingresos</ion-label>
-    </ion-tab-button> -->
     <ion-tab-button tab="gastos" [routerLink]="['/gastos']">
       <ion-icon name="receipt-outline" color="danger"></ion-icon>
       <ion-label>Gastos</ion-label>
@@ -21,8 +13,12 @@
       <ion-label>Ingresos</ion-label>
     </ion-tab-button>
     <ion-tab-button tab="tarjetas" [routerLink]="['/tarjetas']">
-      <ion-icon name="wallet-outline"></ion-icon>
+      <ion-icon name="wallet-outline" color="dark"></ion-icon>
       <ion-label>Tarjetas</ion-label>
+    </ion-tab-button>
+    <ion-tab-button tab="balances" [routerLink]="['/balances']">
+      <ion-icon name="bar-chart-outline" color="warning"></ion-icon>
+      <ion-label>Balances</ion-label>
     </ion-tab-button>
   </ion-tab-bar>
 </ion-footer>
