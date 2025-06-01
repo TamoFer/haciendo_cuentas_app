@@ -30,6 +30,10 @@ const routes: Routes = [
     path: 'ingresos',
     loadChildren: () => import('./pages/main/ingresos/ingresos.module').then(m => m.IngresosPageModule), canActivate: [AuthGuard]
   },
+  {
+    path: 'tarjetas',
+    loadChildren: () => import('./pages/main/tarjetas/tarjetas.module').then(m => m.TarjetasPageModule), canActivate: [AuthGuard]
+  },
 
 
 ];
