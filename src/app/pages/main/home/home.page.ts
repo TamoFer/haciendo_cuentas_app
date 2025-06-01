@@ -43,7 +43,7 @@ export class HomePage implements OnInit, OnDestroy {
   movimientosCuenta: Movimiento[] = [];
   user: User;
   subscripcionUser: Subscription;
-  mostrarSaldos: boolean = true;
+  mostrarSaldos: boolean;
 
   private opciones: Intl.DateTimeFormatOptions = {
     day: '2-digit',
@@ -84,6 +84,8 @@ export class HomePage implements OnInit, OnDestroy {
     this.saldo_efe = user?.saldo_efectivo || 0;
     this.saldo_total = this.saldo_bco + this.saldo_efe;
     this.usuarioLogeado = true;
+    this.mostrarSaldos = user.censurar_montos;
+
     this.obtenerMovimientosCuenta();
   }
 
@@ -131,7 +133,8 @@ export class HomePage implements OnInit, OnDestroy {
     const data = {
       ... this.user,
       saldo_banco: this.saldo_bco,
-      saldo_efectivo: this.saldo_efe
+      saldo_efectivo: this.saldo_efe,
+      censurar_montos: this.mostrarSaldos
     };
 
     this.firebaseSVC.setDocument(path, data).then(() => {

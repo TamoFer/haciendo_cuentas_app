@@ -30,8 +30,7 @@ export class RegistroUsuarioPage implements OnInit {
     name: new FormControl('', [Validators.required, Validators.minLength(4)]),
     saldo_banco: new FormControl(0),
     saldo_efectivo: new FormControl(0),
-
-
+    censurar_montos: new FormControl(false)
   });
 
   firebaseSv = inject(FirebaseService);
