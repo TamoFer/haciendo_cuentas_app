@@ -4,7 +4,6 @@ import { AlertController, LoadingController, ModalController, ModalOptions, Toas
 import { BehaviorSubject } from 'rxjs';
 import { User } from '../models/user.model';
 import { Movimiento } from '../models/movimiento.mode';
-import Swal from 'sweetalert2'
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +15,6 @@ export class UtilsService {
   router = inject(Router);
   alertasCtrl = inject(AlertController);
   modalsCtrl = inject(ModalController);
-  sweetAlert = Swal;
 
   // NUEVO: BehaviorSubject del usuario
   private userSubject = new BehaviorSubject<User>(this.obtenerDatosLS('user'));
