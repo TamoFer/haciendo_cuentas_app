@@ -18,42 +18,62 @@
           </ion-header>
           <ion-content class="ion-padding">
 
-            <form>
+            <form [formGroup]="formulario" (ngSubmit)="submit()">
               <ion-item>
-                <ion-select justify="center" label="Banco" placeholder="Selecciona el banco">
+                <ion-select justify="center" label="Banco" placeholder="Selecciona el banco" formControlName="banco">
                   <ion-select-option value="Santander">Santander</ion-select-option>
                   <ion-select-option value="Galicia">Galicia</ion-select-option>
                   <ion-select-option value="Bbva">Bbva</ion-select-option>
                 </ion-select>
               </ion-item>
+              <div *ngIf="formulario.controls.banco.errors && formulario.controls.banco.touched">
+                <div class="errores" *ngIf="formulario.controls.banco.errors?.['required']">El banco es necesario</div>
+              </div>
 
               <ion-item>
-                <ion-select justify="center" label="Tipo" placeholder="Elegi que es tu tarjeta">
+                <ion-select justify="center" label="Tipo" placeholder="Elegi que es tu tarjeta"
+                  formControlName="tarjeta">
                   <ion-select-option value="Visa">Visa</ion-select-option>
                   <ion-select-option value="Mastercard">Mastercard</ion-select-option>
                   <ion-select-option value="American Express">American Express</ion-select-option>
                 </ion-select>
               </ion-item>
+              <div *ngIf="formulario.controls.tarjeta.errors && formulario.controls.tarjeta.touched">
+                <div class="errores" *ngIf="formulario.controls.tarjeta.errors?.['required']">La tarjeta es necesario
+                </div>
+              </div>
+
 
               <ion-item class="fecha-item">
                 <ion-label>Ultimos 4 digitos</ion-label>
-                <ion-input placeholder="**** **** **** 0000" [maskito]="cardMask"
-                  [maskitoElement]="maskPredicate"></ion-input>
+                <ion-input placeholder="**** **** **** 0000" [maskito]="cardMask" [maskitoElement]="maskPredicate"
+                  formControlName="digitos"></ion-input>
               </ion-item>
+              <div *ngIf="formulario.controls.digitos.errors && formulario.controls.digitos.touched">
+                <div class="errores" *ngIf="formulario.controls.digitos.errors?.['required']">Los ultimos 4 digitos son
+                  necesarios
+                </div>
+                <div class="errores" *ngIf="formulario.controls.digitos.errors?.['minlength']">Deben ser 4 los digitos
+                </div>
+              </div>
+
 
               <ion-item class="fecha-item">
-                <ion-label>Fecha de vencimiento</ion-label>
-                <ion-input type="date"></ion-input>
+                <div class="fcierre">
+                  <div class="fc_info">
+                    <ion-label class="estilo-texto">Fecha de cierre </ion-label>
+                    <ion-icon slot="end" name="help-circle-outline" (click)="infoCierre()"></ion-icon>
+                  </div>
+                  <ion-input type="date" formControlName="fecha_cierre"></ion-input>
+                </div>
               </ion-item>
-
-              <ion-item class="fecha-item">
-                <ion-label>Fecha de cierre</ion-label>
-                <ion-input type="date"></ion-input>
-              </ion-item>
-
+              <div *ngIf="formulario.controls.fecha_cierre.errors && formulario.controls.fecha_cierre.touched">
+                <div class="errores" *ngIf="formulario.controls.fecha_cierre.errors?.['required']">La fecha de cierre es
+                  necesaria
+                </div>
+              </div>
 
             </form>
-
           </ion-content>
 
         </ng-template>

@@ -11,3 +11,51 @@
         text-align: end;
     }
 }
+
+@media screen and (max-width: 768px) {
+
+
+    ion-button {
+        margin: 10px;
+    }
+
+    p {
+        margin-inline-end: 10px;
+    }
+
+    .errores {
+        color: red;
+        text-align: center;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+
+}
+
+.fcierre {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+
+    .fc_info {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        text-align: center;
+        gap: 10px;
+
+        ion-icon {
+            display: block;
+            font-size: 35px;
+            margin-top: 5px;
+
+        }
+
+        .estilo-texto {
+            margin-top: 15px;
+
+        }
+
+    }
+}
