@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgFor } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
@@ -10,12 +10,14 @@ import { MaskitoOptions, MaskitoElementPredicate } from '@maskito/core';
 import { MaskitoDirective } from '@maskito/angular';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Tarjeta } from 'src/app/models/tarjeta.model';
+import { Subscription } from 'rxjs';
+import { User } from 'src/app/models/user.model';
 
 @Component({
   selector: 'app-tarjetas',
   templateUrl: './tarjetas.page.html',
   styleUrls: ['./tarjetas.page.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, CommonModule, RouterLink, MaskitoDirective, ReactiveFormsModule]
+  imports: [IonicModule, HeaderComponent, FooterComponent, CommonModule, RouterLink, MaskitoDirective, ReactiveFormsModule, NgFor]
 })
 export class TarjetasPage implements OnInit {
   firebaseSVC = inject(FirebaseService);
@@ -24,6 +26,9 @@ export class TarjetasPage implements OnInit {
   usuarioLogeado: boolean = false;
   usuario = this.utilsSVC.obtenerDatosLS('user');
   nombreUser: string = '';
+  tarjetas: Tarjeta[] = [];
+  subscripcionUser: Subscription;
+
 
 
   formulario = new FormGroup({
@@ -49,10 +54,43 @@ export class TarjetasPage implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    if (this.usuario) {
-      this.nombreUser = this.usuario.name;
-      this.usuarioLogeado = true;
-    }
+
+
+    this.subscripcionUser = this.utilsSVC.user$.subscribe((user) => {
+      if (user) {
+        this.usuario = user;
+        this.obtenerDatosUsuario(user);
+      }
+    });
+
+    this.utilsSVC.tarjetas$.subscribe(tarjeta => {
+      this.tarjetas = tarjeta;
+    });
+
+    this.obtenerTarjetasUsuario();
+    console.log(this.tarjetas);
+
+  }
+
+  obtenerDatosUsuario(user: User) {
+
+    this.nombreUser = user.name;
+    this.usuarioLogeado = true;
+    this.obtenerTarjetasUsuario();
+  }
+
+
+  obtenerTarjetasUsuario() {
+    const path = `users/${this.usuario.uid}/tarjetas`;
+
+    this.firebaseSVC.getCollectionData(path).subscribe({
+      next: (res: Tarjeta[]) => {
+        this.utilsSVC.setTarjetas(res);
+      },
+      error: err => {
+        console.error('Error obteniendo tarjetas', err);
+      }
+    });
   }
 
   async canDismiss(data?: undefined, role?: string) {
@@ -67,18 +105,7 @@ export class TarjetasPage implements OnInit {
 
   readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
 
-  obtenerTarjetas() {
-    const path = `users/${this.usuario.uid}/tarjetas`;
 
-    this.firebaseSVC.getCollectionData(path).subscribe({
-      next: (res: Tarjeta[]) => {
-        this.utilsSVC.setTarjetas(res);
-      },
-      error: err => {
-        console.error('Error obteniendo tarjetas', err);
-      }
-    });
-  }
 
 
   async submit() {
@@ -89,10 +116,10 @@ export class TarjetasPage implements OnInit {
     this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
       const Tarjeta: Tarjeta = {
-        id: this.formulario.value.digitos!,
+        digitos: this.formulario.value.digitos!,
         fecha_cierre: this.formulario.value.fecha_cierre!,
-        entidad_bancaria: this.formulario.value.banco!,
-        tipo_tarjeta: this.formulario.value.tarjeta!,
+        banco: this.formulario.value.banco!,
+        tarjeta: this.formulario.value.tarjeta!,
         consumos: this.formulario.value.consumos!,
       };
 
@@ -121,5 +148,50 @@ export class TarjetasPage implements OnInit {
       loading.dismiss();
     })
   }
+
+  getClaseTarjeta(banco: string, tipo: string): string {
+    const bancoLower = banco.toLowerCase();
+    const tipoLower = tipo.toLowerCase();
+
+    switch (bancoLower) {
+      case 'santander':
+        switch (tipoLower) {
+          case 'visa':
+            return 'bg-santander-visa';
+          case 'mastercard':
+            return 'bg-santander-mastercard';
+          case 'american':
+            return 'bg-santander-mastercard';
+          default:
+            return 'bg-santander-generica';
+        }
+
+      case 'galicia':
+        switch (tipoLower) {
+          case 'visa':
+            return 'bg-galicia-visa';
+          case 'mastercard':
+            return 'bg-galicia-mastercard';
+          default:
+            return 'bg-galicia-generica';
+        }
+
+      case 'bbva':
+        switch (tipoLower) {
+          case 'visa':
+            return 'bg-bbva-visa';
+          case 'mastercard':
+            return 'bg-bbva-mastercard';
+          default:
+            return 'bg-bbva-generica';
+        }
+
+      default:
+        return 'bg-generica';
+    }
+  }
+
+
+
 }
 

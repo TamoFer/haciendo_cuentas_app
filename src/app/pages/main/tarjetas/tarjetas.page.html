@@ -2,6 +2,19 @@
 <ion-content>
   <div class="ion-page" #page>
     <ion-content class="ion-padding">
+
+      <!-- {{ tarjeta | json }} -->
+      <ion-card *ngFor="let tarjeta of tarjetas" [ngClass]="getClaseTarjeta(tarjeta.banco, tarjeta.tarjeta)"
+        class="tarjeta-card">
+        <div class="contenido-tarjeta">
+          <div class="numero">{{ tarjeta.digitos }}</div>
+          <div class="vencimiento">{{ tarjeta.fecha_cierre }}</div>
+        </div>
+      </ion-card>
+
+
+
+      <!-- MODAL COMPONENTE, SE VE SOLO CUANDO LE DAS A AGREGAR TARJETA -->
       <ion-button id="open-modal" expand="block">Agregar Nueva Tarjeta</ion-button>
       <ion-modal #modal trigger="open-modal" [canDismiss]="canDismiss" [presentingElement]="page">
         <ng-template>
@@ -16,7 +29,6 @@
             </ion-toolbar>
           </ion-header>
           <ion-content class="ion-padding">
-
             <form [formGroup]="formulario" (ngSubmit)="submit()">
               <ion-item>
                 <ion-select justify="center" label="Banco" placeholder="Selecciona el banco" formControlName="banco">
@@ -77,11 +89,6 @@
               <ion-button type="submit" [disabled]="!formulario.valid">Agregar</ion-button>
 
             </form>
-
-
-            <!-- <pre>{{ formulario.value | json }}</pre>
-            <pre>{{ formulario.valid }}</pre> -->
-
           </ion-content>
         </ng-template>
       </ion-modal>
