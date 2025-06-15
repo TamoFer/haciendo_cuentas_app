@@ -160,8 +160,8 @@ export class TarjetasPage implements OnInit {
             return 'bg-santander-visa';
           case 'mastercard':
             return 'bg-santander-mastercard';
-          case 'american':
-            return 'bg-santander-mastercard';
+          case 'american express':
+            return 'bg-santander-american';
           default:
             return 'bg-santander-generica';
         }
@@ -172,6 +172,8 @@ export class TarjetasPage implements OnInit {
             return 'bg-galicia-visa';
           case 'mastercard':
             return 'bg-galicia-mastercard';
+          case 'american express':
+            return 'bg-galicia-american';
           default:
             return 'bg-galicia-generica';
         }
@@ -182,6 +184,8 @@ export class TarjetasPage implements OnInit {
             return 'bg-bbva-visa';
           case 'mastercard':
             return 'bg-bbva-mastercard';
+          case 'american express':
+            return 'bg-bbva-american';
           default:
             return 'bg-bbva-generica';
         }
