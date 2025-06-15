@@ -1,4 +1,5 @@
 import { Movimiento } from "./movimiento.mode";
+import { Tarjeta } from "./tarjeta.model";
 
 export interface User {
     uid: string;
@@ -9,5 +10,6 @@ export interface User {
     saldo_efectivo: number;
     movimientos: Movimiento[];
     censurar_montos: boolean;
+    tarjetas: Tarjeta[];
 }
 

@@ -9,7 +9,6 @@
             <ion-toolbar>
               <ion-title>Tarjeta de Credito</ion-title>
               <ion-buttons slot="start">
-                <ion-button>Agregar</ion-button>
               </ion-buttons>
               <ion-buttons slot="end">
                 <ion-button (click)="modal.dismiss()">Cancelar</ion-button>
@@ -62,7 +61,10 @@
                 <div class="fcierre">
                   <div class="fc_info">
                     <ion-label class="estilo-texto">Fecha de cierre </ion-label>
-                    <ion-icon slot="end" name="help-circle-outline" (click)="infoCierre()"></ion-icon>
+                    <ion-icon slot="end" name="help-circle-outline" id="info-cierre" color="warning"></ion-icon>
+                    <ion-alert trigger="info-cierre" header="Info"
+                      message="La fecha de cierre indica que hasta esa fecha inclusive,todo gasto que realices con la tarjeta, va a entrar en el resumen proximo a abonar. Si compras luego de esa fecha, esos consumos que realices, vendran para abonar dentro de 30 dias, el siguiente resumen al corriente. La fecha de cierre varia mes a mes, la puedes ver en tu HomeBanking"
+                      [buttons]="alertaInfo"></ion-alert>
                   </div>
                   <ion-input type="date" formControlName="fecha_cierre"></ion-input>
                 </div>
@@ -72,13 +74,19 @@
                   necesaria
                 </div>
               </div>
+              <ion-button type="submit" [disabled]="!formulario.valid">Agregar</ion-button>
 
             </form>
-          </ion-content>
 
+
+            <!-- <pre>{{ formulario.value | json }}</pre>
+            <pre>{{ formulario.valid }}</pre> -->
+
+          </ion-content>
         </ng-template>
       </ion-modal>
     </ion-content>
+
   </div>
 </ion-content>
 <app-footer></app-footer>

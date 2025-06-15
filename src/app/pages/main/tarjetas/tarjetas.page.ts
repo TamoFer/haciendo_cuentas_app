@@ -6,9 +6,10 @@ import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
-import { MaskitoOptions, MaskitoElementPredicate, maskitoTransform } from '@maskito/core';
+import { MaskitoOptions, MaskitoElementPredicate } from '@maskito/core';
 import { MaskitoDirective } from '@maskito/angular';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Tarjeta } from 'src/app/models/tarjeta.model';
 
 @Component({
   selector: 'app-tarjetas',
@@ -24,13 +25,26 @@ export class TarjetasPage implements OnInit {
   usuario = this.utilsSVC.obtenerDatosLS('user');
   nombreUser: string = '';
 
+
   formulario = new FormGroup({
+    digitos: new FormControl(null, [Validators.required, Validators.minLength(4)]),
+    fecha_cierre: new FormControl(null, [Validators.required]),
     banco: new FormControl('', [Validators.required]),
-    tarjeta: new FormControl('', [Validators.required, Validators.minLength(4)]),
-    digitos: new FormControl('', [Validators.required]),
-    fecha_cierre: new FormControl('', [Validators.required]),
-    consumos: new FormControl([], [Validators.required])
+    tarjeta: new FormControl('', [Validators.required]),
+    consumos: new FormControl([])
   });
+
+  public alertaInfo = [
+    {
+      text: 'OK',
+      role: 'confirm',
+    }
+  ]
+
+  getHoy(): string {
+    const hoy = new Date();
+    return hoy.toISOString().substring(0, 10); // yyyy-mm-dd
+  }
 
   constructor() { }
 
@@ -53,42 +67,59 @@ export class TarjetasPage implements OnInit {
 
   readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
 
-  infoCierre() {
-    // this.utilsSVC.sweetAlert.fire({
-    //   icon: "info",
-    //   text: 'La fecha de cierre indica que hasta la fecha, los consumos que realices entraran para el proximo resumen de tu tarjeta, si compras pasada la fecha de cierre, los gastos realizados los abonaras 30 dias despues',
-    //   draggable: true
-    // });
+  obtenerTarjetas() {
+    const path = `users/${this.usuario.uid}/tarjetas`;
 
+    this.firebaseSVC.getCollectionData(path).subscribe({
+      next: (res: Tarjeta[]) => {
+        this.utilsSVC.setTarjetas(res);
+      },
+      error: err => {
+        console.error('Error obteniendo tarjetas', err);
+      }
+    });
   }
 
 
   async submit() {
-    // if (this.formulario.valid) {
+    const loading = await this.utilsSVC.loading();
+    await loading.present();
+    const path = `users/${this.usuario.uid}/tarjetas`;
 
-    //   const loading = await this.utilsSv.loading();
-    //   await loading.present();
+    this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
+      const Tarjeta: Tarjeta = {
+        id: this.formulario.value.digitos!,
+        fecha_cierre: this.formulario.value.fecha_cierre!,
+        entidad_bancaria: this.formulario.value.banco!,
+        tipo_tarjeta: this.formulario.value.tarjeta!,
+        consumos: this.formulario.value.consumos!,
+      };
 
-    //   this.firebaseSv.signIn(this.formulario.value as User).then(res => {
+      this.utilsSVC.dismissModal({ success: true });
 
-    //     this.getUserInfo(res.user.uid);
+      this.utilsSVC.presentToast({
+        message: 'Tarjeta ingresada con exito',
+        duration: 1500,
+        color: 'success',
+        position: 'middle',
+        icon: 'checkmark-circle-outline'
+      })
 
-    //   }).catch(error => {
-    //     console.log(error);
+    }).catch(error => {
+      console.log(error);
 
-    //     this.utilsSv.presentToast({
-    //       message: error.message,
-    //       duration: 2500,
-    //       color: 'primary',
-    //       position: 'middle',
-    //       icon: 'alert-circle-outline'
-    //     })
+      this.utilsSVC.presentToast({
+        message: error.message,
+        duration: 2500,
+        color: 'primary',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      })
 
-    //   }).finally(() => {
-    //     loading.dismiss();
-    //   })
-    // }
+    }).finally(() => {
+      loading.dismiss();
+    })
   }
-
 }
+
