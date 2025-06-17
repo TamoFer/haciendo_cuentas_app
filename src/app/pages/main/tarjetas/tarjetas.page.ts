@@ -54,8 +54,6 @@ export class TarjetasPage implements OnInit {
   constructor() { }
 
   ngOnInit() {
-
-
     this.subscripcionUser = this.utilsSVC.user$.subscribe((user) => {
       if (user) {
         this.usuario = user;
@@ -68,7 +66,6 @@ export class TarjetasPage implements OnInit {
     });
 
     this.obtenerTarjetasUsuario();
-    console.log(this.tarjetas);
 
   }
 
@@ -149,51 +146,6 @@ export class TarjetasPage implements OnInit {
     })
   }
 
-  getClaseTarjeta(banco: string, tipo: string): string {
-    const bancoLower = banco.toLowerCase();
-    const tipoLower = tipo.toLowerCase();
-
-    switch (bancoLower) {
-      case 'santander':
-        switch (tipoLower) {
-          case 'visa':
-            return 'bg-santander-visa';
-          case 'mastercard':
-            return 'bg-santander-mastercard';
-          case 'american express':
-            return 'bg-santander-american';
-          default:
-            return 'bg-santander-generica';
-        }
-
-      case 'galicia':
-        switch (tipoLower) {
-          case 'visa':
-            return 'bg-galicia-visa';
-          case 'mastercard':
-            return 'bg-galicia-mastercard';
-          case 'american express':
-            return 'bg-galicia-american';
-          default:
-            return 'bg-galicia-generica';
-        }
-
-      case 'bbva':
-        switch (tipoLower) {
-          case 'visa':
-            return 'bg-bbva-visa';
-          case 'mastercard':
-            return 'bg-bbva-mastercard';
-          case 'american express':
-            return 'bg-bbva-american';
-          default:
-            return 'bg-bbva-generica';
-        }
-
-      default:
-        return 'bg-generica';
-    }
-  }
 
 
 

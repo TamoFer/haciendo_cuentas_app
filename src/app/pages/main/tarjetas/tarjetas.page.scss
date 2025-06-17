@@ -67,33 +67,8 @@
     margin: 1rem auto;
     border-radius: 12px;
     overflow: hidden;
-    background-image: url('/assets/img/santander_visa.png');
     background-size: cover;
     background-position: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
 
-.contenido-tarjeta {
-    position: absolute;
-    color: white;
-    top: 40px;
-    left: 20px;
-    font-weight: bold;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.numero {
-    font-size: 18px;
-    letter-spacing: 2px;
-}
-
-.entidad {
-    font-size: 20px;
-}
-
-.vencimiento,
-.tipo {
-    font-size: 14px;
 }
