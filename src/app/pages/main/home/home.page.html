@@ -121,9 +121,10 @@
       <ion-icon name="menu-outline"></ion-icon>
     </ion-fab-button>
     <ion-fab-list side="top">
-      <!-- <ion-fab-button (click)="intercambioSaldos()">
-        <ion-icon name="swap-horizontal-outline" color="secondary" style="font-size: 2rem;"></ion-icon>
-      </ion-fab-button> -->
+      <ion-fab-button (click)="intercambioSaldos()">
+        <ion-icon name="swap-horizontal-outline" color="primary" style="font-size: 1.5rem;"
+          id="present-alert"></ion-icon>
+      </ion-fab-button>
       <ion-fab-button (click)="agregarGastos()">
         <ion-icon name="remove-circle-outline" color="danger" style="font-size: 2rem;"></ion-icon>
         <ion-icon name="card-outline" color="danger" style="font-size: 2rem;"></ion-icon>
@@ -132,9 +133,9 @@
         <ion-icon name="add-circle-outline" color="success" style="font-size: 2rem;"></ion-icon>
         <ion-icon name="wallet-outline" color="success" style="font-size: 2rem;"></ion-icon>
       </ion-fab-button>
+
     </ion-fab-list>
   </ion-fab>
-
 </ion-content>
 
 <app-footer></app-footer>

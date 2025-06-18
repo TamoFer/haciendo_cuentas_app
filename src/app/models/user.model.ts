@@ -7,6 +7,7 @@ export interface User {
     name: string;
     saldo_banco: number;
     saldo_efectivo: number;
+    censurar_montos: boolean;
     movimientos: Movimiento[]
 }
 

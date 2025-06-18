@@ -1,5 +1,50 @@
 <app-header title="Intercambio divisas" (volverAccion)="cerrarModal()" [isModal]="mostrarBack">
 </app-header>
 <ion-content>
+    <div class="formulario">
+        <ion-segment>
+            <ion-segment-button value="Efectivo" content-id="first">
+                <div class="titulo-segmento">
+                    <p>Efectivo </p>
+                    <ion-icon name="swap-horizontal-outline" style="font-size: 1.5rem; margin-top: 0.5rem;"></ion-icon>
+                    <p>Digital</p>
+                </div>
+            </ion-segment-button>
+            <ion-segment-button value="Digital" content-id="second">
+                <div class="titulo-segmento">
+                    <p>Digital</p>
+                    <ion-icon name="swap-horizontal-outline" style="font-size: 1.5rem; margin-top: 0.5rem;"></ion-icon>
+                    <p>Efectivo </p>
+                </div>
+            </ion-segment-button>
+
+        </ion-segment>
+        <ion-segment-view>
+            <ion-segment-content id="first">
+                <form [formGroup]="formulario" (ngSubmit)="submit()">
+                    <ion-input placeholder="Efectivo" [maskito]="cardMask" [maskitoElement]="maskPredicate"
+                        formControlName="efectivo"></ion-input>
+                    <ion-input placeholder="Digital" [maskito]="cardMask" [maskitoElement]="maskPredicate"
+                        formControlName="digital"></ion-input>
+                </form>
+            </ion-segment-content>
+            <ion-segment-content id="second">
+                <form [formGroup]="formulario" (ngSubmit)="submit()">
+                    <ion-input placeholder="Digital" [maskito]="cardMask" [maskitoElement]="maskPredicate"
+                        formControlName="digital"></ion-input>
+                    <ion-input placeholder="Efectivo" [maskito]="cardMask" [maskitoElement]="maskPredicate"
+                        formControlName="efectivo"></ion-input>
+                </form>
+            </ion-segment-content>
+        </ion-segment-view>
+
+    </div>
+
+    <div style="width: 100% ; display: flex; flex-direction: row; justify-content: center;">
+        <ion-button expand="block" shape="round" style="width: fit-content;">
+            Finalizar
+        </ion-button>
+    </div>
 
 </ion-content>
+<app-footer></app-footer>
