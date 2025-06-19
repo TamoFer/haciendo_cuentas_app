@@ -15,8 +15,15 @@
         </div>
 
         <!-- importe del ingreso -->
-        <app-ingreso-datos icon="logo-usd" autocomplete="detail" label="Importe" [control]="formulario.controls.importe"
-            type="number"></app-ingreso-datos>
+        <div style="display: flex; flex-direction: row;">
+            <ion-icon slot="start" name="logo-usd" color="primary"></ion-icon>
+            <ion-input autocomplete="detail" label="Importe" formControlName="importe" [maskito]="mascara"
+                class="custom" [maskitoElement]="maskPredicate" fill="outline" label-placement="floating"
+                [clearInput]="true"></ion-input>
+        </div>
+
+        <!-- <app-ingreso-datos icon="logo-usd" autocomplete="detail" label="Importe" [control]="formulario.controls.importe"
+            type="number"> </app-ingreso-datos> -->
 
         <div *ngIf="formulario.controls.importe.errors && formulario.controls.importe.touched">
             <div class="errores" *ngIf="formulario.controls.importe.errors?.['required']">El importe es necesario</div>

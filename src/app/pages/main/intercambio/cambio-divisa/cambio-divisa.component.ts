@@ -3,10 +3,12 @@ import { Component, inject, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { UtilsService } from 'src/app/services/utils.service';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
-import { MaskitoOptions, MaskitoElementPredicate } from '@maskito/core';
+import { MaskitoElementPredicate } from '@maskito/core';
 import { MaskitoDirective } from '@maskito/angular';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
+import { maskitoNumberOptionsGenerator } from '@maskito/kit';
+
 
 
 @Component({
@@ -20,11 +22,14 @@ export class CambioDivisaComponent implements OnInit {
   utilsSVC = inject(UtilsService);
   mostrarBack: boolean = true;
 
-  readonly cardMask: MaskitoOptions = {
-    mask: [
-      ...Array(4).fill(/\d/),
-    ],
-  };
+  mascara = maskitoNumberOptionsGenerator({
+    decimalSeparator: ',',
+    thousandSeparator: '.',
+    maximumFractionDigits: 2,
+  });
+
+
+  ngOnInit() { }
 
   readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
 
@@ -38,7 +43,7 @@ export class CambioDivisaComponent implements OnInit {
   }
 
 
-  ngOnInit() { }
+
 
   cerrarModal() {
     this.utilsSVC.dismissModal();

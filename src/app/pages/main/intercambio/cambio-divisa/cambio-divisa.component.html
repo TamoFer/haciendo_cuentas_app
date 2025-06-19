@@ -22,17 +22,21 @@
         <ion-segment-view>
             <ion-segment-content id="first">
                 <form [formGroup]="formulario" (ngSubmit)="submit()">
-                    <ion-input placeholder="Efectivo" [maskito]="cardMask" [maskitoElement]="maskPredicate"
+                    <p>Ingrese el importe a cambiar: </p>
+                    <ion-input [maskito]="mascara" class="custom" [maskitoElement]="maskPredicate"
                         formControlName="efectivo"></ion-input>
-                    <ion-input placeholder="Digital" [maskito]="cardMask" [maskitoElement]="maskPredicate"
+                    <p>Sumaria a su cuenta: </p>
+                    <ion-input [maskito]="mascara" class="custom" [maskitoElement]="maskPredicate"
                         formControlName="digital"></ion-input>
                 </form>
             </ion-segment-content>
             <ion-segment-content id="second">
                 <form [formGroup]="formulario" (ngSubmit)="submit()">
-                    <ion-input placeholder="Digital" [maskito]="cardMask" [maskitoElement]="maskPredicate"
+                    <p>Ingrese el importe a cambiar: </p>
+                    <ion-input [maskito]="mascara" class="custom" [maskitoElement]="maskPredicate"
                         formControlName="digital"></ion-input>
-                    <ion-input placeholder="Efectivo" [maskito]="cardMask" [maskitoElement]="maskPredicate"
+                    <p>Sumaria a su bolsillo: </p>
+                    <ion-input [maskito]="mascara" class="custom" [maskitoElement]="maskPredicate"
                         formControlName="efectivo"></ion-input>
                 </form>
             </ion-segment-content>

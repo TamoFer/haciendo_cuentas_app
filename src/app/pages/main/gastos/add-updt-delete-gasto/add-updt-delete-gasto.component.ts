@@ -2,6 +2,7 @@ import { NgIf } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
+import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import { Movimiento } from 'src/app/models/movimiento.mode';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
@@ -9,18 +10,24 @@ import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/ingreso-datos.component';
+import { MaskitoElementPredicate } from '@maskito/core';
+import { MaskitoDirective } from '@maskito/angular';
+
+
 
 @Component({
   selector: 'app-add-updt-delete-gasto',
   templateUrl: './add-updt-delete-gasto.component.html',
   styleUrls: ['./add-updt-delete-gasto.component.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, ReactiveFormsModule, IngresoDatosComponent, NgIf]
+  imports: [IonicModule, HeaderComponent, FooterComponent, ReactiveFormsModule, MaskitoDirective, IngresoDatosComponent, NgIf,]
 
 })
 export class AddUpdtDeleteGastoComponent {
 
 
-  @Input() gasto: Movimiento
+  @Input() gasto: Movimiento;
+  @Input() maskito: any;
+  @Input() maskitoElement: any;
 
   ngOnInit() {
     this.user = this.utilsSVC.obtenerDatosLS('user');
@@ -48,6 +55,18 @@ export class AddUpdtDeleteGastoComponent {
     tipo: new FormControl(null, Validators.required),
     genero: new FormControl('gasto')
   });
+
+  mascara = maskitoNumberOptionsGenerator({
+    decimalSeparator: ',',
+    thousandSeparator: '.',
+    maximumFractionDigits: 2,
+  });
+
+
+  readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
+
+
+
 
   async crearGasto() {
 
