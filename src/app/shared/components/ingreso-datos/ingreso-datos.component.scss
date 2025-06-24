@@ -6,7 +6,7 @@
  .input-email {
      display: flex;
      flex-direction: row;
-     width: 50vw;
+     width: max-content;
      align-items: center;
 
 
@@ -16,4 +16,9 @@
          padding-right: 1rem;
      }
 
+
+     ion-select {
+         width: 200px;
+         max-width: 100%;
+     }
  }

@@ -5,7 +5,8 @@
 
       <!-- INPUT normal -->
       <ion-input *ngIf="type !== 'select' " [type]="type" [autocomplete]="autocomplete" [label]="label"
-        [formControl]="control" label-placement="floating" [clearInput]="true" fill="outline">
+        [formControl]="control" label-placement="floating" [clearInput]="true" fill="outline" [maskito]="maskito"
+        [maskitoElement]="maskitoElement">
       </ion-input>
 
       <!-- SELECT (cuando el tipo es 'select') -->

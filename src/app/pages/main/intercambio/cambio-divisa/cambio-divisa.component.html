@@ -29,11 +29,8 @@
                 <form [formGroup]="formulario">
                     <p>
                         Contás con un saldo de :
-                        {{
-                        opcionSeleccionada === 'first'
-                        ? user.saldo_efectivo
-                        : user.saldo_banco
-                        | currency: 'ARS'
+                        {{opcionSeleccionada === 'first'? (user.saldo_efectivo | currency: 'ARS')
+                        : (user.saldo_banco | currency: 'ARS')
                         }}
                     </p>
                     <p>Ingrese el importe a cambiar:</p>

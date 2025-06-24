@@ -2,7 +2,7 @@ import { NgFor, NgIf } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { maskitoNumberOptionsGenerator } from '@maskito/kit';
+import { MaskitoDirective } from '@maskito/angular';
 import { MaskitoElementPredicate } from '@maskito/core';
 
 
@@ -10,13 +10,15 @@ import { MaskitoElementPredicate } from '@maskito/core';
   selector: 'app-ingreso-datos',
   templateUrl: './ingreso-datos.component.html',
   styleUrls: ['./ingreso-datos.component.scss'],
-  imports: [IonicModule, NgIf, ReactiveFormsModule, NgFor],
+  imports: [IonicModule, NgIf, ReactiveFormsModule, NgFor, MaskitoDirective],
 })
 export class IngresoDatosComponent implements OnInit {
 
   contrasenia!: boolean;
   ocultarVer: boolean = true;
 
+  @Input() maskito: any; // para recibir la máscara
+  @Input() maskitoElement: MaskitoElementPredicate; // para el elemento interno
   @Input() control!: FormControl;
   @Input() type: string = 'text';
   @Input() label!: string;

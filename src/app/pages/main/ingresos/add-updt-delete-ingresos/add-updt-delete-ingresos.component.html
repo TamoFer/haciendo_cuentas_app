@@ -5,7 +5,7 @@
 
 
         <!-- fecha  -->
-        <app-ingreso-datos icon="calendar-outline" autocomplete="detail" label="Fecha"
+        <app-ingreso-datos icon="calendar-number-outline" autocomplete="detail" label="Fecha"
             [control]="formulario.controls.fecha" type="date"></app-ingreso-datos>
 
         <div *ngIf="formulario.controls.fecha.errors && formulario.controls.fecha.touched">
@@ -13,8 +13,12 @@
         </div>
 
         <!-- importe  -->
+        <!-- <app-ingreso-datos icon="logo-usd" autocomplete="detail" label="Importe" [control]="formulario.controls.importe"
+            type="number"></app-ingreso-datos> -->
+
         <app-ingreso-datos icon="logo-usd" autocomplete="detail" label="Importe" [control]="formulario.controls.importe"
-            type="number"></app-ingreso-datos>
+            [maskito]="mascara" [maskitoElement]="maskPredicate" type="text"></app-ingreso-datos>
+
 
         <div *ngIf="formulario.controls.importe.errors && formulario.controls.importe.touched">
             <div class="errores" *ngIf="formulario.controls.importe.errors?.['required']">El importe es necesario</div>

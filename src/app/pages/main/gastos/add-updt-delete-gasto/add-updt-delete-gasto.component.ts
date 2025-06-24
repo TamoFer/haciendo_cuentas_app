@@ -11,7 +11,6 @@ import { FooterComponent } from 'src/app/shared/components/footer/footer.compone
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/ingreso-datos.component';
 import { MaskitoElementPredicate } from '@maskito/core';
-import { MaskitoDirective } from '@maskito/angular';
 
 
 
@@ -19,7 +18,7 @@ import { MaskitoDirective } from '@maskito/angular';
   selector: 'app-add-updt-delete-gasto',
   templateUrl: './add-updt-delete-gasto.component.html',
   styleUrls: ['./add-updt-delete-gasto.component.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, ReactiveFormsModule, MaskitoDirective, IngresoDatosComponent, NgIf,]
+  imports: [IonicModule, HeaderComponent, FooterComponent, ReactiveFormsModule, IngresoDatosComponent, NgIf,]
 
 })
 export class AddUpdtDeleteGastoComponent {
@@ -77,16 +76,13 @@ export class AddUpdtDeleteGastoComponent {
       let path = `users/${this.user.uid}/movimientos`;
       this.formulario.get('id').setValue(this.idContador);
 
-
-
-
       this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
         this.restarSaldos(this.formulario.value)
         const movimiento: Movimiento = {
           id: this.formulario.value.id!,
           fecha: this.formulario.value.fecha!,
-          importe: this.formulario.value.importe!,
+          importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
           detalle: this.formulario.value.detalle!,
           rubro: this.formulario.value.rubro!,
           tipo: this.formulario.value.tipo!,
@@ -139,7 +135,7 @@ export class AddUpdtDeleteGastoComponent {
         const movimiento: Movimiento = {
           id: this.gasto.id,
           fecha: this.formulario.value.fecha!,
-          importe: this.formulario.value.importe!,
+          importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
           detalle: this.formulario.value.detalle!,
           rubro: this.formulario.value.rubro!,
           tipo: this.formulario.value.tipo!,
@@ -227,8 +223,8 @@ export class AddUpdtDeleteGastoComponent {
     let nuevoSaldoEfe = this.user.saldo_efectivo;
 
     movimiento.tipo === 'Efectivo' ?
-      nuevoSaldoEfe -= Number(this.formulario.value.importe) :
-      nuevoSaldoBco -= Number(this.formulario.value.importe);
+      nuevoSaldoEfe -= Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')) :
+      nuevoSaldoBco -= Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.'));
 
     this.firebaseSVC.updateDocument(path, {
       ...this.user,
