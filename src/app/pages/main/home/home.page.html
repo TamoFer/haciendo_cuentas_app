@@ -62,11 +62,12 @@
 
 
       <ion-item-sliding *ngFor="let mov of movimientosCuenta | slice:0:5">
+        <!-- {{mov | json}} -->
         <ion-item *ngIf="mov.genero == 'gasto' ">
           <div class="detalle-style">
             <ion-label color="dark" class="detalle-style-fecha"> {{ mov.fecha | date:'dd/MM'}} </ion-label>
             <ion-label color="dark" class="detalle-style-rubro"> {{mov.rubro}} </ion-label>
-            <ion-label color="danger" class="detalle-style-importe">- {{mov.importe | currency:'ARS'}} </ion-label>
+            <ion-label color="danger" class="detalle-style-importe">- $ {{mov.importe }} </ion-label>
             <ion-label *ngIf="mov.tipo == 'Efectivo'" class="detalle-style-icono">
               <ion-icon name="cash" color="dark"></ion-icon>
             </ion-label>
@@ -79,7 +80,7 @@
           <div class="detalle-style">
             <ion-label color="dark" class="detalle-style-fecha"> {{ mov.fecha | date:'dd/MM'}} </ion-label>
             <ion-label color="dark" class="detalle-style-rubro"> {{mov.rubro}} </ion-label>
-            <ion-label color="success" class="detalle-style-importe">+ {{mov.importe | currency:'ARS'}} </ion-label>
+            <ion-label color="success" class="detalle-style-importe">+ $ {{mov.importe }} </ion-label>
             <ion-label *ngIf="mov.tipo == 'Efectivo'" class="detalle-style-icono"> <ion-icon name="cash"
                 color="dark"></ion-icon>
             </ion-label>

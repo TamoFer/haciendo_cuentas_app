@@ -75,9 +75,10 @@ export class AddUpdtDeleteGastoComponent {
     if (this.saldoNegativoAlert(this.formulario.value)) {
       let path = `users/${this.user.uid}/movimientos`;
       this.formulario.get('id').setValue(this.idContador);
-      console.log(this.formulario.value.importe);
-      console.log(typeof (this.formulario.value.importe));
-      let importe = Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.'))
+
+      let importeParseado = Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.'))
+
+
 
 
       this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
@@ -86,7 +87,7 @@ export class AddUpdtDeleteGastoComponent {
         const movimiento: Movimiento = {
           id: this.formulario.value.id!,
           fecha: this.formulario.value.fecha!,
-          importe: importe,
+          importe: importeParseado,
           detalle: this.formulario.value.detalle!,
           rubro: this.formulario.value.rubro!,
           tipo: this.formulario.value.tipo!,
@@ -229,6 +230,7 @@ export class AddUpdtDeleteGastoComponent {
     movimiento.tipo === 'Efectivo' ?
       nuevoSaldoEfe -= Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')) :
       nuevoSaldoBco -= Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.'));
+
 
     this.firebaseSVC.updateDocument(path, {
       ...this.user,

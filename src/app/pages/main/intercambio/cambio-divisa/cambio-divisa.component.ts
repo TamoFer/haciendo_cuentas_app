@@ -57,18 +57,12 @@ export class CambioDivisaComponent implements OnInit {
     const path = `users/${this.user.uid}`;
     const loading = await this.utilsSVC.loading();
 
-
     const saldoEfectivoOriginal = this.user.saldo_efectivo;
-
     const saldoBancoOriginal = this.user.saldo_banco;
-
     const importeCambio = Number(this.formulario.value.importeAcambiar.replace(/\./g, '').replace(',', '.'));
 
-
     const saldoEfectivoNuevo = Math.abs(saldoEfectivoOriginal - importeCambio);
-
     const saldoBancoNuevo = Math.abs(saldoBancoOriginal + importeCambio);
-
 
     this.utilsSVC.setUser({
       ... this.user,
@@ -162,7 +156,25 @@ export class CambioDivisaComponent implements OnInit {
   }
 
   async realizarIntercambio() {
-    this.opcionSeleccionada === 'first' ? await this.submitEtoB() : await this.submitBtoE();
+    let importeIngresado = Number(this.formulario.value.importeAcambiar.replace(/\./g, '').replace(',', '.'));
+
+    if (this.opcionSeleccionada === 'first') {
+      importeIngresado <= this.user.saldo_efectivo ? await this.submitEtoB() : this.utilsSVC.presentToast({
+        header: 'Error',
+        message: 'El importe a cambiar supera el saldo disponible.',
+        color: 'danger',
+        position: 'bottom',
+        duration: 1500
+      });
+    } else {
+      importeIngresado <= this.user.saldo_banco ? await this.submitBtoE() : this.utilsSVC.presentToast({
+        header: 'Error',
+        message: 'El importe a cambiar supera el saldo disponible.',
+        color: 'danger',
+        position: 'bottom',
+        duration: 1500
+      });
+    }
 
   }
 
