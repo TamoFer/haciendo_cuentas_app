@@ -8,6 +8,8 @@
 *.tmp.*
 UserInterfaceState.xcuserstate
 $RECYCLE.BIN/
+/deploys
+/ideas_diseños
 
 *.log
 log.txt
