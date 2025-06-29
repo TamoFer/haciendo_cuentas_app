@@ -72,3 +72,58 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 
 }
+
+.card-title {
+    font-size: 1.5rem;
+    // margin-top: 2rem;
+
+
+}
+
+.card-subtitle {
+    color: 212, 172, 13;
+    font-size: 1.2rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    text-shadow:
+        -0.5px -0.5px 0 black,
+        0.5px -0.5px 0 black,
+        -0.5px 0.5px 0 black,
+        0.5px 0.5px 0 black;
+
+    .icono-tarjeta {
+        width: 3.5rem;
+        height: 3.5rem;
+        margin: 0rem;
+    }
+
+    .icono-banco {
+        width: 8rem;
+        height: 3rem;
+        margin: 0rem;
+    }
+
+}
+
+.botones {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+
+    ion-button {
+        width: fit-content;
+        height: fit-content;
+        gap: 0rem;
+        margin: 0.3rem;
+    }
+
+    ion-icon {
+        gap: 0rem;
+        margin: 0rem;
+        color: black;
+        width: 20px;
+        height: 20px;
+    }
+}

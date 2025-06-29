@@ -1,7 +1,7 @@
 <app-header title="Ingresos" [mostrarVolver]="usuarioLogeado" [routerLink]="['/home']"></app-header>
 <ion-content>
     <p style="text-transform: uppercase; margin-left: 10px;">el listado de tus ingresos {{nombreUser}} </p>
-    <p style="text-transform: uppercase; margin-left: 10px;">ingresado hasta la fecha $ {{totalIngresos }}
+    <p style="text-transform: uppercase; margin-left: 10px;">ingresado hasta la fecha {{totalIngresos | currency:'ARS'}}
     </p>
     <ion-item-sliding *ngFor="let mov of movimientosCuenta ">
 

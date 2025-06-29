@@ -146,7 +146,31 @@ export class TarjetasPage implements OnInit {
     })
   }
 
+  getColorBanco(banco: string): string {
+    switch (banco.toLowerCase()) {
+      case 'santander': return '#c8102e';
+      case 'bbva': return '#0033a0';
+      case 'galicia': return '#ff6f00';
+      default: return '#f0f0f0';
+    }
+  }
 
+  getIconoTarjeta(tarejeta: string): string {
+    switch (tarejeta.toLowerCase()) {
+      case 'visa': return '../../../../assets/icon/visa-icono.png';
+      case 'mastercard': return '../../../../assets/icon/mastercard-icono.png';
+      case 'american express': return '../../../../assets/icon/american_express-icono.png';
+      default: return '#f0f0f0';
+    }
+  }
+  getIconoBanco(banco: string): string {
+    switch (banco.toLowerCase()) {
+      case 'santander': return '../../../../assets/img/santander.png';
+      case 'galicia': return '../../../../assets/img/galicia.jpg';
+      case 'bbva': return '../../../../assets/img/bbva.png';
+      default: return '#f0f0f0';
+    }
+  }
 
 
 }
