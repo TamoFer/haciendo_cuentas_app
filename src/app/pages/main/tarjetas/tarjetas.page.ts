@@ -1,5 +1,5 @@
 import { CommonModule, NgFor } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { FirebaseService } from 'src/app/services/firebase.service';
@@ -12,6 +12,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Tarjeta } from 'src/app/models/tarjeta.model';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/models/user.model';
+import { TarjetaAddUpdDeleteComponent } from './tarjeta-add-upd-delete/tarjeta-add-upd-delete.component';
 
 @Component({
   selector: 'app-tarjetas',
@@ -28,6 +29,7 @@ export class TarjetasPage implements OnInit {
   nombreUser: string = '';
   tarjetas: Tarjeta[] = [];
   subscripcionUser: Subscription;
+
 
 
 
@@ -103,9 +105,19 @@ export class TarjetasPage implements OnInit {
   readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
 
 
+  async editarTarjeta(tarjeta?: Tarjeta) {
+    const modal = await this.utilsSVC.modalsCtrl.create({
+      component: TarjetaAddUpdDeleteComponent,
+      componentProps: {
+        tarjeta: tarjeta
+      }
+    });
+
+    await modal.present();
+  }
 
 
-  async submit() {
+  async crearTarjeta() {
     const loading = await this.utilsSVC.loading();
     await loading.present();
     const path = `users/${this.usuario.uid}/tarjetas`;
@@ -145,6 +157,69 @@ export class TarjetasPage implements OnInit {
       loading.dismiss();
     })
   }
+
+
+  async confirmarDelete(tarjeta) {
+
+    const alert = await this.utilsSVC.alertasCtrl.create({
+      header: 'Eliminar Tarjeta',
+      message: '¿Estás seguro que deseas eliminarla?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Si',
+          role: 'destructive',
+          handler: () => {
+            this.eliminarTarjeta(tarjeta)
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async eliminarTarjeta(tarjeta: Tarjeta) {
+    const loading = await this.utilsSVC.loading();
+    await loading.present();
+
+
+    let path = `users/${this.usuario.uid}/tarjetas/${tarjeta.id}`;
+
+    this.firebaseSVC.deleteDocument(path).then(async res => {
+
+      this.utilsSVC.presentToast({
+        message: 'Tarjeta eliminada con exito',
+        duration: 1500,
+        color: 'success',
+        position: 'middle',
+        icon: 'checkmark-circle-outline'
+      })
+
+    }).catch(error => {
+      console.log(error);
+
+      this.utilsSVC.presentToast({
+        message: error.message,
+        duration: 2500,
+        color: 'primary',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      })
+
+    }).finally(() => {
+      loading.dismiss();
+    })
+
+    this.obtenerTarjetasUsuario()
+
+  }
+
 
   getColorBanco(banco: string): string {
     switch (banco.toLowerCase()) {

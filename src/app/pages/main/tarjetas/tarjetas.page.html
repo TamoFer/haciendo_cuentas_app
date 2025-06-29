@@ -18,7 +18,7 @@
             </ion-toolbar>
           </ion-header>
           <ion-content class="ion-padding">
-            <form [formGroup]="formulario" (ngSubmit)="submit()">
+            <form [formGroup]="formulario" (ngSubmit)="crearTarjeta()">
               <ion-item>
                 <ion-select justify="center" label="Banco" placeholder="Selecciona el banco" formControlName="banco">
                   <ion-select-option value="Santander">Santander</ion-select-option>
@@ -95,10 +95,10 @@
 
           <div class="botones">
             <ion-button color="dark" fill="clear">Consumos</ion-button>
-            <ion-button fill="clear">
+            <ion-button fill="clear" (click)="editarTarjeta(tarjeta)">
               <ion-icon name="pencil"></ion-icon>
             </ion-button>
-            <ion-button fill="clear">
+            <ion-button fill="clear" (click)="confirmarDelete(tarjeta)">
               <ion-icon name="trash-outline"></ion-icon>
             </ion-button>
 
