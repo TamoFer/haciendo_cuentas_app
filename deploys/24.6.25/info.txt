@@ -1,0 +1,5 @@
+. función intercambio saldos
+. función censurar montos
+. nuevo sistema dígitos 
+. mas todo lo anterior
+
