@@ -6,7 +6,7 @@
 
         <!-- Ingreso de email -->
         <app-ingreso-datos icon="mail-outline" autocomplete="email" label="Correo electrónico"
-            [control]="formulario.controls.email" type="email"></app-ingreso-datos>
+            [control]="formulario.controls.email" type="email" inputmode="email"></app-ingreso-datos>
 
         <div *ngIf="formulario.controls.email.errors && formulario.controls.email.touched">
             <div class="errores" *ngIf="formulario.controls.email.errors?.['required']">El correo es necesario</div>
@@ -40,7 +40,7 @@
             <ion-icon slot="end" name="person-add-outline"></ion-icon>
         </ion-button>
 
-        <!-- {{formulario.value.password}} para chequear los datos de los input del form-->
+
 
     </form>
 </ion-content>

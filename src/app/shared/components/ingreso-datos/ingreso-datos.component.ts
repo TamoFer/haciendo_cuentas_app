@@ -25,6 +25,7 @@ export class IngresoDatosComponent implements OnInit {
   @Input() autocomplete!: string;
   @Input() icon!: string;
   @Input() options: string[] = [];
+  @Input() inputmode: string = 'decimal';
 
   constructor() { }
   ngOnInit() {

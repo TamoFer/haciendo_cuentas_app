@@ -13,9 +13,9 @@
             <div class="errores" *ngIf="formulario.controls.fecha.errors?.['required']">La fecha es necesario</div>
 
         </div>
-
+        <!-- Ingreo del importe -->
         <app-ingreso-datos icon="logo-usd" autocomplete="detail" label="Importe" [control]="formulario.controls.importe"
-            [maskito]="mascara" [maskitoElement]="maskPredicate" type="text"></app-ingreso-datos>
+            [maskito]="mascara" [maskitoElement]="maskPredicate" type="text" inputmode="decimal"></app-ingreso-datos>
 
 
         <div *ngIf="formulario.controls.importe.errors && formulario.controls.importe.touched">
@@ -26,7 +26,7 @@
 
         <!-- detalle del ingreso -->
         <app-ingreso-datos icon="document-text-outline" autocomplete="detail" label="Detalle"
-            [control]="formulario.controls.detalle" type="text"></app-ingreso-datos>
+            [control]="formulario.controls.detalle" type="text" inputmode="text"></app-ingreso-datos>
 
         <div *ngIf="formulario.controls.detalle.errors && formulario.controls.detalle.touched">
             <div class="errores" *ngIf="formulario.controls.detalle.errors?.['required']">El detalle es necesario</div>

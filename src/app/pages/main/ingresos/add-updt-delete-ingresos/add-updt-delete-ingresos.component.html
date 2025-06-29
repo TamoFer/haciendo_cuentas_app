@@ -13,11 +13,8 @@
         </div>
 
         <!-- importe  -->
-        <!-- <app-ingreso-datos icon="logo-usd" autocomplete="detail" label="Importe" [control]="formulario.controls.importe"
-            type="number"></app-ingreso-datos> -->
-
         <app-ingreso-datos icon="logo-usd" autocomplete="detail" label="Importe" [control]="formulario.controls.importe"
-            [maskito]="mascara" [maskitoElement]="maskPredicate" type="text"></app-ingreso-datos>
+            [maskito]="mascara" [maskitoElement]="maskPredicate" inputmode="decimal" type='text'></app-ingreso-datos>
 
 
         <div *ngIf="formulario.controls.importe.errors && formulario.controls.importe.touched">
@@ -28,7 +25,7 @@
 
         <!-- detalle  -->
         <app-ingreso-datos icon="document-text-outline" autocomplete="detail" label="Detalle"
-            [control]="formulario.controls.detalle" type="text"></app-ingreso-datos>
+            [control]="formulario.controls.detalle" inputmode="text" type='text'></app-ingreso-datos>
 
         <div *ngIf="formulario.controls.detalle.errors && formulario.controls.detalle.touched">
             <div class="errores" *ngIf="formulario.controls.detalle.errors?.['required']">El detalle es necesario</div>
