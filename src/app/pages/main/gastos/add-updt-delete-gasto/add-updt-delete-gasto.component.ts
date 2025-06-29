@@ -2,6 +2,7 @@ import { NgIf } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
+import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import { Movimiento } from 'src/app/models/movimiento.mode';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
@@ -9,18 +10,23 @@ import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/ingreso-datos.component';
+import { MaskitoElementPredicate } from '@maskito/core';
+
+
 
 @Component({
   selector: 'app-add-updt-delete-gasto',
   templateUrl: './add-updt-delete-gasto.component.html',
   styleUrls: ['./add-updt-delete-gasto.component.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, ReactiveFormsModule, IngresoDatosComponent, NgIf]
+  imports: [IonicModule, HeaderComponent, FooterComponent, ReactiveFormsModule, IngresoDatosComponent, NgIf,]
 
 })
 export class AddUpdtDeleteGastoComponent {
 
 
-  @Input() gasto: Movimiento
+  @Input() gasto: Movimiento;
+  @Input() maskito: any;
+  @Input() maskitoElement: any;
 
   ngOnInit() {
     this.user = this.utilsSVC.obtenerDatosLS('user');
@@ -49,6 +55,18 @@ export class AddUpdtDeleteGastoComponent {
     genero: new FormControl('gasto')
   });
 
+  mascara = maskitoNumberOptionsGenerator({
+    decimalSeparator: ',',
+    thousandSeparator: '.',
+    maximumFractionDigits: 2,
+  });
+
+
+  readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
+
+
+
+
   async crearGasto() {
 
     const loading = await this.utilsSVC.loading();
@@ -57,6 +75,8 @@ export class AddUpdtDeleteGastoComponent {
     if (this.saldoNegativoAlert(this.formulario.value)) {
       let path = `users/${this.user.uid}/movimientos`;
       this.formulario.get('id').setValue(this.idContador);
+
+      let importeParseado = Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.'))
 
 
 
@@ -67,7 +87,7 @@ export class AddUpdtDeleteGastoComponent {
         const movimiento: Movimiento = {
           id: this.formulario.value.id!,
           fecha: this.formulario.value.fecha!,
-          importe: this.formulario.value.importe!,
+          importe: importeParseado,
           detalle: this.formulario.value.detalle!,
           rubro: this.formulario.value.rubro!,
           tipo: this.formulario.value.tipo!,
@@ -120,7 +140,7 @@ export class AddUpdtDeleteGastoComponent {
         const movimiento: Movimiento = {
           id: this.gasto.id,
           fecha: this.formulario.value.fecha!,
-          importe: this.formulario.value.importe!,
+          importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
           detalle: this.formulario.value.detalle!,
           rubro: this.formulario.value.rubro!,
           tipo: this.formulario.value.tipo!,
@@ -208,8 +228,9 @@ export class AddUpdtDeleteGastoComponent {
     let nuevoSaldoEfe = this.user.saldo_efectivo;
 
     movimiento.tipo === 'Efectivo' ?
-      nuevoSaldoEfe -= Number(this.formulario.value.importe) :
-      nuevoSaldoBco -= Number(this.formulario.value.importe);
+      nuevoSaldoEfe -= Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')) :
+      nuevoSaldoBco -= Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.'));
+
 
     this.firebaseSVC.updateDocument(path, {
       ...this.user,

@@ -5,7 +5,7 @@
 
     <!-- Ingreso de nombre -->
     <app-ingreso-datos icon="person-outline" autocomplete="name" label="Nombre" [control]="formulario.controls.name"
-      type="text"></app-ingreso-datos>
+      type="text" inputmode="text"></app-ingreso-datos>
 
     <div *ngIf="formulario.controls.name.errors && formulario.controls.name.touched">
       <div class="errores" *ngIf="formulario.controls.name.errors?.['required']">El nombre es necesario</div>
@@ -15,7 +15,7 @@
 
     <!-- Ingreso de email -->
     <app-ingreso-datos icon="mail-outline" autocomplete="email" label="Correo electrónico"
-      [control]="formulario.controls.email" type="email"></app-ingreso-datos>
+      [control]="formulario.controls.email" type="email" inputmode="email"></app-ingreso-datos>
 
     <div *ngIf="formulario.controls.email.errors && formulario.controls.email.touched">
       <div class="errores" *ngIf="formulario.controls.email.errors?.['required']">El correo es necesario</div>

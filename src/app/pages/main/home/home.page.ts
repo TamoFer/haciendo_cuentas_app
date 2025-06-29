@@ -84,8 +84,6 @@ export class HomePage implements OnInit, OnDestroy {
     this.saldo_efe = user?.saldo_efectivo || 0;
     this.saldo_total = this.saldo_bco + this.saldo_efe;
     this.usuarioLogeado = true;
-    this.mostrarSaldos = user.censurar_montos;
-
     this.obtenerMovimientosCuenta();
   }
 
@@ -298,5 +296,8 @@ export class HomePage implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.subscripcionUser?.unsubscribe();
   }
+
+
+
 }
 
