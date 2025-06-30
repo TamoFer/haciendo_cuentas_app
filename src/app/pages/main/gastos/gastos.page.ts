@@ -1,5 +1,6 @@
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { IonicModule, NavController } from '@ionic/angular';
 import { Movimiento } from 'src/app/models/movimiento.mode';
@@ -12,7 +13,7 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
   selector: 'app-gastos',
   templateUrl: './gastos.page.html',
   styleUrls: ['./gastos.page.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor, CommonModule, RouterLink]
+  imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor, CommonModule, RouterLink, ReactiveFormsModule]
 })
 export class GastosPage implements OnInit {
 
@@ -23,8 +24,24 @@ export class GastosPage implements OnInit {
   movimientosCuenta: Movimiento[] = [];
   usuario = this.utilsSVC.obtenerDatosLS('user');
   totalGastos: string;
+  rubros = ['Compra', 'Regalo', 'Deudas', 'Servicios'];
+  busquedaPorFechas: boolean = false;
+  busquedaPorOtros: boolean = false;
+
+  filtrosFecha = new FormGroup({
+    desde: new FormControl(Validators.required),
+    hasta: new FormControl(Validators.required),
+
+  });
+
+  filtrosOtros = new FormGroup({
+    rubro: new FormControl(Validators.required),
+    detalle: new FormControl(Validators.required),
+
+  });
 
   constructor() { }
+
 
 
 
@@ -41,6 +58,10 @@ export class GastosPage implements OnInit {
 
     });
     this.obtenerMovimientosCuenta();
+  }
+
+  filtrarDatos() {
+
   }
 
 

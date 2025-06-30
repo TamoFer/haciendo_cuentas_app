@@ -6,3 +6,28 @@ ion-card {
     color: black;
     margin-top: 0rem;
 }
+
+
+.filtros {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    height: fit-content;
+    gap: 1rem;
+
+
+
+    .filtros-fecha {
+        display: flex;
+        flex-direction: column;
+        width: fit-content;
+        height: fit-content;
+    }
+
+    .filtros-especificos {
+        display: flex;
+        flex-direction: column;
+        width: fit-content;
+        height: fit-content;
+    }
+}
