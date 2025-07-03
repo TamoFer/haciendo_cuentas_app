@@ -43,7 +43,7 @@ export class HomePage implements OnInit, OnDestroy {
   movimientosCuenta: Movimiento[] = [];
   user: User;
   subscripcionUser: Subscription;
-  mostrarSaldos: boolean;
+  mostrarSaldos: boolean = false;
 
   private opciones: Intl.DateTimeFormatOptions = {
     day: '2-digit',
@@ -84,6 +84,7 @@ export class HomePage implements OnInit, OnDestroy {
     this.saldo_efe = user?.saldo_efectivo || 0;
     this.saldo_total = this.saldo_bco + this.saldo_efe;
     this.usuarioLogeado = true;
+    this.mostrarSaldos = user.censurar_montos;
     this.obtenerMovimientosCuenta();
   }
 

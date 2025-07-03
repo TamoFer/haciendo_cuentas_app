@@ -4,30 +4,30 @@
     <!-- <p style="text-transform: uppercase; margin-left: 10px;">Gastado hasta la fecha {{totalGastos | currency:'ARS'}} -->
     <!-- </p> -->
 
-    <ion-label (click)="busquedaPorFechas = !busquedaPorFechas">
-        Buscar por fecha
-        <ion-icon [name]="busquedaPorFechas ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
-    </ion-label>
-    <ion-list *ngIf="busquedaPorFechas">
-        <form class="filtros" [formGroup]="filtrosFecha">
-            <div class="filtros-fecha">
-                <ion-item>
-                    <ion-label style="font-weight: bold;">Desde</ion-label>
-                    <ion-input type="date" formControlName="desde"></ion-input>
-                </ion-item>
-                <ion-item>
-                    <ion-label style="font-weight: bold;">Hasta</ion-label>
-                    <ion-input type="date" formControlName="hasta"></ion-input>
+    <div class="filtros">
+        <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorFechas = !busquedaPorFechas">Buscar por
+            fecha
+        </ion-checkbox>
+        <ion-list *ngIf="busquedaPorFechas">
+            <form [formGroup]="filtrosFecha">
+                <div class="filtros-fecha">
+                    <ion-item>
+                        <ion-label style="font-weight: bold;">Desde</ion-label>
+                        <ion-input type="date" formControlName="desde"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-label style="font-weight: bold;">Hasta</ion-label>
+                        <ion-input type="date" formControlName="hasta"></ion-input>
+                    </ion-item>
+                </div>
+            </form>
+        </ion-list>
+        <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorOtros = !busquedaPorOtros">Buscar
+            por rubro o detalle
+        </ion-checkbox>
 
-                </ion-item>
-            </div>
-        </form>
-    </ion-list>
+    </div>
 
-    <ion-label (click)="busquedaPorOtros = !busquedaPorOtros">
-        Buscar por rubro o detalle
-        <ion-icon [name]="busquedaPorOtros ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
-    </ion-label>
     <ion-list *ngIf="busquedaPorOtros">
         <form [formGroup]="filtrosOtros">
             <div class="filtros-especificos">
@@ -37,17 +37,18 @@
                         <ion-select-option *ngFor="let r of rubros" [value]="r">{{r}}</ion-select-option>
                     </ion-select>
                 </ion-item>
-
                 <ion-item>
                     <ion-label>Detalle</ion-label>
                     <ion-input formControlName="detalle"></ion-input>
                 </ion-item>
             </div>
         </form>
+        <ion-button style="margin-left: 40%;" [disabled]="filtrosFecha.valid "
+            (click)=" filtrarDatos()">Filtrar</ion-button>
     </ion-list>
 
 
-    <ion-button style="margin-left: 40%;" (click)="filtrarDatos()">Filtrar</ion-button>
+
 
 
     <ion-item-sliding *ngFor=" let mov of movimientosCuenta ">

@@ -11,11 +11,8 @@ ion-card {
 .filtros {
     display: flex;
     flex-direction: column;
-    width: fit-content;
-    height: fit-content;
     gap: 1rem;
-
-
+    margin-left: 10px;
 
     .filtros-fecha {
         display: flex;

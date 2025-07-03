@@ -25,6 +25,8 @@ export class GastosPage implements OnInit {
   usuario = this.utilsSVC.obtenerDatosLS('user');
   totalGastos: string;
   rubros = ['Compra', 'Regalo', 'Deudas', 'Servicios'];
+
+
   busquedaPorFechas: boolean = false;
   busquedaPorOtros: boolean = false;
 
@@ -35,8 +37,8 @@ export class GastosPage implements OnInit {
   });
 
   filtrosOtros = new FormGroup({
-    rubro: new FormControl(Validators.required),
-    detalle: new FormControl(Validators.required),
+    rubro: new FormControl(null, Validators.required),
+    detalle: new FormControl("", Validators.minLength(1)),
 
   });
 
