@@ -1,6 +1,57 @@
 <app-header title="Ingresos" [mostrarVolver]="usuarioLogeado" [routerLink]="['/home']"></app-header>
 <ion-content>
-    <p style="text-transform: uppercase; margin-left: 10px;">el listado de tus ingresos {{nombreUser}} </p>
+    <div class="filtros">
+        <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorFechas = !busquedaPorFechas">Buscar por
+            fecha
+        </ion-checkbox>
+        <ion-list *ngIf="busquedaPorFechas">
+            <form [formGroup]="filtrosFecha">
+                <div class="filtros-fecha">
+                    <ion-item>
+                        <ion-label style="font-weight: bold;">Desde</ion-label>
+                        <ion-input type="date" formControlName="desde"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-label style="font-weight: bold;">Hasta</ion-label>
+                        <ion-input type="date" formControlName="hasta"></ion-input>
+                    </ion-item>
+                </div>
+            </form>
+        </ion-list>
+        <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorOtros = !busquedaPorOtros">Buscar
+            por rubro o detalle
+        </ion-checkbox>
+        <ion-checkbox labelPlacement="end" justify="start">Ver gastos
+            ultimos 30 dias
+        </ion-checkbox>
+    </div>
+
+    <ion-list *ngIf="busquedaPorOtros">
+        <form [formGroup]="filtrosOtros">
+            <div class="filtros-especificos">
+                <ion-item>
+                    <ion-label>Rubro</ion-label>
+                    <ion-select formControlName="rubro">
+                        <ion-select-option *ngFor="let r of rubros" [value]="r">{{r}}</ion-select-option>
+                    </ion-select>
+                </ion-item>
+                <ion-item>
+                    <ion-label>Detalle</ion-label>
+                    <ion-input formControlName="detalle"></ion-input>
+                </ion-item>
+            </div>
+        </form>
+
+    </ion-list>
+
+    <ion-button style="margin-left: 40%;" [disabled]="filtrosFecha.valid "
+        (click)=" filtrarDatos()">Filtrar</ion-button>
+
+
+</ion-content>
+<app-footer></app-footer>
+
+<!-- <p style="text-transform: uppercase; margin-left: 10px;">el listado de tus ingresos {{nombreUser}} </p>
     <p style="text-transform: uppercase; margin-left: 10px;">ingresado hasta la fecha {{totalIngresos | currency:'ARS'}}
     </p>
     <ion-item-sliding *ngFor="let mov of movimientosCuenta ">
@@ -16,6 +67,4 @@
             </ion-card-content>
         </ion-card>
 
-    </ion-item-sliding>
-</ion-content>
-<app-footer></app-footer>
+    </ion-item-sliding> -->

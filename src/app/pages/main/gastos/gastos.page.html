@@ -1,57 +1,113 @@
 <app-header title="Gastos" [mostrarVolver]="usuarioLogeado" [routerLink]="['/home']"></app-header>
 <ion-content>
-    <p style="text-transform: uppercase; margin-left: 10px;">El listado de tus gastos {{nombreUser}} </p>
-    <!-- <p style="text-transform: uppercase; margin-left: 10px;">Gastado hasta la fecha {{totalGastos | currency:'ARS'}} -->
-    <!-- </p> -->
 
-    <div class="filtros">
-        <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorFechas = !busquedaPorFechas">Buscar por
-            fecha
-        </ion-checkbox>
-        <ion-list *ngIf="busquedaPorFechas">
-            <form [formGroup]="filtrosFecha">
-                <div class="filtros-fecha">
-                    <ion-item>
-                        <ion-label style="font-weight: bold;">Desde</ion-label>
-                        <ion-input type="date" formControlName="desde"></ion-input>
-                    </ion-item>
-                    <ion-item>
-                        <ion-label style="font-weight: bold;">Hasta</ion-label>
-                        <ion-input type="date" formControlName="hasta"></ion-input>
-                    </ion-item>
-                </div>
-            </form>
-        </ion-list>
-        <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorOtros = !busquedaPorOtros">Buscar
-            por rubro o detalle
-        </ion-checkbox>
+    <form [formGroup]="formulario">
 
-    </div>
-
-    <ion-list *ngIf="busquedaPorOtros">
-        <form [formGroup]="filtrosOtros">
-            <div class="filtros-especificos">
-                <ion-item>
-                    <ion-label>Rubro</ion-label>
-                    <ion-select formControlName="rubro">
-                        <ion-select-option *ngFor="let r of rubros" [value]="r">{{r}}</ion-select-option>
-                    </ion-select>
-                </ion-item>
-                <ion-item>
-                    <ion-label>Detalle</ion-label>
-                    <ion-input formControlName="detalle"></ion-input>
-                </ion-item>
+        <div class="filtros">
+            <!-- BUSQUEDA POR FECHAS -->
+            <div id="filtro-fechas">
+                <ion-checkbox labelPlacement="end" justify="start"
+                    (click)="busquedaPorFechas = !busquedaPorFechas">Buscar
+                    por
+                    fecha
+                </ion-checkbox>
+                <ion-list *ngIf="busquedaPorFechas">
+                    <div class="filtros-fecha">
+                        <ion-item>
+                            <ion-label style="font-weight: bold;">Desde</ion-label>
+                            <ion-input type="date" formControlName="desde"></ion-input>
+                        </ion-item>
+                        <ion-item>
+                            <ion-label style="font-weight: bold;">Hasta</ion-label>
+                            <ion-input type="date" formControlName="hasta"></ion-input>
+                        </ion-item>
+                    </div>
+                </ion-list>
             </div>
-        </form>
-        <ion-button style="margin-left: 40%;" [disabled]="filtrosFecha.valid "
-            (click)=" filtrarDatos()">Filtrar</ion-button>
+
+            <!-- BUSQUEDA POR RUBRO -->
+            <div id="filtro-rubro">
+                <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorRubro = !busquedaPorRubro">Buscar
+                    por rubro
+                </ion-checkbox>
+
+                <ion-radio-group *ngIf="busquedaPorRubro" formControlName="rubro">
+                    <div>
+                        <ion-icon slot="start" name="cart-outline"
+                            style="font-size: 1.3rem; margin-right: 0.5rem;"></ion-icon><ion-radio value="compra">
+                            Compras</ion-radio>
+                    </div>
+                    <div>
+                        <ion-icon slot="start" name="gift-outline"
+                            style="font-size: 1.3rem; margin-right: 0.5rem;"></ion-icon><ion-radio
+                            value="regalo">Regalos</ion-radio>
+                    </div>
+                    <div>
+                        <ion-icon slot="start" name="receipt-outline"
+                            style="font-size: 1.3rem; margin-right: 0.5rem;"></ion-icon><ion-radio
+                            value="deudas">Deudas</ion-radio>
+                    </div>
+                    <div>
+                        <ion-icon slot="start" name="globe-outline"
+                            style="font-size: 1.3rem; margin-right: 0.5rem;"></ion-icon> <ion-radio
+                            value="servicios">Servicios</ion-radio>
+                    </div>
+                </ion-radio-group>
+            </div>
+
+            <!-- BUSQUEDA POR DETALLE -->
+            <div id="filtro-detalle">
+                <ion-checkbox labelPlacement="end" justify="start"
+                    (click)="busquedaPorDetalle = !busquedaPorDetalle">Buscar
+                    por detalle
+                </ion-checkbox>
+                <ion-list *ngIf="busquedaPorDetalle">
+                    <div class="filtros-especificos">
+                        <ion-item>
+                            <ion-label>Detalle</ion-label>
+                            <ion-input formControlName="detalle"></ion-input>
+                        </ion-item>
+                    </div>
+                </ion-list>
+            </div>
+
+            <!-- BUSQUEDA POR FECHAS -->
+            <div id="filtro-dias">
+                <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorDias = !busquedaPorDias">Ver
+                    gastos
+                    ultimos ...
+                </ion-checkbox>
+
+                <ion-radio-group *ngIf="busquedaPorDias" formControlName="dias">
+                    <ion-radio value="8">7 dias</ion-radio>
+                    <ion-radio value="16">15 dias</ion-radio>
+                    <ion-radio value="31">30 dias</ion-radio>
+                </ion-radio-group>
+            </div>
+        </div>
+
+    </form>
+
+    <div class="botones-filtros">
+        <ion-button (click)=" filtrarDatos(formulario)">Filtrar</ion-button>
+        <ion-button (click)=" limpiarFiltros()">Limpiar
+            filtros</ion-button>
+    </div>
+    <!-- 
+    {{formulario.value | json}} -->
+
+    <ion-list>
+        <ion-label *ngIf="movimientosFiltrados && movimientosFiltrados.length > 0"> TOTAL GASTADO $
+            {{totalGastos}}</ion-label>
+        <ion-item *ngFor="let mov of movimientosFiltrados">
+            <ion-label>
+                {{ mov.fecha | date:'dd/MM' }} - {{ mov.rubro }} - {{ mov.detalle }} - {{ mov.importe }}
+            </ion-label>
+        </ion-item>
     </ion-list>
 
 
-
-
-
-    <ion-item-sliding *ngFor=" let mov of movimientosCuenta ">
+    <!-- <ion-item-sliding *ngFor=" let mov of movimientosCuenta ">
 
         <ion-card color=" danger" *ngIf="mov.genero == 'gasto' ">
             <ion-card-header>
@@ -64,6 +120,6 @@
             </ion-card-content>
         </ion-card>
 
-    </ion-item-sliding>
+    </ion-item-sliding> -->
 </ion-content>
 <app-footer></app-footer>

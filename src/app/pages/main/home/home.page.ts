@@ -265,12 +265,12 @@ export class HomePage implements OnInit, OnDestroy {
 
     if (movimiento.genero === 'gasto') {
       movimiento.tipo === 'Efectivo' ?
-        nuevoSaldoEfe += Number(movimiento.importe) :
-        nuevoSaldoBco += Number(movimiento.importe);
+        nuevoSaldoEfe += Number(movimiento.importe.replace(/\./g, '').replace(',', '.')) :
+        nuevoSaldoBco += Number(movimiento.importe.replace(/\./g, '').replace(',', '.'));
     } else {
       movimiento.tipo === 'Efectivo' ?
-        nuevoSaldoEfe -= Number(movimiento.importe) :
-        nuevoSaldoBco -= Number(movimiento.importe);
+        nuevoSaldoEfe -= Number(movimiento.importe.replace(/\./g, '').replace(',', '.')) :
+        nuevoSaldoBco -= Number(movimiento.importe.replace(/\./g, '').replace(',', '.'));
     }
 
     this.firebaseSVC.updateDocument(path, {

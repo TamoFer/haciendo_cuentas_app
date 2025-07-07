@@ -1,6 +1,6 @@
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { IonicModule, NavController } from '@ionic/angular';
 import { Movimiento } from 'src/app/models/movimiento.mode';
@@ -22,30 +22,29 @@ export class GastosPage implements OnInit {
   nombreUser: string = '';
   usuarioLogeado: boolean = false;
   movimientosCuenta: Movimiento[] = [];
+  movimientosFiltrados: Movimiento[];
   usuario = this.utilsSVC.obtenerDatosLS('user');
-  totalGastos: string;
-  rubros = ['Compra', 'Regalo', 'Deudas', 'Servicios'];
+  totalGastos: number = 0;
+
+  dias = [7, 15, 30]
 
 
   busquedaPorFechas: boolean = false;
-  busquedaPorOtros: boolean = false;
+  busquedaPorRubro: boolean = false;
+  busquedaPorDetalle: boolean = false;
+  busquedaPorDias: boolean = false;
 
-  filtrosFecha = new FormGroup({
-    desde: new FormControl(Validators.required),
-    hasta: new FormControl(Validators.required),
 
+  formulario = new FormGroup({
+    desde: new FormControl(null),
+    hasta: new FormControl(null),
+    rubro: new FormControl(null),
+    detalle: new FormControl(null, Validators.minLength(1)),
+    dias: new FormControl(null)
   });
 
-  filtrosOtros = new FormGroup({
-    rubro: new FormControl(null, Validators.required),
-    detalle: new FormControl("", Validators.minLength(1)),
-
-  });
 
   constructor() { }
-
-
-
 
   ngOnInit() {
     if (this.usuario) {
@@ -56,16 +55,11 @@ export class GastosPage implements OnInit {
     this.utilsSVC.movimientos$.subscribe(movs => {
       this.movimientosCuenta = movs.sort((a, b) =>
         new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
-      );
+      ) && movs.filter(mov => mov.genero != 'ingreso');
 
     });
     this.obtenerMovimientosCuenta();
   }
-
-  filtrarDatos() {
-
-  }
-
 
   obtenerMovimientosCuenta() {
     const path = `users/${this.usuario.uid}/movimientos`;
@@ -73,7 +67,6 @@ export class GastosPage implements OnInit {
     this.firebaseSVC.getCollectionData(path).subscribe({
       next: (res: Movimiento[]) => {
         this.utilsSVC.setMovimientos(res);
-        this.totalGastos = this.sumarTotalGastos(this.movimientosCuenta)
       },
       error: err => {
         console.error('Error obteniendo movimientos', err);
@@ -85,15 +78,75 @@ export class GastosPage implements OnInit {
 
   sumarTotalGastos(movimientos) {
     let total = 0;
-    for (let movimiento of movimientos) {
-      if (movimiento.genero === 'gasto') {
-        total += Number(movimiento.importe)
-      }
+    for (let mov of movimientos) {
+      total += Number(mov.importe.replace(/\./g, '').replace(',', '.'))
     }
-    return String(total)
+    return total
+  }
+
+  filtrarPorDias(dias: number) {
+    const hoy = new Date();
+    const fechaLimite = new Date();
+    fechaLimite.setDate(hoy.getDate() - dias);
+    let total = 0;
+
+    this.movimientosFiltrados = this.movimientosCuenta.filter(mov => {
+      const fechaMov = new Date(mov.fecha);
+      if (fechaMov >= fechaLimite) {
+        total = total + Number(String(mov.importe).replace(/\./g, '').replace(',', '.'));
+      }
+      this.totalGastos = total;
+      return fechaMov >= fechaLimite;
+    });
+
+
+  }
+
+  filtrarPorFechas(desde, hasta) {
+    let total = 0
+    this.movimientosFiltrados = this.movimientosCuenta.filter(mov => {
+      if (new Date(mov.fecha) >= new Date(desde) && new Date(mov.fecha) <= new Date(hasta)) {
+        total = total + Number(String(mov.importe).replace(/\./g, '').replace(',', '.'))
+      }
+      this.totalGastos = total
+      return new Date(mov.fecha) >= new Date(desde) && new Date(mov.fecha) <= new Date(hasta)
+    }
+    )
   }
 
 
+  filtrarDatos(formulario: FormGroup) {
+    let total = 0;
+    if (formulario.get('rubro')?.value != null) {
+      this.movimientosFiltrados = this.movimientosCuenta.filter(mov => {
+        if (mov.rubro.toLowerCase() === formulario.value.rubro) {
+          total = total + Number(String(mov.importe).replace(/\./g, '').replace(',', '.')),
+            this.totalGastos = total
+        }
+        return mov.rubro.toLowerCase() === formulario.value.rubro
+      }
+      )
+    } else if (formulario.get('detalle')?.value != null) {
+      this.movimientosFiltrados = this.movimientosCuenta.filter(mov => {
+        if (mov.detalle.toLowerCase() === formulario.value.detalle.toLowerCase()) {
+          total = total + Number(String(mov.importe).replace(/\./g, '').replace(',', '.')),
+            this.totalGastos = total
+        }
+        return mov.detalle.toLowerCase() === formulario.value.detalle.toLowerCase()
+      }
 
+      )
+    } else if (formulario.get('dias')?.value != null) {
+      this.filtrarPorDias(formulario.value.dias)
+    } else {
+      this.filtrarPorFechas(formulario.value.desde, formulario.value.hasta)
+    }
+  }
+
+  limpiarFiltros() {
+    this.formulario.reset();
+    this.movimientosFiltrados = [];
+    this.totalGastos = 0;
+  }
 
 }
