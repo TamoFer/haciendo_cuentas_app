@@ -36,6 +36,15 @@ ion-card {
         flex-direction: column;
     }
 
+    .opciones-rubro {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+
+        .opcion {
+            width: max-content;
+        }
+    }
 
 }
 

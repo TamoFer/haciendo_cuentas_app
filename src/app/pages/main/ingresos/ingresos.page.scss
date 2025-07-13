@@ -7,6 +7,7 @@ ion-card {
     margin-top: 0rem;
 }
 
+
 .filtros {
     display: flex;
     flex-direction: column;
@@ -30,5 +31,35 @@ ion-card {
 
     }
 
+    .filtros-dias {
+        display: flex;
+        flex-direction: column;
+    }
 
+    .opciones-rubro {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+
+        .opcion {
+            width: max-content;
+        }
+    }
+
+}
+
+ion-radio-group {
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+    margin-top: 1rem;
+    margin-left: 3rem;
+    gap: 0.5rem;
+}
+
+.botones-filtros {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
 }

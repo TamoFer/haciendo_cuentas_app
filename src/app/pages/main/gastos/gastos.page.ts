@@ -22,7 +22,7 @@ export class GastosPage implements OnInit {
   nombreUser: string = '';
   usuarioLogeado: boolean = false;
   movimientosCuenta: Movimiento[] = [];
-  movimientosFiltrados: Movimiento[];
+  movimientosFiltrados: Movimiento[] = [];
   usuario = this.utilsSVC.obtenerDatosLS('user');
   totalGastos: number = 0;
 
@@ -76,71 +76,38 @@ export class GastosPage implements OnInit {
 
   }
 
-  sumarTotalGastos(movimientos) {
-    let total = 0;
-    for (let mov of movimientos) {
-      total += Number(mov.importe.replace(/\./g, '').replace(',', '.'))
-    }
-    return total
-  }
-
-  filtrarPorDias(dias: number) {
-    const hoy = new Date();
-    const fechaLimite = new Date();
-    fechaLimite.setDate(hoy.getDate() - dias);
-    let total = 0;
-
-    this.movimientosFiltrados = this.movimientosCuenta.filter(mov => {
-      const fechaMov = new Date(mov.fecha);
-      if (fechaMov >= fechaLimite) {
-        total = total + Number(String(mov.importe).replace(/\./g, '').replace(',', '.'));
-      }
-      this.totalGastos = total;
-      return fechaMov >= fechaLimite;
-    });
-
-
-  }
-
-  filtrarPorFechas(desde, hasta) {
-    let total = 0
-    this.movimientosFiltrados = this.movimientosCuenta.filter(mov => {
-      if (new Date(mov.fecha) >= new Date(desde) && new Date(mov.fecha) <= new Date(hasta)) {
-        total = total + Number(String(mov.importe).replace(/\./g, '').replace(',', '.'))
-      }
-      this.totalGastos = total
-      return new Date(mov.fecha) >= new Date(desde) && new Date(mov.fecha) <= new Date(hasta)
-    }
-    )
-  }
 
 
   filtrarDatos(formulario: FormGroup) {
+    const { rubro, detalle, dias, desde, hasta } = formulario.value;
     let total = 0;
-    if (formulario.get('rubro')?.value != null) {
-      this.movimientosFiltrados = this.movimientosCuenta.filter(mov => {
-        if (mov.rubro.toLowerCase() === formulario.value.rubro) {
-          total = total + Number(String(mov.importe).replace(/\./g, '').replace(',', '.')),
-            this.totalGastos = total
-        }
-        return mov.rubro.toLowerCase() === formulario.value.rubro
-      }
-      )
-    } else if (formulario.get('detalle')?.value != null) {
-      this.movimientosFiltrados = this.movimientosCuenta.filter(mov => {
-        if (mov.detalle.toLowerCase() === formulario.value.detalle.toLowerCase()) {
-          total = total + Number(String(mov.importe).replace(/\./g, '').replace(',', '.')),
-            this.totalGastos = total
-        }
-        return mov.detalle.toLowerCase() === formulario.value.detalle.toLowerCase()
+    const hoy = new Date();
+    let fechaLimite: Date | null = null;
+
+    if (dias != null) {
+      fechaLimite = new Date();
+      fechaLimite.setDate(hoy.getDate() - dias);
+    }
+
+    this.movimientosFiltrados = this.movimientosCuenta.filter(mov => {
+      const fechaMov = new Date(mov.fecha);
+      const importe = Number(String(mov.importe).replace(/\./g, '').replace(',', '.'));
+
+      const coincideRubro = rubro ? mov.rubro.toLowerCase() === rubro.toLowerCase() : true;
+      const coincideDetalle = detalle ? mov.detalle.toLowerCase().includes(detalle.toLowerCase()) : true;
+      const coincideDias = fechaLimite ? fechaMov >= fechaLimite : true;
+      const coincideFechas = (desde && hasta) ? (fechaMov >= new Date(desde) && fechaMov <= new Date(hasta)) : true;
+
+      const pasaFiltros = coincideRubro && coincideDetalle && coincideDias && coincideFechas;
+
+      if (pasaFiltros) {
+        total += importe;
       }
 
-      )
-    } else if (formulario.get('dias')?.value != null) {
-      this.filtrarPorDias(formulario.value.dias)
-    } else {
-      this.filtrarPorFechas(formulario.value.desde, formulario.value.hasta)
-    }
+      return pasaFiltros;
+    });
+
+    this.totalGastos = total;
   }
 
   limpiarFiltros() {
@@ -148,5 +115,6 @@ export class GastosPage implements OnInit {
     this.movimientosFiltrados = [];
     this.totalGastos = 0;
   }
+
 
 }
