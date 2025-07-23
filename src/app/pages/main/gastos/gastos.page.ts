@@ -1,13 +1,14 @@
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { FormControl, FormGroup, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { IonicModule, NavController } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 import { Movimiento } from 'src/app/models/movimiento.mode';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
+import { AddUpdtDeleteGastoComponent } from './add-updt-delete-gasto/add-updt-delete-gasto.component';
 
 @Component({
   selector: 'app-gastos',
@@ -25,6 +26,7 @@ export class GastosPage implements OnInit {
   movimientosFiltrados: Movimiento[] = [];
   usuario = this.utilsSVC.obtenerDatosLS('user');
   totalGastos: number = 0;
+
 
   dias = [7, 15, 30]
 
@@ -108,6 +110,118 @@ export class GastosPage implements OnInit {
     });
 
     this.totalGastos = total;
+  }
+
+
+  async confirmarDelete(movimiento) {
+
+    const alert = await this.utilsSVC.alertasCtrl.create({
+      header: 'Eliminar Movimiento',
+      message: '¿Estás seguro que deseas eliminarlo?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Si',
+          role: 'destructive',
+          handler: () => {
+            this.eliminarMovimiento(movimiento)
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async eliminarMovimiento(movimiento: Movimiento) {
+
+    const loading = await this.utilsSVC.loading();
+    await loading.present();
+
+
+    let path = `users/${this.usuario.uid}/movimientos/${movimiento.id}`;
+
+    this.restarSaldos(movimiento);
+
+    this.firebaseSVC.deleteDocument(path).then(async res => {
+
+
+      this.utilsSVC.presentToast({
+        message: 'Movimiento eliminado con exito',
+        duration: 1500,
+        color: 'success',
+        position: 'middle',
+        icon: 'checkmark-circle-outline'
+      })
+
+    }).catch(error => {
+      console.log(error);
+
+      this.utilsSVC.presentToast({
+        message: error.message,
+        duration: 2500,
+        color: 'primary',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      })
+
+    }).finally(() => {
+      loading.dismiss();
+    })
+
+    this.obtenerMovimientosCuenta()
+    this.limpiarFiltros()
+  }
+
+  async agregarGastos(movimiento?: Movimiento) {
+    const modal = await this.utilsSVC.modalsCtrl.create({
+      component: AddUpdtDeleteGastoComponent,
+      componentProps: {
+        gasto: movimiento // ✅ PASA el movimiento si existe
+      }
+    });
+
+    await modal.present();
+    this.obtenerMovimientosCuenta()
+    this.limpiarFiltros()
+  }
+
+  restarSaldos(movimiento) {
+    const path = `users/${this.usuario.uid}`;
+
+    let nuevoSaldoBco = this.usuario.saldo_banco;
+    console.log(nuevoSaldoBco);
+
+    let nuevoSaldoEfe = this.usuario.saldo_efectivo;
+    console.log(nuevoSaldoEfe);
+
+
+    if (movimiento.genero === 'gasto') {
+      movimiento.tipo === 'Efectivo' ?
+        nuevoSaldoEfe += Number(movimiento.importe.replace(/\./g, '').replace(',', '.')) :
+        nuevoSaldoBco += Number(movimiento.importe.replace(/\./g, '').replace(',', '.'));
+    } else {
+      movimiento.tipo === 'Efectivo' ?
+        nuevoSaldoEfe -= Number(movimiento.importe.replace(/\./g, '').replace(',', '.')) :
+        nuevoSaldoBco -= Number(movimiento.importe.replace(/\./g, '').replace(',', '.'));
+    }
+
+    this.firebaseSVC.updateDocument(path, {
+      ...this.usuario,
+      saldo_banco: nuevoSaldoBco,
+      saldo_efectivo: nuevoSaldoEfe
+    })
+
+    this.utilsSVC.setUser({
+      ... this.usuario,
+      saldo_banco: nuevoSaldoBco,
+      saldo_efectivo: nuevoSaldoEfe
+    })
   }
 
   limpiarFiltros() {

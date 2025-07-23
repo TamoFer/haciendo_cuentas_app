@@ -138,8 +138,8 @@
                     <ion-label color="dark">$ {{ mov.importe }}</ion-label>
                 </div>
                 <div style="display: flex; flex-direction: row; font-size: 1rem; width: 10%;">
-                    <ion-icon name="create-outline" color="dark"></ion-icon>
-                    <ion-icon name="trash-outline" color="dark"></ion-icon>
+                    <ion-icon name="create-outline" color="light" (click)="agregarIngresos(mov)"></ion-icon>
+                    <ion-icon name="trash-outline" color="light" (click)="confirmarDelete(mov)"></ion-icon>
                 </div>
             </ion-chip>
 

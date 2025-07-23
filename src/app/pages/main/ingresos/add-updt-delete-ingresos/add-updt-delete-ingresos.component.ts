@@ -91,7 +91,7 @@ export class AddUpdtDeleteIngresosComponent {
       this.utilsSVC.dismissModal({ success: true });
 
       this.utilsSVC.presentToast({
-        message: 'Gasto actualizado con exito',
+        message: 'Ingreso actualizado con exito',
         duration: 1500,
         color: 'success',
         position: 'middle',
@@ -173,12 +173,12 @@ export class AddUpdtDeleteIngresosComponent {
     const path = `users/${this.user.uid}`;
 
     const nuevo = this.formulario.value;
-    const original = this.ingreso.importe;
+    const original = Number(String(this.ingreso.importe).replace(/\./g, '').replace(',', '.'));
 
     let saldoEfectivoNuevo = this.user.saldo_efectivo
     let saldoBancoNuevo = this.user.saldo_banco
 
-    const nuevoImporte = parseFloat(nuevo.importe);
+    const nuevoImporte = Number(nuevo.importe?.replace(/\./g, '').replace(',', '.'));
     const importeAnterior = original;
 
     const diferencia = Math.abs(nuevoImporte - importeAnterior);
