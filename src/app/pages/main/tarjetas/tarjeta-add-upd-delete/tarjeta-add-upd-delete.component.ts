@@ -41,6 +41,7 @@ export class TarjetaAddUpdDeleteComponent implements OnInit {
   mostrarBack: boolean = true;
 
   formulario = new FormGroup({
+    id: new FormControl(),
     digitos: new FormControl(null, [Validators.required, Validators.minLength(4)]),
     fecha_cierre: new FormControl(null, [Validators.required]),
     banco: new FormControl('', [Validators.required]),

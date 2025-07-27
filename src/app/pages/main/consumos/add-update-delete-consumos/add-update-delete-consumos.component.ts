@@ -18,7 +18,7 @@ import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/i
   selector: 'app-add-update-delete-consumos',
   templateUrl: './add-update-delete-consumos.component.html',
   styleUrls: ['./add-update-delete-consumos.component.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, CommonModule, RouterLink, ReactiveFormsModule, NgFor, IngresoDatosComponent]
+  imports: [IonicModule, HeaderComponent, FooterComponent, CommonModule, ReactiveFormsModule, IngresoDatosComponent]
 })
 export class AddUpdateDeleteConsumosComponent implements OnInit {
 
@@ -36,13 +36,14 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
   mostrarBack: boolean = true;
   idContador: number;
   listadoTarjetas = [];
+  idTarjeta: string;
 
 
   formulario = new FormGroup({
     id: new FormControl(null),
     fecha: new FormControl(null, [Validators.required, Validators.min(0)]),
     importe_total: new FormControl(null, [Validators.required, Validators.min(0)]),
-    cuotificacion: new FormControl('', [Validators.required]),
+    cuotificacion: new FormControl(null, [Validators.required]),
     detalle: new FormControl(null, [Validators.required, Validators.minLength(1)]),
     tarjeta: new FormControl(null, [Validators.required]),
   });
@@ -100,62 +101,59 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
 
   readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
 
+  asignarConsumoAtarjeta() {
+    let tarjetaAsociada: Object;
+
+
+  }
 
   async crearConsumo() {
 
-    // const loading = await this.utilsSVC.loading();
-    // await loading.present();
+    const loading = await this.utilsSVC.loading();
+    await loading.present();
 
-    // if (this.saldoNegativoAlert(this.formulario.value)) {
-    //   let path = `users/${this.user.uid}/movimientos`;
-    //   this.formulario.get('id').setValue(this.idContador);
+    let path = `users/${this.usuario.uid}a/`;
+    this.formulario.get('id').setValue(this.idContador);
 
-    //   let importeParseado = Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.'))
+    let importeParseado = Number(this.formulario.value.importe_total!.replace(/\./g, '').replace(',', '.'))
 
+    this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
+      const consumo: Consumo = {
+        id: this.formulario.value.id!,
+        fecha: this.formulario.value.fecha!,
+        importe: importeParseado,
+        detalle: this.formulario.value.detalle!,
+        cuotas: this.formulario.value.cuotificacion!,
+        tarjeta_asociada: this.formulario.value.tarjeta!,
+      };
 
+      this.utilsSVC.dismissModal({ success: true });
 
-    //   this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
+      this.utilsSVC.presentToast({
+        message: 'Gasto ingresado con exito',
+        duration: 1500,
+        color: 'success',
+        position: 'middle',
+        icon: 'checkmark-circle-outline'
+      })
 
-    //     this.restarSaldos(this.formulario.value)
-    //     const movimiento: Movimiento = {
-    //       id: this.formulario.value.id!,
-    //       fecha: this.formulario.value.fecha!,
-    //       importe: importeParseado,
-    //       detalle: this.formulario.value.detalle!,
-    //       rubro: this.formulario.value.rubro!,
-    //       tipo: this.formulario.value.tipo!,
-    //       genero: this.formulario.value.genero!
-    //     };
+    }).catch(error => {
+      console.log(error);
 
-    //     this.utilsSVC.agregarMovimiento(movimiento);
+      this.utilsSVC.presentToast({
+        message: error.message,
+        duration: 2500,
+        color: 'primary',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      })
 
-    //     this.utilsSVC.dismissModal({ success: true });
-
-    //     this.utilsSVC.presentToast({
-    //       message: 'Gasto ingresado con exito',
-    //       duration: 1500,
-    //       color: 'success',
-    //       position: 'middle',
-    //       icon: 'checkmark-circle-outline'
-    //     })
-
-    //   }).catch(error => {
-    //     console.log(error);
-
-    //     this.utilsSVC.presentToast({
-    //       message: error.message,
-    //       duration: 2500,
-    //       color: 'primary',
-    //       position: 'middle',
-    //       icon: 'alert-circle-outline'
-    //     })
-
-    //   }).finally(() => {
-    //     loading.dismiss();
-    //   })
-    // }
+    }).finally(() => {
+      loading.dismiss();
+    })
   }
+
 
 
   async editarConsumo() {

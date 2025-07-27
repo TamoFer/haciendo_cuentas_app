@@ -1,7 +1,7 @@
 import { Consumo } from "./consumoTarjeta.model";
 
 export interface Tarjeta {
-    id?: Number;
+    id: Number;
     digitos: Number;
     fecha_cierre: Date;
     banco: string;

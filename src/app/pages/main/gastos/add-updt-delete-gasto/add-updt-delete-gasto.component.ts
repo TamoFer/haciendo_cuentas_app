@@ -28,10 +28,19 @@ export class AddUpdtDeleteGastoComponent {
   @Input() maskito: any;
   @Input() maskitoElement: any;
 
+  movimientosCuenta: Movimiento[] = [];
+
+
   ngOnInit() {
     this.user = this.utilsSVC.obtenerDatosLS('user');
     this.gasto ? this.formulario.patchValue(this.gasto) : this.formulario;
-    this.user.movimientos ? this.idContador = this.user.movimientos.length + 1 : this.idContador = 1;
+
+    this.utilsSVC.movimientos$.subscribe(movs => {
+      this.movimientosCuenta = movs.sort((a, b) =>
+        new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+      ) && movs.filter(mov => mov.genero != 'ingreso');
+
+    });
   }
 
   firebaseSVC = inject(FirebaseService);
@@ -40,13 +49,11 @@ export class AddUpdtDeleteGastoComponent {
 
   mostrarBack: boolean = true;
   user = {} as User;
-  idContador: number;
 
   opcionesRubro = ['Compra', 'Regalo', 'Deudas', 'Servicios'];
   opcionesTipo = ['Efectivo', 'Dinero en cuenta'];
 
   formulario = new FormGroup({
-    id: new FormControl(null,),
     fecha: new FormControl(null, [Validators.required, Validators.min(0)]),
     importe: new FormControl(null, [Validators.required, Validators.min(0)]),
     detalle: new FormControl('', [Validators.required, Validators.minLength(1)]),
@@ -74,7 +81,6 @@ export class AddUpdtDeleteGastoComponent {
 
     if (this.saldoNegativoAlert(this.formulario.value)) {
       let path = `users/${this.user.uid}/movimientos`;
-      this.formulario.get('id').setValue(this.idContador);
 
       let importeParseado = Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.'))
 
@@ -85,7 +91,7 @@ export class AddUpdtDeleteGastoComponent {
 
         this.restarSaldos(this.formulario.value)
         const movimiento: Movimiento = {
-          id: this.formulario.value.id!,
+          id: this.utilsSVC.asignarId(this.utilsSVC.crearId(), this.movimientosCuenta),
           fecha: this.formulario.value.fecha!,
           importe: importeParseado,
           detalle: this.formulario.value.detalle!,

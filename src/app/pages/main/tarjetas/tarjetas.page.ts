@@ -20,7 +20,7 @@ import { Consumo } from 'src/app/models/consumoTarjeta.model';
   selector: 'app-tarjetas',
   templateUrl: './tarjetas.page.html',
   styleUrls: ['./tarjetas.page.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, CommonModule, RouterLink, MaskitoDirective, ReactiveFormsModule, NgFor]
+  imports: [IonicModule, HeaderComponent, FooterComponent, CommonModule, RouterLink, MaskitoDirective, ReactiveFormsModule]
 })
 export class TarjetasPage implements OnInit {
   firebaseSVC = inject(FirebaseService);
@@ -116,6 +116,7 @@ export class TarjetasPage implements OnInit {
   }
 
 
+
   async crearTarjeta() {
     const loading = await this.utilsSVC.loading();
     await loading.present();
@@ -124,6 +125,7 @@ export class TarjetasPage implements OnInit {
     this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
       const Tarjeta: Tarjeta = {
+        id: this.utilsSVC.asignarId(this.utilsSVC.crearId(), this.tarjetas),
         digitos: this.formulario.value.digitos!,
         fecha_cierre: this.formulario.value.fecha_cierre!,
         banco: this.formulario.value.banco!,
