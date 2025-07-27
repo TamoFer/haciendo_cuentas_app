@@ -13,6 +13,8 @@ import { Tarjeta } from 'src/app/models/tarjeta.model';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/models/user.model';
 import { TarjetaAddUpdDeleteComponent } from './tarjeta-add-upd-delete/tarjeta-add-upd-delete.component';
+import { AddUpdateDeleteConsumosComponent } from '../consumos/add-update-delete-consumos/add-update-delete-consumos.component';
+import { Consumo } from 'src/app/models/consumoTarjeta.model';
 
 @Component({
   selector: 'app-tarjetas',
@@ -41,17 +43,14 @@ export class TarjetasPage implements OnInit {
     consumos: new FormControl([])
   });
 
+
+
   public alertaInfo = [
     {
       text: 'OK',
       role: 'confirm',
     }
   ]
-
-  getHoy(): string {
-    const hoy = new Date();
-    return hoy.toISOString().substring(0, 10); // yyyy-mm-dd
-  }
 
   constructor() { }
 
@@ -158,6 +157,16 @@ export class TarjetasPage implements OnInit {
     })
   }
 
+  async agregarConsumo(consumo?: Consumo) {
+    const modal = await this.utilsSVC.modalsCtrl.create({
+      component: AddUpdateDeleteConsumosComponent,
+      componentProps: {
+        consumo: consumo // Aunque sea ingreso, lo tratás como Movimiento
+      }
+    });
+
+    await modal.present();
+  }
 
   async confirmarDelete(tarjeta) {
 
