@@ -11,7 +11,7 @@
 
       <!-- SELECT (cuando el tipo es 'select') -->
       <ion-select *ngIf="type === 'select'" [formControl]="control" [label]="label" label-placement="floating"
-        interface="popover" fill="outline">
+        fill="outline">
 
         <ion-select-option *ngFor="let opcion of options" [value]="opcion">
           {{ opcion }}

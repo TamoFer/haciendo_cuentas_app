@@ -1,5 +1,64 @@
 <app-header [title]="consumo ? 'Modificar Consumo':'Nuevo Consumo'" [isModal]="mostrarBack"
   (volverAccion)="cerrarModal()"></app-header>
 <ion-content>
+  <form [formGroup]="formulario" (ngSubmit)="submit()">
+
+
+    <!-- fecha del ingreso -->
+
+    <app-ingreso-datos icon="calendar-number-outline" autocomplete="detail" label="Fecha"
+      [control]="formulario.controls.fecha" type="date"></app-ingreso-datos>
+
+    <div *ngIf="formulario.controls.fecha.errors && formulario.controls.fecha.touched">
+      <div class="errores" *ngIf="formulario.controls.fecha.errors?.['required']">La fecha es necesario</div>
+
+    </div>
+
+    <!-- detalle del ingreso -->
+    <app-ingreso-datos icon="document-text-outline" autocomplete="detail" label="Detalle"
+      [control]="formulario.controls.detalle" type="text" inputmode="text"></app-ingreso-datos>
+
+    <div *ngIf="formulario.controls.detalle.errors && formulario.controls.detalle.touched">
+      <div class="errores" *ngIf="formulario.controls.detalle.errors?.['required']">El detalle es necesario</div>
+      <div class="errores" *ngIf="formulario.controls.detalle.errors?.['minlength']">El detalle debe tener al
+        menos 1
+        caracteres</div>
+    </div>
+
+    <!-- Ingreo del importe -->
+    <app-ingreso-datos icon="logo-usd" autocomplete="detail" label="Importe total del consumo"
+      [control]="formulario.controls.importe_total" [maskito]="mascara" [maskitoElement]="maskPredicate" type="text"
+      inputmode="decimal"></app-ingreso-datos>
+
+
+    <div *ngIf="formulario.controls.importe_total.errors && formulario.controls.importe_total.touched">
+      <div class="errores" *ngIf="formulario.controls.importe_total.errors?.['required']">El importe es necesario</div>
+      <div class="errores" *ngIf="formulario.controls.importe_total.errors?.['minlength']">El importe debe ser mayor a 0
+      </div>
+    </div>
+
+    <!-- tarjeta  -->
+    <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Tarjeta" [type]="'select'"
+      [options]="listadoTarjetas" [control]="formulario.controls.tarjeta">
+    </app-ingreso-datos>
+
+    <div *ngIf="formulario.controls.tarjeta.errors && formulario.controls.tarjeta.touched">
+      <div class="errores" *ngIf="formulario.controls.tarjeta.errors?.['required']">La tarjeta con la cual se realizo el
+        consumo es necesaria</div>
+
+    </div>
+
+
+    <!-- cuotificacion -->
+    <app-ingreso-datos icon="journal-outline" autocomplete="detail" label="Cuotas realizadas"
+      [control]="formulario.controls.cuotificacion" type="number"></app-ingreso-datos>
+
+    <ion-button expand="block" mode="ios" type="submit" [disabled]="!formulario.valid">
+      {{consumo ? 'Modificar ': 'Agregar'}}
+      <ion-icon slot="end" [name]="consumo? 'pencil' : 'checkmark-circle'"></ion-icon>
+    </ion-button>
+
+
+  </form>
 </ion-content>
 <app-footer></app-footer>

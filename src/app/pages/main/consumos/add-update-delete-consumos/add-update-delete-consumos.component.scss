@@ -1,19 +1,36 @@
-@media screen and (max-width: 768px) {
+form {
+    width: 100%;
+    padding-top: 20%;
+    padding-left: 20%;
+    padding-right: 20%;
 
 
-    ion-button {
-        margin: 10px;
-    }
 
     p {
-        margin-inline-end: 10px;
+        text-align: end;
+        text-decoration: wavy;
     }
 
-    .errores {
-        color: red;
-        text-align: center;
-        font-weight: bold;
-        margin-top: 5px;
+
+    @media screen and (max-width: 768px) {
+        padding: 5%;
+
+        ion-button {
+            margin: 10px;
+        }
+
+        p {
+            margin-inline-end: 10px;
+        }
+
+        .errores {
+            color: red;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+
     }
 
 }

@@ -12,17 +12,20 @@ import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
+import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/ingreso-datos.component';
 
 @Component({
   selector: 'app-add-update-delete-consumos',
   templateUrl: './add-update-delete-consumos.component.html',
   styleUrls: ['./add-update-delete-consumos.component.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, CommonModule, RouterLink, ReactiveFormsModule, NgFor]
+  imports: [IonicModule, HeaderComponent, FooterComponent, CommonModule, RouterLink, ReactiveFormsModule, NgFor, IngresoDatosComponent]
 })
 export class AddUpdateDeleteConsumosComponent implements OnInit {
 
 
   @Input() consumo: Consumo;
+  @Input() maskito: any;
+  @Input() maskitoElement: any;
 
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
@@ -31,6 +34,9 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
   nombreUser: string = '';
   tarjetas: Tarjeta[] = [];
   mostrarBack: boolean = true;
+  idContador: number;
+  listadoTarjetas = [];
+
 
   formulario = new FormGroup({
     id: new FormControl(null),
@@ -51,6 +57,8 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    this.consumo ? this.formulario.patchValue(this.consumo) : this.formulario;
+    this.usuario.movimientos ? this.idContador = this.usuario.movimientos.length + 1 : this.idContador = 1;
 
     if (this.usuario) {
       this.nombreUser = this.usuario.name;
@@ -62,7 +70,7 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
       this.tarjetas = tarjeta;
     });
 
-    this.obtenerTarjetasUsuario();
+    this.obtenerTarjetasUsuario()
 
   }
 
@@ -72,6 +80,9 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
     this.firebaseSVC.getCollectionData(path).subscribe({
       next: (res: Tarjeta[]) => {
         this.utilsSVC.setTarjetas(res);
+        for (let tarjeta of res) {
+          this.listadoTarjetas.push(`${tarjeta.banco} -  ${tarjeta.tarjeta} - ${tarjeta.digitos}`)
+        }
       },
       error: err => {
         console.error('Error obteniendo tarjetas', err);
@@ -88,6 +99,125 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
 
 
   readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
+
+
+  async crearConsumo() {
+
+    // const loading = await this.utilsSVC.loading();
+    // await loading.present();
+
+    // if (this.saldoNegativoAlert(this.formulario.value)) {
+    //   let path = `users/${this.user.uid}/movimientos`;
+    //   this.formulario.get('id').setValue(this.idContador);
+
+    //   let importeParseado = Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.'))
+
+
+
+
+    //   this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
+
+    //     this.restarSaldos(this.formulario.value)
+    //     const movimiento: Movimiento = {
+    //       id: this.formulario.value.id!,
+    //       fecha: this.formulario.value.fecha!,
+    //       importe: importeParseado,
+    //       detalle: this.formulario.value.detalle!,
+    //       rubro: this.formulario.value.rubro!,
+    //       tipo: this.formulario.value.tipo!,
+    //       genero: this.formulario.value.genero!
+    //     };
+
+    //     this.utilsSVC.agregarMovimiento(movimiento);
+
+    //     this.utilsSVC.dismissModal({ success: true });
+
+    //     this.utilsSVC.presentToast({
+    //       message: 'Gasto ingresado con exito',
+    //       duration: 1500,
+    //       color: 'success',
+    //       position: 'middle',
+    //       icon: 'checkmark-circle-outline'
+    //     })
+
+    //   }).catch(error => {
+    //     console.log(error);
+
+    //     this.utilsSVC.presentToast({
+    //       message: error.message,
+    //       duration: 2500,
+    //       color: 'primary',
+    //       position: 'middle',
+    //       icon: 'alert-circle-outline'
+    //     })
+
+    //   }).finally(() => {
+    //     loading.dismiss();
+    //   })
+    // }
+  }
+
+
+  async editarConsumo() {
+
+    // const loading = await this.utilsSVC.loading();
+    // await loading.present();
+
+    // if (this.saldoNegativoAlert(this.formulario.value)) {
+
+    //   let path = `users/${this.user.uid}/movimientos/${this.gasto.id}`;
+    //   this.actualizarMovimiento(this.gasto);
+
+    //   this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
+
+
+    //     const movimiento: Movimiento = {
+    //       id: this.gasto.id,
+    //       fecha: this.formulario.value.fecha!,
+    //       importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
+    //       detalle: this.formulario.value.detalle!,
+    //       rubro: this.formulario.value.rubro!,
+    //       tipo: this.formulario.value.tipo!,
+    //       genero: this.formulario.value.genero!
+    //     };
+
+    //     this.utilsSVC.actualizarMovimiento(movimiento);
+    //     this.utilsSVC.dismissModal({ success: true });
+
+    //     this.utilsSVC.presentToast({
+    //       message: 'Gasto actualizado con exito',
+    //       duration: 1500,
+    //       color: 'success',
+    //       position: 'middle',
+    //       icon: 'checkmark-circle-outline'
+    //     })
+
+    //   }).catch(error => {
+    //     console.log(error);
+
+    //     this.utilsSVC.presentToast({
+    //       message: error.message,
+    //       duration: 2500,
+    //       color: 'primary',
+    //       position: 'middle',
+    //       icon: 'alert-circle-outline'
+    //     })
+
+    //   }).finally(() => {
+    //     loading.dismiss();
+    //   })
+    // }
+
+  }
+
+
+
+  submit() {
+    if (this.formulario.valid) {
+      this.consumo ? this.editarConsumo() : this.crearConsumo();
+    }
+  }
+
 
   cerrarModal() {
     this.utilsSVC.dismissModal();
