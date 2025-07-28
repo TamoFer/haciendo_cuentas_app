@@ -29,12 +29,12 @@ export class AddUpdtDeleteIngresosComponent {
 
   mostrarBack: boolean = true;
 
+
   opcionesRubro = ['Sueldo', 'Venta', 'Prestamo', 'Apuesta', 'Changa', 'Saldo'];
   opcionesTipo = ['Efectivo', 'Dinero en cuenta'];
 
   user = {} as User;
 
-  movimientosCuenta: Movimiento[] = [];
 
 
   mascara = maskitoNumberOptionsGenerator({
@@ -46,6 +46,7 @@ export class AddUpdtDeleteIngresosComponent {
   readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
 
   formulario = new FormGroup({
+    id: new FormControl(''),
     fecha: new FormControl(null, [Validators.required, Validators.min(0)]),
     importe: new FormControl(null, [Validators.required, Validators.min(0)]),
     detalle: new FormControl(null, [Validators.required, Validators.minLength(1)]),
@@ -61,12 +62,7 @@ export class AddUpdtDeleteIngresosComponent {
 
     if (this.ingreso) this.formulario.setValue(this.ingreso);
 
-    this.utilsSVC.movimientos$.subscribe(movs => {
-      this.movimientosCuenta = movs.sort((a, b) =>
-        new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
-      ) && movs.filter(mov => mov.genero != 'ingreso');
 
-    });
   }
 
 
@@ -130,12 +126,14 @@ export class AddUpdtDeleteIngresosComponent {
 
     let path = `users/${this.user.uid}/movimientos`;
 
+    this.formulario.value.id = String(this.utilsSVC.crearId())
+
 
     this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
       this.sumarSaldos(this.formulario.value);
       const movimiento: Movimiento = {
-        id: this.utilsSVC.asignarId(this.utilsSVC.crearId(), this.movimientosCuenta),
+        id: this.formulario.value.id,
         fecha: this.formulario.value.fecha!,
         importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
         detalle: this.formulario.value.detalle!,

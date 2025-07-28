@@ -28,21 +28,6 @@ export class AddUpdtDeleteGastoComponent {
   @Input() maskito: any;
   @Input() maskitoElement: any;
 
-  movimientosCuenta: Movimiento[] = [];
-
-
-  ngOnInit() {
-    this.user = this.utilsSVC.obtenerDatosLS('user');
-    this.gasto ? this.formulario.patchValue(this.gasto) : this.formulario;
-
-    this.utilsSVC.movimientos$.subscribe(movs => {
-      this.movimientosCuenta = movs.sort((a, b) =>
-        new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
-      ) && movs.filter(mov => mov.genero != 'ingreso');
-
-    });
-  }
-
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
 
@@ -54,6 +39,7 @@ export class AddUpdtDeleteGastoComponent {
   opcionesTipo = ['Efectivo', 'Dinero en cuenta'];
 
   formulario = new FormGroup({
+    id: new FormControl(null),
     fecha: new FormControl(null, [Validators.required, Validators.min(0)]),
     importe: new FormControl(null, [Validators.required, Validators.min(0)]),
     detalle: new FormControl('', [Validators.required, Validators.minLength(1)]),
@@ -72,6 +58,10 @@ export class AddUpdtDeleteGastoComponent {
   readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
 
 
+  ngOnInit() {
+    this.user = this.utilsSVC.obtenerDatosLS('user');
+    this.gasto ? this.formulario.patchValue(this.gasto) : this.formulario;
+  }
 
 
   async crearGasto() {
@@ -82,18 +72,16 @@ export class AddUpdtDeleteGastoComponent {
     if (this.saldoNegativoAlert(this.formulario.value)) {
       let path = `users/${this.user.uid}/movimientos`;
 
-      let importeParseado = Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.'))
-
-
+      this.formulario.value.id = String(this.utilsSVC.crearId())
 
 
       this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
         this.restarSaldos(this.formulario.value)
         const movimiento: Movimiento = {
-          id: this.utilsSVC.asignarId(this.utilsSVC.crearId(), this.movimientosCuenta),
+          id: this.formulario.value.id,
           fecha: this.formulario.value.fecha!,
-          importe: importeParseado,
+          importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
           detalle: this.formulario.value.detalle!,
           rubro: this.formulario.value.rubro!,
           tipo: this.formulario.value.tipo!,

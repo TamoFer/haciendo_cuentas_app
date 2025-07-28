@@ -41,20 +41,9 @@ export class UtilsService {
 
   crearId() {
     let max: number = 1000;
-    let randomNumber: number = Math.random() * max;
+    let randomNumber: number = Math.floor(Math.random() * max);
     return randomNumber
   }
-
-  asignarId(numero, objeto) {
-    for (let t of objeto) {
-      if (t.id === numero) {
-        numero = this.crearId()
-      } else {
-        return numero
-      }
-    }
-  }
-
 
   //MOVIMIENTOS
 

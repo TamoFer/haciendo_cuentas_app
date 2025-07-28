@@ -33,9 +33,8 @@ export class TarjetasPage implements OnInit {
   subscripcionUser: Subscription;
 
 
-
-
   formulario = new FormGroup({
+    id: new FormControl(''),
     digitos: new FormControl(null, [Validators.required, Validators.minLength(4)]),
     fecha_cierre: new FormControl(null, [Validators.required]),
     banco: new FormControl('', [Validators.required]),
@@ -55,6 +54,7 @@ export class TarjetasPage implements OnInit {
   constructor() { }
 
   ngOnInit() {
+
     this.subscripcionUser = this.utilsSVC.user$.subscribe((user) => {
       if (user) {
         this.usuario = user;
@@ -122,10 +122,12 @@ export class TarjetasPage implements OnInit {
     await loading.present();
     const path = `users/${this.usuario.uid}/tarjetas`;
 
+    this.formulario.value.id = String(this.utilsSVC.crearId())
+
     this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
       const Tarjeta: Tarjeta = {
-        id: this.utilsSVC.asignarId(this.utilsSVC.crearId(), this.tarjetas),
+        id: this.formulario.value.id,
         digitos: this.formulario.value.digitos!,
         fecha_cierre: this.formulario.value.fecha_cierre!,
         banco: this.formulario.value.banco!,

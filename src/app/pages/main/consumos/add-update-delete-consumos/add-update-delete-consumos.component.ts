@@ -8,6 +8,7 @@ import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import { Subscription } from 'rxjs';
 import { Consumo } from 'src/app/models/consumoTarjeta.model';
 import { Tarjeta } from 'src/app/models/tarjeta.model';
+import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
@@ -29,7 +30,8 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
 
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
-  usuario = this.utilsSVC.obtenerDatosLS('user');
+  usuario = {} as User;
+
   subscripcionUser: Subscription;
   nombreUser: string = '';
   tarjetas: Tarjeta[] = [];
@@ -54,10 +56,19 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
       role: 'confirm',
     }
   ]
+  mascara = maskitoNumberOptionsGenerator({
+    decimalSeparator: ',',
+    thousandSeparator: '.',
+    maximumFractionDigits: 2,
+  });
+
+
+  readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
 
   constructor() { }
 
   ngOnInit() {
+    this.usuario = this.utilsSVC.obtenerDatosLS('user');
     this.consumo ? this.formulario.patchValue(this.consumo) : this.formulario;
     this.usuario.movimientos ? this.idContador = this.usuario.movimientos.length + 1 : this.idContador = 1;
 
@@ -92,20 +103,6 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
   }
 
 
-  mascara = maskitoNumberOptionsGenerator({
-    decimalSeparator: ',',
-    thousandSeparator: '.',
-    maximumFractionDigits: 2,
-  });
-
-
-  readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
-
-  asignarConsumoAtarjeta() {
-    let tarjetaAsociada: Object;
-
-
-  }
 
   async crearConsumo() {
 
