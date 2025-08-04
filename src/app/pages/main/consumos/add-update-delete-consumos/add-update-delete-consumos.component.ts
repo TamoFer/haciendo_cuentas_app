@@ -104,13 +104,33 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
 
 
 
+  asociarTarjeta(tarjeta: string) {
+    for (let t of this.tarjetas) {
+      if (tarjeta.toLowerCase().includes(String(t.digitos).toLocaleLowerCase())) {
+        this.idTarjeta = t.id;
+      } else {
+        this.idTarjeta = '';
+        console.warn('No se encontró la tarjeta asociada');
+      }
+    }
+    console.log('ID de la tarjeta asociada:', this.idTarjeta);
+
+    return this.idTarjeta;
+
+  }
+
+
   async crearConsumo() {
 
     const loading = await this.utilsSVC.loading();
     await loading.present();
+    this.asociarTarjeta(this.formulario.value.tarjeta!);
+    console.log(this.idTarjeta);
 
-    let path = `users/${this.usuario.uid}a/`;
-    this.formulario.get('id').setValue(this.idContador);
+    let path = `users/${this.usuario.uid}/tarjetas/${this.idTarjeta}/consumos`;
+
+    this.formulario.value.id = String(this.utilsSVC.crearId())
+
 
     let importeParseado = Number(this.formulario.value.importe_total!.replace(/\./g, '').replace(',', '.'))
 
@@ -119,16 +139,17 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
       const consumo: Consumo = {
         id: this.formulario.value.id!,
         fecha: this.formulario.value.fecha!,
-        importe: importeParseado,
+        importe_total: importeParseado,
         detalle: this.formulario.value.detalle!,
-        cuotas: this.formulario.value.cuotificacion!,
+        cuotificacion: this.formulario.value.cuotificacion!,
         tarjeta_asociada: this.formulario.value.tarjeta!,
       };
 
+      this.utilsSVC.agregarConsumo(consumo);
       this.utilsSVC.dismissModal({ success: true });
 
       this.utilsSVC.presentToast({
-        message: 'Gasto ingresado con exito',
+        message: 'Consumo ingresado con exito',
         duration: 1500,
         color: 'success',
         position: 'middle',

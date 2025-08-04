@@ -1,5 +1,5 @@
-import { CommonModule, NgFor } from '@angular/common';
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { FirebaseService } from 'src/app/services/firebase.service';
@@ -15,6 +15,7 @@ import { User } from 'src/app/models/user.model';
 import { TarjetaAddUpdDeleteComponent } from './tarjeta-add-upd-delete/tarjeta-add-upd-delete.component';
 import { AddUpdateDeleteConsumosComponent } from '../consumos/add-update-delete-consumos/add-update-delete-consumos.component';
 import { Consumo } from 'src/app/models/consumoTarjeta.model';
+import { ConsumosComponent } from '../consumos/consumos.component';
 
 @Component({
   selector: 'app-tarjetas',
@@ -104,19 +105,8 @@ export class TarjetasPage implements OnInit {
   readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
 
 
-  async editarTarjeta(tarjeta?: Tarjeta) {
-    const modal = await this.utilsSVC.modalsCtrl.create({
-      component: TarjetaAddUpdDeleteComponent,
-      componentProps: {
-        tarjeta: tarjeta
-      }
-    });
 
-    await modal.present();
-  }
-
-
-
+  // Acciones para crear, editar y eliminar tarjetas
   async crearTarjeta() {
     const loading = await this.utilsSVC.loading();
     await loading.present();
@@ -161,11 +151,11 @@ export class TarjetasPage implements OnInit {
     })
   }
 
-  async agregarConsumo(consumo?: Consumo) {
+  async editarTarjeta(tarjeta?: Tarjeta) {
     const modal = await this.utilsSVC.modalsCtrl.create({
-      component: AddUpdateDeleteConsumosComponent,
+      component: TarjetaAddUpdDeleteComponent,
       componentProps: {
-        consumo: consumo // Aunque sea ingreso, lo tratás como Movimiento
+        tarjeta: tarjeta
       }
     });
 
@@ -234,6 +224,33 @@ export class TarjetasPage implements OnInit {
   }
 
 
+
+  // Acciones para crear, editar y eliminar consumos
+  async verConsumos(tarjeta: Tarjeta) {
+    const modal = await this.utilsSVC.modalsCtrl.create({
+      component: ConsumosComponent,
+      componentProps: {
+        tarjeta: tarjeta
+      }
+    });
+
+    await modal.present();
+
+  }
+
+  async agregarConsumo(consumo?: Consumo) {
+    const modal = await this.utilsSVC.modalsCtrl.create({
+      component: AddUpdateDeleteConsumosComponent,
+      componentProps: {
+        consumo: consumo
+      }
+    });
+
+    await modal.present();
+  }
+
+
+  // Diseño de tarjetas 
   getColorBanco(banco: string): string {
     switch (banco.toLowerCase()) {
       case 'santander': return '#c8102e';
@@ -262,4 +279,5 @@ export class TarjetasPage implements OnInit {
 
 
 }
+
 

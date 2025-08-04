@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 import { User } from '../models/user.model';
 import { Movimiento } from '../models/movimiento.mode';
 import { Tarjeta } from '../models/tarjeta.model';
+import { Consumo } from '../models/consumoTarjeta.model';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +29,10 @@ export class UtilsService {
   // ✅ Subject para los tarjetas
   private tarjetasSubject = new BehaviorSubject<Tarjeta[]>([]);
   tarjetas$ = this.tarjetasSubject.asObservable();
+
+  // ✅ Subject para los consumos
+  private consumosSubject = new BehaviorSubject<Consumo[]>([]);
+  consumos$ = this.consumosSubject.asObservable();
 
   // NUEVO: obtener el valor actual del usuario
   getUserActual(): User {
@@ -157,34 +162,34 @@ export class UtilsService {
 
   //CONSUMOS 
 
-  // // ✅ Obtener los tarjetas actuales
-  // getTarjetasActuales(): Tarjeta[] {
-  //   return this.tarjetasSubject.getValue();
-  // }
+  // ✅ Obtener los consumos actuales
+  getConsumosActuales(): Consumo[] {
+    return this.consumosSubject.getValue();
+  }
 
-  // // ✅ Establecer tarjetas
-  // setTarjetas(tarjetas: Tarjeta[]) {
-  //   this.tarjetasSubject.next(tarjetas);
-  // }
-  // // ✅ Agregar tarjetas (opcional helper)
-  // agregarTarjeta(nuevo: Tarjeta) {
-  //   const actualizados = [nuevo, ...this.getTarjetasActuales()];
-  //   this.setTarjetas(actualizados);
-  // }
+  // ✅ Establecer consumo
+  setConsumos(consumos: Consumo[]) {
+    this.consumosSubject.next(consumos);
+  }
+  // ✅ Agregar consumo (opcional helper)
+  agregarConsumo(nuevo: Consumo) {
+    const actualizados = [nuevo, ...this.getConsumosActuales()];
+    this.setConsumos(actualizados);
+  }
 
-  // // ✅ Editar tarjetas
-  // actualizarTarjeta(actualizado: Tarjeta) {
-  //   const lista = this.getTarjetasActuales().map(m =>
-  //     m.id === actualizado.id ? actualizado : m
-  //   );
-  //   this.setTarjetas(lista);
-  // }
+  // ✅ Editar consumo
+  actualizarConsumos(actualizado: Consumo) {
+    const lista = this.getConsumosActuales().map(m =>
+      m.id === actualizado.id ? actualizado : m
+    );
+    this.setConsumos(lista);
+  }
 
-  // // ✅ Eliminar movimiento
-  // eliminarTarjeta(id: number | string) {
-  //   const lista = this.getTarjetasActuales().filter(m => m.id !== id);
-  //   this.setTarjetas(lista);
-  // }
+  // ✅ Eliminar consumo
+  eliminarConsumo(id: number | string) {
+    const lista = this.getConsumosActuales().filter(m => m.id !== id);
+    this.setConsumos(lista);
+  }
 
 }
 

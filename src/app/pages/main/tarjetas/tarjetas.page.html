@@ -85,7 +85,31 @@
         </ng-template>
       </ion-modal>
 
+      <ion-item-sliding *ngFor="let tarjeta of tarjetas">
+        <ion-card class="tarjeta-card" [ngStyle]="{'background-color': getColorBanco(tarjeta.banco), color: 'white'}">
+          <ion-card-header>
+            <ion-card-title class="card-title">**** **** **** {{tarjeta.digitos}}
+            </ion-card-title>
+            <ion-card-subtitle class="card-subtitle">
+              <ion-img [src]="getIconoBanco(tarjeta.banco)" class="icono-banco"></ion-img>
+              <ion-img [src]="getIconoTarjeta(tarjeta.tarjeta)" class="icono-tarjeta"></ion-img>
+            </ion-card-subtitle>
+          </ion-card-header>
 
+          <div class="botones">
+            <ion-button fill="clear" (click)="verConsumos(tarjeta)">
+              <ion-icon name="receipt" labe> </ion-icon>
+            </ion-button>
+            <ion-button fill="clear" (click)="editarTarjeta(tarjeta)">
+              <ion-icon name="pencil"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" (click)="confirmarDelete(tarjeta)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
+
+          </div>
+        </ion-card>
+      </ion-item-sliding>
 
     </ion-content>
     <app-footer></app-footer>

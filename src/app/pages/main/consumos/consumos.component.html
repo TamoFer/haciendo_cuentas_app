@@ -1,3 +1,59 @@
-<p>
-  consumos works!
-</p>
+<app-header [title]="'Consumos de la tarjeta '" [isModal]="mostrarBack" (volverAccion)="cerrarModal()"></app-header>
+<ion-content>
+
+  <ion-list style="margin-top: 1rem;margin-bottom: 1rem;">
+    <ion-chip *ngIf="consumos.length!=0"
+      style="width: 100%; display: flex; flex-direction: row; justify-content: space-between; font-weight: bold;">
+      <ion-label style="display: flex; flex-direction: row;"><ion-icon name="calendar-number-outline" color="dark"
+          style="margin-right: 5px;"></ion-icon>FECHA</ion-label>
+      <ion-label style="display: flex; flex-direction: row;"><ion-icon name="reader-outline" color="dark"
+          style="margin-right: 5px;"></ion-icon>DETALLE</ion-label>
+      <ion-label style="display: flex; flex-direction: row;"><ion-icon name="logo-usd" color="dark"
+          style="margin-right: 5px;"></ion-icon>IMP</ion-label>
+      <ion-label style="display: flex; flex-direction: row;"><ion-icon name="calculator-outline" color="dark"
+          style="margin-right: 5px;"></ion-icon>CUOTAS</ion-label>
+    </ion-chip>
+
+    <ion-list>
+
+      <ion-item-sliding *ngFor="let c of consumos ">
+        <ion-item>
+          <div class="detalle-style">
+            <ion-label color="dark" class="detalle-style-fecha"> {{ c.fecha | date:'dd/MM'}} </ion-label>
+            <ion-label color="dark" class="detalle-style-detalle"> {{c.detalle}} </ion-label>
+            <ion-label color="dark" class="detalle-style-importe">$ {{c.importe_total }} </ion-label>
+            <ion-label color="dark" class="detalle-style-cuotas"> {{c.cuotificacion}} </ion-label>
+          </div>
+        </ion-item>
+        <ion-item-options>
+          <ion-item-option color="secondary">
+            <ion-icon name="create-outline"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="danger">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    </ion-list>
+
+    <ion-label *ngIf="consumos && consumos.length > 0">
+      <ion-chip *ngIf="consumos.length!=0"
+        style="width: 100%; display: flex; flex-direction: row; justify-content: space-between; margin-top: 10px; font-weight: bold;">
+        <ion-label style="display: flex; flex-direction: row;">
+
+        </ion-label>
+        <ion-label style="display: flex; flex-direction: row; ">
+          TOTAL
+        </ion-label>
+        <ion-label style="display: flex; flex-direction: row; ">
+          {{totalConsumos | currency:'ARS':'symbol':'1.2-2':'es-AR' }}
+        </ion-label>
+        <ion-label style="display: flex; flex-direction: row;"></ion-label>
+
+
+      </ion-chip>
+    </ion-label>
+  </ion-list>
+</ion-content>
+
+<app-footer></app-footer>

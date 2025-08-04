@@ -46,7 +46,7 @@ export class TarjetaAddUpdDeleteComponent implements OnInit {
     fecha_cierre: new FormControl(null, [Validators.required]),
     banco: new FormControl('', [Validators.required]),
     tarjeta: new FormControl('', [Validators.required]),
-    consumos: new FormControl([])
+    consumos: new FormControl(null)
   });
 
   public alertaInfo = [
