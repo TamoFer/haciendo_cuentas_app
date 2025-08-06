@@ -8,6 +8,7 @@ import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
+import { AddUpdateDeleteConsumosComponent } from './add-update-delete-consumos/add-update-delete-consumos.component';
 
 @Component({
   selector: 'app-consumos',
@@ -28,7 +29,6 @@ export class ConsumosComponent implements OnInit {
   consumos: Consumo[] = [];
   totalConsumos: number = 0;
 
-
   @Input() tarjeta: Tarjeta;
 
 
@@ -42,9 +42,84 @@ export class ConsumosComponent implements OnInit {
         this.usuarioLogeado = true;
       }
     });
-
-
     this.obtenerConsumosTarjeta();
+
+    // if (this.consumos.length === 0) {
+    //   this.sinConsumos();
+
+    // }
+  }
+
+  async modificarConsumo(consumo?: Consumo) {
+    const modal = await this.utilsSVC.modalsCtrl.create({
+      component: AddUpdateDeleteConsumosComponent,
+      componentProps: {
+        consumo: consumo
+      }
+    })
+    await modal.present();
+  }
+
+  async eliminarConsumo(consumo: Consumo) {
+    const loading = await this.utilsSVC.loading();
+    await loading.present();
+
+
+    let path = `users/${this.usuario.uid}/tarjetas/${this.tarjeta.id}/consumos/${consumo.id}`;
+
+
+    this.firebaseSVC.deleteDocument(path).then(async res => {
+
+
+      this.utilsSVC.presentToast({
+        message: 'Consumo eliminado con exito',
+        duration: 1500,
+        color: 'success',
+        position: 'middle',
+        icon: 'checkmark-circle-outline'
+      })
+
+    }).catch(error => {
+      console.log(error);
+
+      this.utilsSVC.presentToast({
+        message: error.message,
+        duration: 2500,
+        color: 'primary',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      })
+
+    }).finally(() => {
+      loading.dismiss();
+    })
+
+    // this.obtenerMovimientosCuenta()
+    // this.limpiarFiltros()
+  }
+
+  async confirmarDelete(consumo: Consumo) {
+    const alert = await this.utilsSVC.alertasCtrl.create({
+      header: 'Eliminar Consumo',
+      message: '¿Estás seguro que deseas eliminarlo?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Si',
+          role: 'destructive',
+          handler: () => {
+            this.eliminarConsumo(consumo)
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   calcularTotal() {
@@ -62,6 +137,9 @@ export class ConsumosComponent implements OnInit {
       next: (res: Consumo[]) => {
         this.utilsSVC.setConsumos(res);
         this.consumos = res;
+        if (this.consumos.length === 0) {
+          this.sinConsumos();
+        }
         this.calcularTotal();
 
       },
@@ -71,6 +149,23 @@ export class ConsumosComponent implements OnInit {
     });
   }
 
+  async sinConsumos() {
+    const alert = await this.utilsSVC.alertasCtrl.create({
+      header: 'Sin consumos',
+      message: 'No hay consumos registrados para esta tarjeta.',
+      buttons: [
+
+        {
+          text: 'OK',
+          handler: () => {
+            this.cerrarModal(); // 👉 tu función que querés ejecutar
+          }
+        }
+      ],
+    });
+
+    await alert.present();
+  }
 
   cerrarModal() {
     this.utilsSVC.dismissModal();

@@ -1,6 +1,12 @@
 <app-header [title]="'Consumos de la tarjeta '" [isModal]="mostrarBack" (volverAccion)="cerrarModal()"></app-header>
 <ion-content>
 
+
+
+
+
+
+  <!-- MENU SI EXISTEN CONSUMOS -->
   <ion-list style="margin-top: 1rem;margin-bottom: 1rem;">
     <ion-chip *ngIf="consumos.length!=0"
       style="width: 100%; display: flex; flex-direction: row; justify-content: space-between; font-weight: bold;">
@@ -16,21 +22,42 @@
 
     <ion-list>
 
+      <!-- DISEÑO DE CONSUMO -->
       <ion-item-sliding *ngFor="let c of consumos ">
         <ion-item>
-          <div class="detalle-style">
-            <ion-label color="dark" class="detalle-style-fecha"> {{ c.fecha | date:'dd/MM'}} </ion-label>
-            <ion-label color="dark" class="detalle-style-detalle"> {{c.detalle}} </ion-label>
-            <ion-label color="dark" class="detalle-style-importe">$ {{c.importe_total }} </ion-label>
-            <ion-label color="dark" class="detalle-style-cuotas"> {{c.cuotificacion}} </ion-label>
-          </div>
+          <ion-chip
+            style="width: 100%; display: flex; flex-direction: row; justify-content: space-between; font-weight: bold; margin: 0rem; background-color: aquamarine;"
+            color="success">
+            <div style="display: flex; flex-direction: row; width: 20%;">
+              <ion-label color="dark">{{ c.fecha | date:'dd/MM'}}</ion-label>
+            </div>
+            <div style="display: flex; flex-direction: row; width: 50%;">
+              <ion-label color="dark">{{c.detalle | uppercase | slice:0:15}}</ion-label>
+            </div>
+            <div style="display: flex; flex-direction: row; width: 30%;">
+              <ion-label color="dark">$ {{c.importe_total }}</ion-label>
+            </div>
+            <div style="display: flex; flex-direction: row; width: 10%;">
+              <ion-label color="dark">{{c.cuotificacion}}</ion-label>
+            </div>
+
+          </ion-chip>
+
         </ion-item>
+
+        <!-- OPCIONES DE CONSUMO -->
         <ion-item-options>
-          <ion-item-option color="secondary">
-            <ion-icon name="create-outline"></ion-icon>
+          <ion-item-option color="#FFFFF">
+            <ion-chip color="#F0EBEB">
+              <ion-icon name="create-outline" color="dark" style="font-weight: 800; font-size: 1.5rem;"
+                (click)="modificarConsumo(c)"></ion-icon>
+            </ion-chip>
           </ion-item-option>
-          <ion-item-option color="danger">
-            <ion-icon name="trash-outline"></ion-icon>
+          <ion-item-option color="#FFFFF">
+            <ion-chip color="#FFFFF">
+              <ion-icon name="trash-outline" color="danger" style="font-weight: 800; font-size: 1.5rem;"
+                (click)="confirmarDelete(c)"></ion-icon>
+            </ion-chip>
           </ion-item-option>
         </ion-item-options>
       </ion-item-sliding>

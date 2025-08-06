@@ -56,6 +56,7 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
       role: 'confirm',
     }
   ]
+
   mascara = maskitoNumberOptionsGenerator({
     decimalSeparator: ',',
     thousandSeparator: '.',
@@ -125,7 +126,6 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
     const loading = await this.utilsSVC.loading();
     await loading.present();
     this.asociarTarjeta(this.formulario.value.tarjeta!);
-    console.log(this.idTarjeta);
 
     let path = `users/${this.usuario.uid}/tarjetas/${this.idTarjeta}/consumos`;
 
@@ -176,53 +176,52 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
 
   async editarConsumo() {
 
-    // const loading = await this.utilsSVC.loading();
-    // await loading.present();
+    const loading = await this.utilsSVC.loading();
+    await loading.present();
 
-    // if (this.saldoNegativoAlert(this.formulario.value)) {
+    this.asociarTarjeta(this.formulario.value.tarjeta!);
 
-    //   let path = `users/${this.user.uid}/movimientos/${this.gasto.id}`;
-    //   this.actualizarMovimiento(this.gasto);
+    let path = `users/${this.usuario.uid}/tarjetas/${this.idTarjeta}/${this.consumo.id}`;
 
-    //   this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
+    let importeParseado = Number(this.formulario.value.importe_total!.replace(/\./g, '').replace(',', '.'))
 
+    this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
 
-    //     const movimiento: Movimiento = {
-    //       id: this.gasto.id,
-    //       fecha: this.formulario.value.fecha!,
-    //       importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
-    //       detalle: this.formulario.value.detalle!,
-    //       rubro: this.formulario.value.rubro!,
-    //       tipo: this.formulario.value.tipo!,
-    //       genero: this.formulario.value.genero!
-    //     };
+      const consumo: Consumo = {
+        id: this.consumo.id,
+        fecha: this.formulario.value.fecha!,
+        importe_total: importeParseado,
+        detalle: this.formulario.value.detalle!,
+        cuotificacion: this.formulario.value.cuotificacion!,
+        tarjeta_asociada: this.formulario.value.tarjeta!,
+      };
 
-    //     this.utilsSVC.actualizarMovimiento(movimiento);
-    //     this.utilsSVC.dismissModal({ success: true });
+      this.utilsSVC.actualizarConsumos(consumo);
+      this.utilsSVC.dismissModal({ success: true });
 
-    //     this.utilsSVC.presentToast({
-    //       message: 'Gasto actualizado con exito',
-    //       duration: 1500,
-    //       color: 'success',
-    //       position: 'middle',
-    //       icon: 'checkmark-circle-outline'
-    //     })
+      this.utilsSVC.presentToast({
+        message: 'Consumo actualizado con exito',
+        duration: 1500,
+        color: 'success',
+        position: 'middle',
+        icon: 'checkmark-circle-outline'
+      })
 
-    //   }).catch(error => {
-    //     console.log(error);
+    }).catch(error => {
+      console.log(error);
 
-    //     this.utilsSVC.presentToast({
-    //       message: error.message,
-    //       duration: 2500,
-    //       color: 'primary',
-    //       position: 'middle',
-    //       icon: 'alert-circle-outline'
-    //     })
+      this.utilsSVC.presentToast({
+        message: error.message,
+        duration: 2500,
+        color: 'primary',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      })
 
-    //   }).finally(() => {
-    //     loading.dismiss();
-    //   })
-    // }
+    }).finally(() => {
+      loading.dismiss();
+    })
+
 
   }
 
