@@ -170,7 +170,7 @@ export class AddUpdtDeleteGastoComponent {
 
   }
 
-  actualizarMovimiento(gasto) {
+  actualizarMovimiento(gasto: Movimiento) {
     const path = `users/${this.user.uid}`;
 
     const nuevo = this.formulario.value;

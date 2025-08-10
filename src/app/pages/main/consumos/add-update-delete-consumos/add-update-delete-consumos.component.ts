@@ -38,7 +38,7 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
   mostrarBack: boolean = true;
   idContador: number;
   listadoTarjetas = [];
-  idTarjeta: string;
+  tarjetaRelacionada: Tarjeta;
 
 
   formulario = new FormGroup({
@@ -47,7 +47,7 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
     importe_total: new FormControl(null, [Validators.required, Validators.min(0)]),
     cuotificacion: new FormControl(null, [Validators.required]),
     detalle: new FormControl(null, [Validators.required, Validators.minLength(1)]),
-    tarjeta: new FormControl(null, [Validators.required]),
+    tarjeta: new FormControl(),
   });
 
   public alertaInfo = [
@@ -64,7 +64,7 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
   });
 
 
-  readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
+  readonly maskPredicate: MaskitoElementPredicate = async (el) => ((el as unknown) as HTMLIonInputElement).getInputElement();
 
   constructor() { }
 
@@ -87,6 +87,7 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
 
   }
 
+
   obtenerTarjetasUsuario() {
     const path = `users/${this.usuario.uid}/tarjetas`;
 
@@ -103,20 +104,16 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
     });
   }
 
-
-
   asociarTarjeta(tarjeta: string) {
     for (let t of this.tarjetas) {
       if (tarjeta.toLowerCase().includes(String(t.digitos).toLocaleLowerCase())) {
-        this.idTarjeta = t.id;
+        this.tarjetaRelacionada = t;
       } else {
-        this.idTarjeta = '';
+        this.tarjetaRelacionada = {} as Tarjeta;
         console.warn('No se encontró la tarjeta asociada');
       }
     }
-    console.log('ID de la tarjeta asociada:', this.idTarjeta);
-
-    return this.idTarjeta;
+    return this.tarjetaRelacionada;
 
   }
 
@@ -127,12 +124,11 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
     await loading.present();
     this.asociarTarjeta(this.formulario.value.tarjeta!);
 
-    let path = `users/${this.usuario.uid}/tarjetas/${this.idTarjeta}/consumos`;
-
-    this.formulario.value.id = String(this.utilsSVC.crearId())
+    let path = `users/${this.usuario.uid}/tarjetas/${this.tarjetaRelacionada.id}/consumos`;
 
 
     let importeParseado = Number(this.formulario.value.importe_total!.replace(/\./g, '').replace(',', '.'))
+    console.log(this.tarjetaRelacionada);
 
     this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
@@ -142,7 +138,7 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
         importe_total: importeParseado,
         detalle: this.formulario.value.detalle!,
         cuotificacion: this.formulario.value.cuotificacion!,
-        tarjeta_asociada: this.formulario.value.tarjeta!,
+        tarjeta_asociada: this.tarjetaRelacionada,
       };
 
       this.utilsSVC.agregarConsumo(consumo);
@@ -181,7 +177,8 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
 
     this.asociarTarjeta(this.formulario.value.tarjeta!);
 
-    let path = `users/${this.usuario.uid}/tarjetas/${this.idTarjeta}/${this.consumo.id}`;
+    let path = `users/${this.usuario.uid}/tarjetas/${this.tarjetaRelacionada.id}/consumos/${this.consumo.id}`;
+
 
     let importeParseado = Number(this.formulario.value.importe_total!.replace(/\./g, '').replace(',', '.'))
 
@@ -193,10 +190,10 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
         importe_total: importeParseado,
         detalle: this.formulario.value.detalle!,
         cuotificacion: this.formulario.value.cuotificacion!,
-        tarjeta_asociada: this.formulario.value.tarjeta!,
+        tarjeta_asociada: this.tarjetaRelacionada,
       };
 
-      this.utilsSVC.actualizarConsumos(consumo);
+      this.utilsSVC.actualizarConsumos(this.consumo);
       this.utilsSVC.dismissModal({ success: true });
 
       this.utilsSVC.presentToast({

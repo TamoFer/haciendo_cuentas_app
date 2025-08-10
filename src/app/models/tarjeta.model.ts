@@ -6,6 +6,5 @@ export interface Tarjeta {
     fecha_cierre: Date;
     banco: string;
     tarjeta: string;
-    consumos: Consumo[];
 
 }

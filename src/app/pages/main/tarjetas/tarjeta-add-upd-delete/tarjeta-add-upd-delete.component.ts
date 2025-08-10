@@ -46,7 +46,6 @@ export class TarjetaAddUpdDeleteComponent implements OnInit {
     fecha_cierre: new FormControl(null, [Validators.required]),
     banco: new FormControl('', [Validators.required]),
     tarjeta: new FormControl('', [Validators.required]),
-    consumos: new FormControl(null)
   });
 
   public alertaInfo = [
@@ -66,7 +65,7 @@ export class TarjetaAddUpdDeleteComponent implements OnInit {
     ],
   };
 
-  readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
+  readonly maskPredicate: MaskitoElementPredicate = async (el) => ((el as unknown) as HTMLIonInputElement).getInputElement();
 
   async editarTarjeta() {
 
@@ -87,7 +86,6 @@ export class TarjetaAddUpdDeleteComponent implements OnInit {
         digitos: this.formulario.value.digitos!,
         banco: this.formulario.value.banco!,
         tarjeta: this.formulario.value.tarjeta!,
-        consumos: this.formulario.value.consumos!
 
       };
 

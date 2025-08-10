@@ -43,11 +43,6 @@ export class ConsumosComponent implements OnInit {
       }
     });
     this.obtenerConsumosTarjeta();
-
-    // if (this.consumos.length === 0) {
-    //   this.sinConsumos();
-
-    // }
   }
 
   async modificarConsumo(consumo?: Consumo) {

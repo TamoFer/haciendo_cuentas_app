@@ -1,10 +1,8 @@
-<app-header [title]="'Consumos de la tarjeta '" [isModal]="mostrarBack" (volverAccion)="cerrarModal()"></app-header>
+<app-header
+  [title]="(tarjeta.banco==='Otro'? 'Tarjeta' : tarjeta.banco)  + ' ' + (tarjeta.tarjeta==='American Express'? 'American' :tarjeta.tarjeta)  + ' ' + tarjeta.digitos "
+  [isModal]="mostrarBack" (volverAccion)="cerrarModal()"> </app-header>
+
 <ion-content>
-
-
-
-
-
 
   <!-- MENU SI EXISTEN CONSUMOS -->
   <ion-list style="margin-top: 1rem;margin-bottom: 1rem;">

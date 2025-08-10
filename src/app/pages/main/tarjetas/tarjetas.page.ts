@@ -102,7 +102,7 @@ export class TarjetasPage implements OnInit {
     ],
   };
 
-  readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
+  readonly maskPredicate: MaskitoElementPredicate = async (el) => ((el as unknown) as HTMLIonInputElement).getInputElement();
 
 
 
@@ -122,7 +122,6 @@ export class TarjetasPage implements OnInit {
         fecha_cierre: this.formulario.value.fecha_cierre!,
         banco: this.formulario.value.banco!,
         tarjeta: this.formulario.value.tarjeta!,
-        consumos: this.formulario.value.consumos!,
       };
 
       this.utilsSVC.dismissModal({ success: true });
@@ -147,6 +146,7 @@ export class TarjetasPage implements OnInit {
       })
 
     }).finally(() => {
+      this.formulario.reset();
       loading.dismiss();
     })
   }
@@ -260,12 +260,12 @@ export class TarjetasPage implements OnInit {
     }
   }
 
-  getIconoTarjeta(tarejeta: string): string {
-    switch (tarejeta.toLowerCase()) {
+  getIconoTarjeta(tarjeta: string): string {
+    switch (tarjeta.toLowerCase()) {
       case 'visa': return '../../../../assets/icon/visa-icono.png';
       case 'mastercard': return '../../../../assets/icon/mastercard-icono.png';
       case 'american express': return '../../../../assets/icon/american_express-icono.png';
-      default: return '#f0f0f0';
+      default: return '';
     }
   }
   getIconoBanco(banco: string): string {
@@ -273,6 +273,7 @@ export class TarjetasPage implements OnInit {
       case 'santander': return '../../../../assets/img/santander.png';
       case 'galicia': return '../../../../assets/img/galicia.jpg';
       case 'bbva': return '../../../../assets/img/bbva.png';
+      case 'otro': return '../../../../assets/img/banco.png';
       default: return '#f0f0f0';
     }
   }

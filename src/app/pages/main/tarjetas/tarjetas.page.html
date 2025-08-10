@@ -4,8 +4,13 @@
     <ion-content class="ion-padding">
 
       <!-- MODAL COMPONENTE, SE VE SOLO CUANDO LE DAS A AGREGAR TARJETA -->
-      <ion-button id="open-modal" expand="block">Agregar Nueva Tarjeta</ion-button>
-      <ion-button expand="block" (click)="agregarConsumo()">Agregar Nueva Consumo</ion-button>
+      <div class="botones-acciones">
+        <ion-button id="open-modal" expand="block"> <ion-icon slot="start" name="add"></ion-icon> Nueva
+          Tarjeta</ion-button>
+
+        <ion-button expand="block" (click)="agregarConsumo()"> <ion-icon slot="start" name="add"></ion-icon>Nuevo
+          Consumo</ion-button>
+      </div>
 
 
       <ion-modal #modal trigger="open-modal" [canDismiss]="canDismiss" [presentingElement]="page">
@@ -27,6 +32,8 @@
                   <ion-select-option value="Santander">Santander</ion-select-option>
                   <ion-select-option value="Galicia">Galicia</ion-select-option>
                   <ion-select-option value="Bbva">Bbva</ion-select-option>
+                  <ion-select-option value="Otro">Otro Banco</ion-select-option>
+
                 </ion-select>
               </ion-item>
               <div *ngIf="formulario.controls.banco.errors && formulario.controls.banco.touched">
@@ -78,7 +85,12 @@
                   necesaria
                 </div>
               </div>
-              <ion-button type="submit" [disabled]="!formulario.valid">Agregar</ion-button>
+              <div
+                style="width: max-content; display: flex; flex-direction: row ; justify-content: center; margin: 10px auto;">
+                <ion-button type="submit" [disabled]="!formulario.valid" shape="round"> <ion-icon slot="start"
+                    name="checkmark-circle-outline"></ion-icon> Agregar
+                </ion-button>
+              </div>
 
             </form>
           </ion-content>
