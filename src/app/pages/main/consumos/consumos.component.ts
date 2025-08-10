@@ -24,6 +24,7 @@ export class ConsumosComponent implements OnInit {
   usuarioLogeado: boolean = false;
   usuario = this.utilsSVC.obtenerDatosLS('user');
   subscripcionUser: Subscription;
+  consumosSubscription: Subscription;
   nombreUser: string = '';
   mostrarBack: boolean = true;
   consumos: Consumo[] = [];
@@ -44,6 +45,8 @@ export class ConsumosComponent implements OnInit {
     });
     this.obtenerConsumosTarjeta();
   }
+
+
 
   async modificarConsumo(consumo?: Consumo) {
     const modal = await this.utilsSVC.modalsCtrl.create({
@@ -89,8 +92,6 @@ export class ConsumosComponent implements OnInit {
       loading.dismiss();
     })
 
-    // this.obtenerMovimientosCuenta()
-    // this.limpiarFiltros()
   }
 
   async confirmarDelete(consumo: Consumo) {
@@ -128,7 +129,7 @@ export class ConsumosComponent implements OnInit {
     }
     const path = `users/${this.usuario.uid}/tarjetas/${this.tarjeta.id}/consumos`;
 
-    this.firebaseSVC.getCollectionData(path).subscribe({
+    this.consumosSubscription = this.firebaseSVC.getCollectionData(path).subscribe({
       next: (res: Consumo[]) => {
         this.utilsSVC.setConsumos(res);
         this.consumos = res;
@@ -153,13 +154,22 @@ export class ConsumosComponent implements OnInit {
         {
           text: 'OK',
           handler: () => {
-            this.cerrarModal(); // 👉 tu función que querés ejecutar
+            this.cerrarModal();
           }
         }
       ],
     });
 
     await alert.present();
+  }
+
+  ngOnDestroy() {
+    if (this.subscripcionUser) {
+      this.subscripcionUser.unsubscribe();
+    }
+    if (this.consumosSubscription) {
+      this.consumosSubscription.unsubscribe();
+    }
   }
 
   cerrarModal() {

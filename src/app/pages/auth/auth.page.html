@@ -29,16 +29,16 @@
         <p routerLink="recuperar-pswd">¿Olvidaste la contraseña?</p>
 
 
-        <ion-button expand="block" mode="ios" type="submit" [disabled]="!formulario.valid">
-            Ingresar
-            <ion-icon slot="end" name="log-in-outline"></ion-icon>
-        </ion-button>
-
-
-        <ion-button expand="block" mode="ios" routerLink="registro-usuario">
-            Registrarme
-            <ion-icon slot="end" name="person-add-outline"></ion-icon>
-        </ion-button>
+        <div class="botones-acciones">
+            <ion-button type="submit" [disabled]="!formulario.valid">
+                <ion-icon name="log-in-outline" style="margin-right: 0.5rem;"></ion-icon>
+                Ingresar
+            </ion-button>
+            <ion-button routerLink="registro-usuario">
+                <ion-icon name="person-add-outline" style="margin-right: 0.5rem;"></ion-icon>
+                Registrarme
+            </ion-button>
+        </div>
 
 
 

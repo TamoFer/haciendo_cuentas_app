@@ -32,6 +32,7 @@ export class TarjetasPage implements OnInit {
   nombreUser: string = '';
   tarjetas: Tarjeta[] = [];
   subscripcionUser: Subscription;
+  consumos: boolean = false;
 
 
   formulario = new FormGroup({
@@ -40,7 +41,6 @@ export class TarjetasPage implements OnInit {
     fecha_cierre: new FormControl(null, [Validators.required]),
     banco: new FormControl('', [Validators.required]),
     tarjeta: new FormControl('', [Validators.required]),
-    consumos: new FormControl([])
   });
 
 
@@ -235,8 +235,8 @@ export class TarjetasPage implements OnInit {
     });
 
     await modal.present();
-
   }
+
 
   async agregarConsumo(consumo?: Consumo) {
     const modal = await this.utilsSVC.modalsCtrl.create({

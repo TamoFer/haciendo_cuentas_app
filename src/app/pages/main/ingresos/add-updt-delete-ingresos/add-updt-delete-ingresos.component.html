@@ -54,11 +54,13 @@
             <div class="errores" *ngIf="formulario.controls.tipo.errors?.['required']">El tipo es necesario</div>
         </div>
 
-        <ion-button expand="block" mode="ios" type="submit" [disabled]="!formulario.valid">
-            {{ingreso ? 'Modificar ': 'Agregar'}}
-
-            <ion-icon slot="end" [name]="ingreso? 'pencil' : 'checkmark-circle'"></ion-icon>
-        </ion-button>
+        <div
+            style="width: max-content; display: flex; flex-direction: row ; justify-content: center; margin: 10px auto;">
+            <ion-button type="submit" [disabled]="!formulario.valid" shape="round">
+                {{ingreso ? 'Modificar ': 'Agregar'}}
+                <ion-icon slot="end" [name]="ingreso? 'pencil' : 'checkmark-circle'"></ion-icon>
+            </ion-button>
+        </div>
 
     </form>
 </ion-content>

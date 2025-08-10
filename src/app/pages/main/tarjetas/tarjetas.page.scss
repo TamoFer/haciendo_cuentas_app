@@ -131,8 +131,6 @@
 .botones-acciones {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
-    width: auto;
-
-
+    justify-content: space-around;
+    width: 100%;
 }
