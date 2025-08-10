@@ -55,7 +55,7 @@ export class AddUpdtDeleteGastoComponent {
   });
 
 
-  readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
+  readonly maskPredicate: MaskitoElementPredicate = async (el) => ((el as unknown) as HTMLIonInputElement).getInputElement();
 
 
   ngOnInit() {
