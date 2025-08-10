@@ -19,6 +19,7 @@ import { CommonModule, registerLocaleData } from '@angular/common';
 import localeEsAR from '@angular/common/locales/es-AR';
 import { FirebaseService } from './services/firebase.service';
 registerLocaleData(localeEsAR); // <-- Esto registra el locale
+import { SplashScreen } from '@capacitor/splash-screen';
 
 @NgModule({
   declarations: [AppComponent],
@@ -59,6 +60,14 @@ export class AppModule {
     // private location: Location
   ) {
     this.initializeApp();
+    this.showSplash();
+  }
+
+  async showSplash() {
+    await SplashScreen.show({
+      autoHide: true,
+      showDuration: 2000,
+    })
   }
 
   initializeApp() {
