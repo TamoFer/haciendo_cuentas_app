@@ -37,7 +37,7 @@ const routes: Routes = [
   {
     path: 'balances',
     loadChildren: () => import('./pages/main/balances/balances.module').then(m => m.BalancesPageModule), canActivate: [AuthGuard]
-  },
+  }
 
 
 ];

@@ -6,15 +6,13 @@ import { IonicModule } from '@ionic/angular';
 
 import { BalancesPageRoutingModule } from './balances-routing.module';
 
-import { BalancesPage } from './balances.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    BalancesPageRoutingModule
+    BalancesPageRoutingModule,
   ],
-  // declarations: [BalancesPage]
 })
 export class BalancesPageModule { }

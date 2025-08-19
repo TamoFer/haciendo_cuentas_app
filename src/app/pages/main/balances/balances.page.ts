@@ -31,4 +31,5 @@ export class BalancesPage implements OnInit {
     }
   }
 
+
 }

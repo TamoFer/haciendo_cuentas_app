@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { BalancesPage } from './balances.page';
 
+
 const routes: Routes = [
   {
     path: '',
@@ -14,4 +15,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class BalancesPageRoutingModule {}
+export class BalancesPageRoutingModule { }
