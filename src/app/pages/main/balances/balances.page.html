@@ -1,9 +1,6 @@
 <app-header title="Balances" [mostrarVolver]="usuarioLogeado" [routerLink]="['/home']"></app-header>
 <ion-content>
   <ion-segment>
-    <ion-segment-button value="day-to-day" content-id="day-to-day">
-      <ion-label>Dia a Dia</ion-label>
-    </ion-segment-button>
     <ion-segment-button value="general" content-id="general">
       <ion-label>General</ion-label>
     </ion-segment-button>
@@ -13,7 +10,6 @@
   </ion-segment>
 
   <ion-segment-view>
-    <ion-segment-content id="day-to-day">En desarrollo </ion-segment-content>
     <ion-segment-content id="general">En desarrollo </ion-segment-content>
     <ion-segment-content id="simulador">En desarrollo </ion-segment-content>
   </ion-segment-view>
