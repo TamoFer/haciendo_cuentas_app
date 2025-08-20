@@ -25,6 +25,18 @@ ion-footer {
     margin-bottom: 3rem;
 }
 
+ion-modal::part(content) {
+    --background: black;
+    /* color que combine con tu app */
+}
+
+ion-app {
+    background-color: black;
+    /* mismo color que el modal */
+}
+
+
+
 // safe padding for ios
 // .safe-p-bottom {
 //     padding-bottom: constant(safe-area-inset-bottom); // for ios 13+
