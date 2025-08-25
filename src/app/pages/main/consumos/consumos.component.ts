@@ -9,6 +9,7 @@ import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { AddUpdateDeleteConsumosComponent } from './add-update-delete-consumos/add-update-delete-consumos.component';
+import { CotizacionService } from 'src/app/services/cotizacion.service';
 
 @Component({
   selector: 'app-consumos',
@@ -28,14 +29,28 @@ export class ConsumosComponent implements OnInit {
   nombreUser: string = '';
   mostrarBack: boolean = true;
   consumos: Consumo[] = [];
-  totalConsumos: number = 0;
+  totalConsumosPesos: number = 0;
+  dolarTarjeta: number = 0;
+  totalConsumosMonedaExt: number = 0;
+
 
   @Input() tarjeta: Tarjeta;
 
 
-  constructor() { }
+  constructor(private cotizacionService: CotizacionService) { }
 
   ngOnInit() {
+
+    this.cotizacionService.obtenerCotizacionDolar().subscribe({
+      next: (cotizacion) => {
+        this.dolarTarjeta = cotizacion.venta;
+      },
+      error: (err) => {
+        console.error('Error al obtener la cotización del dólar:', err);
+      }
+    })
+
+
     this.subscripcionUser = this.utilsSVC.user$.subscribe((user) => {
       if (user) {
         this.usuario = user;
@@ -118,8 +133,22 @@ export class ConsumosComponent implements OnInit {
     await alert.present();
   }
 
-  calcularTotal() {
-    this.totalConsumos = this.consumos.reduce((acc, consumo) => acc + Number(String(consumo.importe_total).replace(/\./g, '').replace(',', '.')), 0);
+  calcularTotalPesos() {
+    this.totalConsumosPesos = this.consumos.reduce((acc, consumo) => {
+      if (consumo.moneda === 'Pesos') {
+        return acc + Number(String(consumo.importe_total).replace(/\./g, '').replace(',', '.'));
+      }
+      return acc;
+    }, 0);
+  }
+
+  calcularTotalMonedaExtranjera() {
+    this.totalConsumosMonedaExt = this.consumos.reduce((acc, consumo) => {
+      if (consumo.moneda === 'Dólares' || consumo.moneda === 'Euros') {
+        return acc + Number(String(consumo.importe_total).replace(/\./g, '').replace(',', '.'));
+      }
+      return acc;
+    }, 0);
   }
 
   obtenerConsumosTarjeta() {
@@ -136,7 +165,8 @@ export class ConsumosComponent implements OnInit {
         if (this.consumos.length === 0) {
           this.sinConsumos();
         }
-        this.calcularTotal();
+        this.calcularTotalPesos();
+        this.calcularTotalMonedaExtranjera();
 
       },
       error: err => {

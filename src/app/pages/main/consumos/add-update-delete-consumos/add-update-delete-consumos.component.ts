@@ -38,6 +38,7 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
   mostrarBack: boolean = true;
   idContador: number;
   listadoTarjetas = [];
+  listadoMonedas = ['Pesos', 'Dólares', 'Euros'];
   tarjetaRelacionada: Tarjeta;
 
 
@@ -47,7 +48,8 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
     importe_total: new FormControl(null, [Validators.required, Validators.min(0)]),
     cuotificacion: new FormControl(null, [Validators.required]),
     detalle: new FormControl(null, [Validators.required, Validators.minLength(1)]),
-    tarjeta: new FormControl(),
+    tarjeta: new FormControl(null, [Validators.required]),
+    moneda: new FormControl('Pesos', [Validators.required]),
   });
 
   public alertaInfo = [
@@ -87,6 +89,14 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
 
   }
 
+  mostrarCuotificacion() {
+    if (this.formulario.value.moneda == 'Pesos') {
+      return true;
+    } else {
+      this.formulario.controls.cuotificacion.setValue(1);
+      return false;
+    }
+  }
 
   obtenerTarjetasUsuario() {
     const path = `users/${this.usuario.uid}/tarjetas`;
@@ -128,7 +138,6 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
 
 
     let importeParseado = Number(this.formulario.value.importe_total!.replace(/\./g, '').replace(',', '.'))
-    console.log(this.tarjetaRelacionada);
 
     this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
@@ -139,6 +148,7 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
         detalle: this.formulario.value.detalle!,
         cuotificacion: this.formulario.value.cuotificacion!,
         tarjeta_asociada: this.tarjetaRelacionada,
+        moneda: this.formulario.value.moneda!
       };
 
       this.utilsSVC.agregarConsumo(consumo);
@@ -191,6 +201,7 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
         detalle: this.formulario.value.detalle!,
         cuotificacion: this.formulario.value.cuotificacion!,
         tarjeta_asociada: this.tarjetaRelacionada,
+        moneda: this.formulario.value.moneda!
       };
 
       this.utilsSVC.actualizarConsumos(this.consumo);

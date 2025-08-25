@@ -7,5 +7,6 @@ export interface Consumo {
     cuotificacion: number;
     tarjeta_asociada: Tarjeta
     detalle: string
+    moneda: string
 
 }

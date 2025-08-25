@@ -20,6 +20,7 @@ import localeEsAR from '@angular/common/locales/es-AR';
 import { FirebaseService } from './services/firebase.service';
 registerLocaleData(localeEsAR); // <-- Esto registra el locale
 import { SplashScreen } from '@capacitor/splash-screen';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [AppComponent],
@@ -31,6 +32,7 @@ import { SplashScreen } from '@capacitor/splash-screen';
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFireAuthModule,
     AngularFireModule,
+    HttpClientModule
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

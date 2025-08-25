@@ -37,6 +37,16 @@
       </div>
     </div>
 
+    <!-- moneda  -->
+    <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Moneda" [type]="'select'"
+      [options]="listadoMonedas" [control]="formulario.controls.moneda">
+    </app-ingreso-datos>
+
+    <div *ngIf="formulario.controls.moneda.errors && formulario.controls.moneda.touched">
+      <div class="errores" *ngIf="formulario.controls.moneda.errors?.['required']">Moneda en que realizo el consumo,
+        dato necesario.</div>
+    </div>
+
     <!-- tarjeta  -->
     <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Tarjeta" [type]="'select'"
       [options]="listadoTarjetas" [control]="formulario.controls.tarjeta">
@@ -50,8 +60,11 @@
 
 
     <!-- cuotificacion -->
-    <app-ingreso-datos icon="journal-outline" autocomplete="detail" label="Cuotas realizadas"
-      [control]="formulario.controls.cuotificacion" type="number"></app-ingreso-datos>
+    <div *ngIf="mostrarCuotificacion()">
+      <app-ingreso-datos icon="journal-outline" autocomplete="detail" label="Cuotas realizadas"
+        [control]="formulario.controls.cuotificacion" type="number"></app-ingreso-datos>
+
+    </div>
 
     <div style="width: max-content; display: flex; flex-direction: row ; justify-content: center; margin: 10px auto;">
       <ion-button type="submit" [disabled]="!formulario.valid" shape="round">
@@ -59,6 +72,7 @@
         <ion-icon slot="end" [name]="consumo? 'pencil' : 'checkmark-circle'"></ion-icon>
       </ion-button>
     </div>
+
 
 
   </form>
