@@ -45,6 +45,7 @@ export class AddUpdtDeleteGastoComponent {
     detalle: new FormControl('', [Validators.required, Validators.minLength(1)]),
     rubro: new FormControl(null, Validators.required),
     tipo: new FormControl(null, Validators.required),
+    fijo: new FormControl(false),
     genero: new FormControl('gasto')
   });
 
@@ -85,6 +86,7 @@ export class AddUpdtDeleteGastoComponent {
           detalle: this.formulario.value.detalle!,
           rubro: this.formulario.value.rubro!,
           tipo: this.formulario.value.tipo!,
+          fijo: this.formulario.value.fijo!,
           genero: this.formulario.value.genero!
         };
 
@@ -138,6 +140,7 @@ export class AddUpdtDeleteGastoComponent {
           detalle: this.formulario.value.detalle!,
           rubro: this.formulario.value.rubro!,
           tipo: this.formulario.value.tipo!,
+          fijo: this.formulario.value.fijo!,
           genero: this.formulario.value.genero!
         };
 
@@ -262,6 +265,12 @@ export class AddUpdtDeleteGastoComponent {
       return condicional = true
     }
   }
+
+
+  cambiarEstado() {
+    this.formulario.value.fijo = !this.formulario.value.fijo;
+  }
+
 
   submit() {
     if (this.formulario.valid) {

@@ -148,7 +148,8 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
         detalle: this.formulario.value.detalle!,
         cuotificacion: this.formulario.value.cuotificacion!,
         tarjeta_asociada: this.tarjetaRelacionada,
-        moneda: this.formulario.value.moneda!
+        moneda: this.formulario.value.moneda!,
+        mes_inicio: new Date(this.formulario.value.fecha!)
       };
 
       this.utilsSVC.agregarConsumo(consumo);
@@ -201,7 +202,8 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
         detalle: this.formulario.value.detalle!,
         cuotificacion: this.formulario.value.cuotificacion!,
         tarjeta_asociada: this.tarjetaRelacionada,
-        moneda: this.formulario.value.moneda!
+        moneda: this.formulario.value.moneda!,
+        mes_inicio: new Date(this.formulario.value.fecha!)
       };
 
       this.utilsSVC.actualizarConsumos(this.consumo);

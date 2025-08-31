@@ -9,9 +9,28 @@
     </ion-segment-button>
   </ion-segment>
 
+  <ion-fab slot="fixed" vertical="bottom" horizontal="start">
+    <ion-fab-button>
+      <ion-icon name="menu-outline"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-list side="top">
+      <ion-button style="width: max-content ;" color="danger">Gasto Fijo</ion-button>
+      <ion-button style="width: max-content ;" color="success">Ingreso Fijo</ion-button>
+      <ion-button style="width: max-content ;" color="tertiary">Simular Gasto</ion-button>
+    </ion-fab-list>
+  </ion-fab>
+
+  {{ tarjetas | json }} <br><br>
+  {{ ingresosFijos | json }} <br><br>
+  {{ gastosFijos | json }} <br><br>
+  {{ consumos | json }} <br><br>
+  {{ totalConsumosPesos}} <br><br>
+  {{ totalConsumosMonedaExt}} <br><br>
+
   <ion-segment-view>
-    <ion-segment-content id="general">En desarrollo </ion-segment-content>
-    <ion-segment-content id="simulador">En desarrollo </ion-segment-content>
+    <ion-segment-content id="general"> </ion-segment-content>
+
+    <ion-segment-content id="simulador"> </ion-segment-content>
   </ion-segment-view>
 
 </ion-content>

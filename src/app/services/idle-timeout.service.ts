@@ -7,7 +7,7 @@ import { getAuth, signOut } from 'firebase/auth';
 })
 export class IdleTimeoutService {
   private timeoutId: any;
-  private readonly idleTime = 3 * 60 * 1000; // 5 minutos
+  private readonly idleTime = 10 * 60 * 1000; // 5 minutos
 
   constructor(private router: Router, private ngZone: NgZone) { }
 

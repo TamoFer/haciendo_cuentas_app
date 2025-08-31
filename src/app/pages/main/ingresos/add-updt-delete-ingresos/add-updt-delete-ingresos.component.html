@@ -54,6 +54,8 @@
             <div class="errores" *ngIf="formulario.controls.tipo.errors?.['required']">El tipo es necesario</div>
         </div>
 
+        <ion-toggle (click)="cambiarEstado()">¿Es un ingreso fijo?</ion-toggle>
+
         <div
             style="width: max-content; display: flex; flex-direction: row ; justify-content: center; margin: 10px auto;">
             <ion-button type="submit" [disabled]="!formulario.valid" shape="round">

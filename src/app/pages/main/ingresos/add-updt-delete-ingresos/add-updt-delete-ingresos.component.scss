@@ -32,3 +32,24 @@ form {
     }
 
 }
+
+ion-toggle {
+    margin-left: 2.5rem;
+}
+
+ion-toggle::part(track),
+ion-toggle.toggle-checked::part(track) {
+    background: #ddd;
+
+    /* Required for iOS handle to overflow the height of the track */
+    overflow: visible;
+}
+
+ion-toggle::part(handle) {
+    background: #eb7769;
+
+}
+
+ion-toggle.toggle-checked::part(handle) {
+    background: #95c34e;
+}

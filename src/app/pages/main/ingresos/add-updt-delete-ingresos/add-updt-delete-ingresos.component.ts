@@ -43,7 +43,7 @@ export class AddUpdtDeleteIngresosComponent {
     maximumFractionDigits: 2,
   });
 
-  readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
+  readonly maskPredicate: MaskitoElementPredicate = async (el) => ((el as unknown) as HTMLIonInputElement).getInputElement();
 
   formulario = new FormGroup({
     id: new FormControl(''),
@@ -52,6 +52,7 @@ export class AddUpdtDeleteIngresosComponent {
     detalle: new FormControl(null, [Validators.required, Validators.minLength(1)]),
     rubro: new FormControl(null, Validators.required),
     tipo: new FormControl(null, Validators.required),
+    fijo: new FormControl(false),
     genero: new FormControl('ingreso')
 
   });
@@ -60,7 +61,18 @@ export class AddUpdtDeleteIngresosComponent {
   ngOnInit() {
     this.user = this.utilsSVC.obtenerDatosLS('user');
 
-    if (this.ingreso) this.formulario.setValue(this.ingreso);
+    if (this.ingreso) {
+      this.formulario.setValue({
+        id: this.ingreso.id,
+        fecha: this.ingreso.fecha,
+        importe: this.ingreso.importe,
+        detalle: this.ingreso.detalle,
+        rubro: this.ingreso.rubro,
+        tipo: this.ingreso.tipo,
+        fijo: this.ingreso.fijo ?? false,
+        genero: this.ingreso.genero
+      });
+    }
 
 
   }
@@ -86,6 +98,7 @@ export class AddUpdtDeleteIngresosComponent {
         detalle: this.formulario.value.detalle!,
         rubro: this.formulario.value.rubro!,
         tipo: this.formulario.value.tipo!,
+        fijo: this.formulario.value.fijo!,
         genero: this.formulario.value.genero!
       };
 
@@ -139,6 +152,7 @@ export class AddUpdtDeleteIngresosComponent {
         detalle: this.formulario.value.detalle!,
         rubro: this.formulario.value.rubro!,
         tipo: this.formulario.value.tipo!,
+        fijo: this.formulario.value.fijo!,
         genero: this.formulario.value.genero!
       };
 
@@ -238,6 +252,10 @@ export class AddUpdtDeleteIngresosComponent {
       saldo_banco: nuevoSaldoBco,
       saldo_efectivo: nuevoSaldoEfe
     })
+  }
+
+  cambiarEstado() {
+    this.formulario.value.fijo = !this.formulario.value.fijo;
   }
 
   submit() {

@@ -8,5 +8,6 @@ export interface Consumo {
     tarjeta_asociada: Tarjeta
     detalle: string
     moneda: string
-
+    mes_inicio: Date
 }
+

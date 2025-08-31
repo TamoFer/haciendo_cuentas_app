@@ -6,5 +6,6 @@ export interface Movimiento {
     rubro: string;
     tipo: string;
     genero: string
+    fijo: boolean
 }
 
