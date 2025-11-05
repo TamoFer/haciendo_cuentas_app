@@ -31,6 +31,7 @@ export class GastosPage implements OnInit {
   dias = [7, 15, 30]
 
 
+  busquedaPorFecha: boolean = false;
   busquedaPorFechas: boolean = false;
   busquedaPorRubro: boolean = false;
   busquedaPorDetalle: boolean = false;
@@ -38,6 +39,7 @@ export class GastosPage implements OnInit {
 
 
   formulario = new FormGroup({
+    hoy: new FormControl(null),
     desde: new FormControl(null),
     hasta: new FormControl(null),
     rubro: new FormControl(null),
@@ -81,26 +83,34 @@ export class GastosPage implements OnInit {
 
 
   filtrarDatos(formulario: FormGroup) {
-    const { rubro, detalle, dias, desde, hasta } = formulario.value;
+    const { rubro, detalle, dias, desde, hasta, hoy } = formulario.value;
     let total = 0;
-    const hoy = new Date();
+
+    const today = new Date();
     let fechaLimite: Date | null = null;
+    let fechaHoy: Date | null = null;
 
     if (dias != null) {
       fechaLimite = new Date();
-      fechaLimite.setDate(hoy.getDate() - dias);
+      fechaLimite.setDate(today.getDate() - dias);
     }
+
 
     this.movimientosFiltrados = this.movimientosCuenta.filter(mov => {
       const fechaMov = new Date(mov.fecha);
       const importe = Number(String(mov.importe).replace(/\./g, '').replace(',', '.'));
 
+      const fechaMovStr = fechaMov.toISOString().split('T')[0];
+      const hoyStr = today.toISOString().split('T')[0];
+
+
+      const coincideHoy = hoy ? (fechaMovStr === hoyStr) : true;
       const coincideRubro = rubro ? mov.rubro.toLowerCase() === rubro.toLowerCase() : true;
       const coincideDetalle = detalle ? mov.detalle.toLowerCase().includes(detalle.toLowerCase()) : true;
       const coincideDias = fechaLimite ? fechaMov >= fechaLimite : true;
       const coincideFechas = (desde && hasta) ? (fechaMov >= new Date(desde) && fechaMov <= new Date(hasta)) : true;
 
-      const pasaFiltros = coincideRubro && coincideDetalle && coincideDias && coincideFechas;
+      const pasaFiltros = coincideRubro && coincideDetalle && coincideDias && coincideFechas && coincideHoy;
 
       if (pasaFiltros) {
         total += importe;
@@ -109,8 +119,32 @@ export class GastosPage implements OnInit {
       return pasaFiltros;
     });
 
+
+    if (total === 0) {
+      this.sinGastos();
+
+    }
     this.totalGastos = total;
   }
+
+  async sinGastos() {
+    const alert = await this.utilsSVC.alertasCtrl.create({
+      header: 'Sin gastos',
+      message: 'No hay gastos que coincidan con los filtros seleccionados',
+      buttons: [
+
+        {
+          text: 'OK',
+          handler: () => {
+            this.cerrarModal();
+          }
+        }
+      ],
+    });
+
+    await alert.present();
+  }
+
 
 
   async confirmarDelete(movimiento) {
@@ -230,5 +264,7 @@ export class GastosPage implements OnInit {
     this.totalGastos = 0;
   }
 
-
+  cerrarModal() {
+    this.utilsSVC.dismissModal();
+  }
 }
