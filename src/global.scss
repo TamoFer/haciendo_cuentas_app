@@ -14,55 +14,23 @@
 @import "@ionic/angular/css/flex-utils.css";
 
 ion-button {
-    text-transform: none;
+  text-transform: none;
 }
 
-ion-header {
-    margin-top: 2.5rem;
-}
+// ion-header {
+//   margin-top: 2.5rem;
+// }
 
 ion-footer {
-    margin-bottom: 3rem;
+  margin-bottom: 3rem;
 }
 
 ion-modal::part(content) {
-    --background: black;
-    /* color que combine con tu app */
+  --background: black;
+  /* color que combine con tu app */
 }
 
 ion-app {
-    background-color: black;
-    /* mismo color que el modal */
+  background-color: black;
+  /* mismo color que el modal */
 }
-
-
-
-// safe padding for ios
-// .safe-p-bottom {
-//     padding-bottom: constant(safe-area-inset-bottom); // for ios 13+
-//     padding-bottom: env(safe-area-inset-bottom); // for previous ios versions
-// }
-
-// :root {
-//     --ion-safe-area-top: env(safe-area-inset-top);
-//     --ion-safe-area-bottom: env(safe-area-inset-bottom);
-//     --ion-safe-area-left: env(safe-area-inset-left);
-//     --ion-safe-area-right: env(safe-area-inset-right);
-// }
-
-// ion-content,
-// ion-header,
-// ion-footer {
-//     --padding-top: env(safe-area-inset-top);
-//     --padding-bottom: env(safe-area-inset-bottom);
-// }
-
-
-// ion-header {
-//     margin-top: env(safe-area-inset-top);
-// }
-
-
-// ion-fab {
-//     bottom: calc(16px + env(safe-area-inset-bottom));
-// }
