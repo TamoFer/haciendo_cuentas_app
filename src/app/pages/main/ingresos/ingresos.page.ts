@@ -35,9 +35,9 @@ export class IngresosPage implements OnInit {
   busquedaPorRubro: boolean = false;
   busquedaPorDetalle: boolean = false;
   busquedaPorDias: boolean = false;
-  hayResultados: boolean = false;
 
   formulario = new FormGroup({
+    hoy: new FormControl(null),
     desde: new FormControl(null),
     hasta: new FormControl(null),
     rubro: new FormControl(null),
@@ -191,26 +191,34 @@ export class IngresosPage implements OnInit {
 
 
   filtrarDatos(formulario: FormGroup) {
-    const { rubro, detalle, dias, desde, hasta } = formulario.value;
+    const { rubro, detalle, dias, desde, hasta, hoy } = formulario.value;
     let total = 0;
-    const hoy = new Date();
+
+    const today = new Date();
     let fechaLimite: Date | null = null;
+    let fechaHoy: Date | null = null;
 
     if (dias != null) {
       fechaLimite = new Date();
-      fechaLimite.setDate(hoy.getDate() - dias);
+      fechaLimite.setDate(today.getDate() - dias);
     }
+
 
     this.movimientosFiltrados = this.movimientosCuenta.filter(mov => {
       const fechaMov = new Date(mov.fecha);
       const importe = Number(String(mov.importe).replace(/\./g, '').replace(',', '.'));
 
+      const fechaMovStr = fechaMov.toISOString().split('T')[0];
+      const hoyStr = today.toISOString().split('T')[0];
+
+
+      const coincideHoy = hoy ? (fechaMovStr === hoyStr) : true;
       const coincideRubro = rubro ? mov.rubro.toLowerCase() === rubro.toLowerCase() : true;
       const coincideDetalle = detalle ? mov.detalle.toLowerCase().includes(detalle.toLowerCase()) : true;
       const coincideDias = fechaLimite ? fechaMov >= fechaLimite : true;
       const coincideFechas = (desde && hasta) ? (fechaMov >= new Date(desde) && fechaMov <= new Date(hasta)) : true;
 
-      const pasaFiltros = coincideRubro && coincideDetalle && coincideDias && coincideFechas;
+      const pasaFiltros = coincideRubro && coincideDetalle && coincideDias && coincideFechas && coincideHoy;
 
       if (pasaFiltros) {
         total += importe;
@@ -219,10 +227,13 @@ export class IngresosPage implements OnInit {
       return pasaFiltros;
     });
 
-    this.totalGastos = total;
-    this.totalGastos > 0 ? this.hayResultados = false : this.hayResultados = true;
-  }
 
+    if (total === 0) {
+      this.sinIngresos();
+
+    }
+    this.totalGastos = total;
+  }
 
   iconPorRubro(rubro: string) {
     switch (rubro.toLowerCase()) {
@@ -244,7 +255,27 @@ export class IngresosPage implements OnInit {
 
   }
 
+  async sinIngresos() {
+    const alert = await this.utilsSVC.alertasCtrl.create({
+      header: 'Sin ingresos',
+      message: 'No hay ingresos que coincidan con los filtros seleccionados',
+      buttons: [
 
+        {
+          text: 'OK',
+          handler: () => {
+            this.cerrarModal();
+          }
+        }
+      ],
+    });
+
+    await alert.present();
+  }
+
+  cerrarModal() {
+    this.utilsSVC.dismissModal();
+  }
 
   limpiarFiltros() {
     this.formulario.reset();
