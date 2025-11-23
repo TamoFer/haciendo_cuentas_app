@@ -30,11 +30,12 @@ export class IngresosPage implements OnInit {
 
   dias = [7, 15, 30];
 
+  busquedaPorFecha: boolean = false;
   busquedaPorFechas: boolean = false;
   busquedaPorRubro: boolean = false;
   busquedaPorDetalle: boolean = false;
   busquedaPorDias: boolean = false;
-
+  hayResultados: boolean = false;
 
   formulario = new FormGroup({
     desde: new FormControl(null),
@@ -219,6 +220,7 @@ export class IngresosPage implements OnInit {
     });
 
     this.totalGastos = total;
+    this.totalGastos > 0 ? this.hayResultados = false : this.hayResultados = true;
   }
 
 

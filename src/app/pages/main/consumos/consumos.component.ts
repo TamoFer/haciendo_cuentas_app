@@ -41,7 +41,7 @@ export class ConsumosComponent implements OnInit {
 
   ngOnInit() {
 
-    this.cotizacionService.obtenerCotizacionDolar().subscribe({
+    this.cotizacionService.obtenerCotizacionDolarTarjeta().subscribe({
       next: (cotizacion) => {
         this.dolarTarjeta = cotizacion.venta;
       },

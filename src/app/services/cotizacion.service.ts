@@ -6,10 +6,17 @@ import { Injectable } from '@angular/core';
 })
 export class CotizacionService {
 
-  private apiUrl: string = 'https://dolarapi.com/v1/dolares/oficial';
+  private apiUrlOficial: string = 'https://dolarapi.com/v1/dolares/oficial';
+  private apiUrlTarjeta: string = 'https://dolarapi.com/v1/dolares/tarjeta';
+
+
   constructor(private http: HttpClient) { }
 
-  obtenerCotizacionDolar() {
-    return this.http.get<any>(this.apiUrl);
+  obtenerCotizacionDolarOficial() {
+    return this.http.get<any>(this.apiUrlOficial);
+  }
+
+  obtenerCotizacionDolarTarjeta() {
+    return this.http.get<any>(this.apiUrlTarjeta);
   }
 }
