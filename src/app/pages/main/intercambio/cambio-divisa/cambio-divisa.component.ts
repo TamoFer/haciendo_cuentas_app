@@ -47,7 +47,7 @@ export class CambioDivisaComponent implements OnInit {
 
   }
 
-  readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
+  readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as unknown as HTMLIonInputElement).getInputElement();
 
   formulario = new FormGroup({
     importeAcambiar: new FormControl(null, [Validators.required, Validators.minLength(1)]),
