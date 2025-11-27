@@ -1,0 +1,70 @@
+<app-header title="Metas" [mostrarVolver]="usuarioLogeado" [routerLink]="['/home']"></app-header>
+<ion-content>
+  <ion-card>
+    <div style="display: flex;flex-direction: row; justify-content: space-between;">
+
+      <div>
+        <ion-card-header>
+          <ion-card-title>Producto Title</ion-card-title>
+          <ion-card-subtitle>Card Subtitle</ion-card-subtitle>
+        </ion-card-header>
+      </div>
+      <div style="margin: 1rem;">
+        <ion-avatar style="width: 5rem; height: 5rem;">
+          <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+        </ion-avatar>
+      </div>
+    </div>
+
+    <ion-card-content>
+      <ion-accordion-group>
+        <ion-accordion value="first">
+          <ion-item slot="header" color="light">
+            <ion-label>Hasta ahora</ion-label>
+          </ion-item>
+          <div class="ion-padding" slot="content">
+            <div style="display: flex; flex-direction: row;">
+              <ion-progress-bar [value]="valorMeta" color="success"></ion-progress-bar>
+              <ion-icon name="trophy-outline"
+                style="font-size: 1.5rem;top: 50%; transform: translateY(-50%);"></ion-icon>
+            </div>
+
+            <div style="display: flex; flex-direction: column;margin-top: 0.5rem;">
+              <ion-label>Valor meta : </ion-label>
+              <ion-label>Ahorrado hasta ahora: </ion-label>
+            </div>
+
+          </div>
+        </ion-accordion>
+      </ion-accordion-group>
+    </ion-card-content>
+  </ion-card>
+
+
+
+
+
+
+
+
+  <!-- Boton con acciones -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button>
+      <ion-icon name="menu-outline"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-list side="top">
+      <ion-fab-button>
+        <ion-icon name="add-circle-outline" color="success" style="font-size: 2rem;"></ion-icon>
+        <ion-icon name="bar-chart-outline" style="font-size: 2rem;"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button>
+        <ion-icon name="add-circle-outline" color="success" style="font-size: 2rem;"></ion-icon>
+        <ion-icon name="trophy-outline" style="font-size: 2rem;"></ion-icon>
+      </ion-fab-button>
+
+    </ion-fab-list>
+  </ion-fab>
+
+
+</ion-content>
+<app-footer></app-footer>

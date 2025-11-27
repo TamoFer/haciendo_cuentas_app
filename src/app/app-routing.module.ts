@@ -37,6 +37,10 @@ const routes: Routes = [
   {
     path: 'balances',
     loadChildren: () => import('./pages/main/balances/balances.module').then(m => m.BalancesPageModule), canActivate: [AuthGuard]
+  },
+  {
+    path: 'metas',
+    loadChildren: () => import('./pages/main/metas/metas.module').then(m => m.MetasPageModule), canActivate: [AuthGuard]
   }
 
 
