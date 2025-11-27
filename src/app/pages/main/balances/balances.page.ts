@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { Consumo } from 'src/app/models/consumoTarjeta.model';
-import { Movimiento } from 'src/app/models/movimiento.mode';
+import { Movimiento } from 'src/app/models/movimiento.model';
 import { Tarjeta } from 'src/app/models/tarjeta.model';
 import { CotizacionService } from 'src/app/services/cotizacion.service';
 import { FirebaseService } from 'src/app/services/firebase.service';

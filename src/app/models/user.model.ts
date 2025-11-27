@@ -1,4 +1,4 @@
-import { Movimiento } from "./movimiento.mode";
+import { Movimiento } from "./movimiento.model";
 import { Tarjeta } from "./tarjeta.model";
 
 export interface User {

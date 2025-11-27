@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { AlertController, LoadingController, ModalController, ModalOptions, ToastController, ToastOptions } from '@ionic/angular';
 import { BehaviorSubject } from 'rxjs';
 import { User } from '../models/user.model';
-import { Movimiento } from '../models/movimiento.mode';
+import { Movimiento } from '../models/movimiento.model';
 import { Tarjeta } from '../models/tarjeta.model';
 import { Consumo } from '../models/consumoTarjeta.model';
 
@@ -82,12 +82,12 @@ export class UtilsService {
     this.setMovimientos(lista);
   }
 
-  // Spinner loading 
+  // Spinner loading
   loading() {
     return this.loadingCtrl.create({ spinner: 'crescent' })
   }
 
-  // Toast notificación 
+  // Toast notificación
   async presentToast(opts?: ToastOptions) {
     const toast = await this.toastCtrl.create(opts)
     toast.present();
@@ -128,7 +128,7 @@ export class UtilsService {
   }
 
 
-  //TARJETAS 
+  //TARJETAS
 
   // ✅ Obtener los tarjetas actuales
   getTarjetasActuales(): Tarjeta[] {
@@ -160,7 +160,7 @@ export class UtilsService {
   }
 
 
-  //CONSUMOS 
+  //CONSUMOS
 
   // ✅ Obtener los consumos actuales
   getConsumosActuales(): Consumo[] {

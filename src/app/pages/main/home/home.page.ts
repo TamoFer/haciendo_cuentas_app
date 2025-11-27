@@ -1,7 +1,7 @@
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { Movimiento } from 'src/app/models/movimiento.mode';
+import { Movimiento } from 'src/app/models/movimiento.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
@@ -144,7 +144,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   }
 
-  //agregar gastos o actualizar 
+  //agregar gastos o actualizar
   async agregarGastos(movimiento?: Movimiento) {
     const modal = await this.utilsSVC.modalsCtrl.create({
       component: AddUpdtDeleteGastoComponent,
@@ -156,7 +156,7 @@ export class HomePage implements OnInit, OnDestroy {
     await modal.present();
   }
 
-  //agregar ingresos o actualizar 
+  //agregar ingresos o actualizar
   async agregarIngresos(movimiento?: Movimiento) {
     const modal = await this.utilsSVC.modalsCtrl.create({
       component: AddUpdtDeleteIngresosComponent,
