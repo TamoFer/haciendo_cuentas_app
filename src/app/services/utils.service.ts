@@ -6,33 +6,29 @@ import { User } from '../models/user.model';
 import { Movimiento } from '../models/movimiento.model';
 import { Tarjeta } from '../models/tarjeta.model';
 import { Consumo } from '../models/consumoTarjeta.model';
+import { MetasPageModule } from '../pages/main/metas/metas.module';
+import { Meta } from '../models/metas.model';
+import { Ahorro } from '../models/ahorro.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UtilsService {
 
+  // @section: controladores
   loadingCtrl = inject(LoadingController);
   toastCtrl = inject(ToastController);
   router = inject(Router);
   alertasCtrl = inject(AlertController);
   modalsCtrl = inject(ModalController);
+  // @endsection
 
+
+
+  // @section: usuario
   // NUEVO: BehaviorSubject del usuario
   private userSubject = new BehaviorSubject<User>(this.obtenerDatosLS('user'));
   user$ = this.userSubject.asObservable(); // observable que se suscriben los componentes
-
-  // ✅ Subject para los movimientos
-  private movimientosSubject = new BehaviorSubject<Movimiento[]>([]);
-  movimientos$ = this.movimientosSubject.asObservable();
-
-  // ✅ Subject para los tarjetas
-  private tarjetasSubject = new BehaviorSubject<Tarjeta[]>([]);
-  tarjetas$ = this.tarjetasSubject.asObservable();
-
-  // ✅ Subject para los consumos
-  private consumosSubject = new BehaviorSubject<Consumo[]>([]);
-  consumos$ = this.consumosSubject.asObservable();
 
   // NUEVO: obtener el valor actual del usuario
   getUserActual(): User {
@@ -49,8 +45,15 @@ export class UtilsService {
     let randomNumber: number = Math.floor(Math.random() * max);
     return randomNumber
   }
+  // @endsection
 
-  //MOVIMIENTOS
+
+  // @section: movimientos
+  // ✅ Subject para los movimientos
+
+
+  private movimientosSubject = new BehaviorSubject<Movimiento[]>([]);
+  movimientos$ = this.movimientosSubject.asObservable();
 
   // ✅ Obtener los movimientos actuales
   getMovimientosActuales(): Movimiento[] {
@@ -82,53 +85,14 @@ export class UtilsService {
     this.setMovimientos(lista);
   }
 
-  // Spinner loading
-  loading() {
-    return this.loadingCtrl.create({ spinner: 'crescent' })
-  }
-
-  // Toast notificación
-  async presentToast(opts?: ToastOptions) {
-    const toast = await this.toastCtrl.create(opts)
-    toast.present();
-  }
-
-  // Navegación
-  routerLink(url: string) {
-    return this.router.navigateByUrl(url);
-  }
-
-  // Guardar datos en localStorage
-  guardarDatosLS(key: string, value: any) {
-    localStorage.setItem(key, JSON.stringify(value));
-
-    // NUEVO: si es el usuario, notificamos el cambio
-    if (key === 'user') {
-      this.userSubject.next(value);
-    }
-  }
-
-  // Obtener datos desde localStorage
-  obtenerDatosLS(key: string) {
-    return JSON.parse(localStorage.getItem(key));
-  }
-
-  // Mostrar modal
-  async presentModal(opts: ModalOptions) {
-    const modal = await this.modalsCtrl.create(opts);
-    await modal.present();
-
-    const { data } = await modal.onWillDismiss();
-    if (data) return data;
-  }
-
-  // Cerrar modal
-  dismissModal(data?: any) {
-    return this.modalsCtrl.dismiss(data);
-  }
+  // @endsection
 
 
-  //TARJETAS
+  // @section: tarjetas
+
+  // ✅ Subject para los tarjetas
+  private tarjetasSubject = new BehaviorSubject<Tarjeta[]>([]);
+  tarjetas$ = this.tarjetasSubject.asObservable();
 
   // ✅ Obtener los tarjetas actuales
   getTarjetasActuales(): Tarjeta[] {
@@ -160,7 +124,14 @@ export class UtilsService {
   }
 
 
-  //CONSUMOS
+  // @endsection
+
+
+  // @section: consumos
+
+  // ✅ Subject para los consumos
+  private consumosSubject = new BehaviorSubject<Consumo[]>([]);
+  consumos$ = this.consumosSubject.asObservable();
 
   // ✅ Obtener los consumos actuales
   getConsumosActuales(): Consumo[] {
@@ -190,6 +161,147 @@ export class UtilsService {
     const lista = this.getConsumosActuales().filter(m => m.id !== id);
     this.setConsumos(lista);
   }
+
+  // @endsection
+
+
+  // @section: metas
+
+  // ✅ Subject para los metas
+  private metasSubject = new BehaviorSubject<Meta[]>([]);
+  metas$ = this.metasSubject.asObservable();
+
+  // ✅ Obtener los consumos actuales
+  getMetasActuales(): Meta[] {
+    return this.metasSubject.getValue();
+  }
+
+  // ✅ Establecer consumo
+  setMetas(metas: Meta[]) {
+    this.metasSubject.next(metas);
+  }
+  // ✅ Agregar consumo (opcional helper)
+  agregarMetas(nuevo: Meta) {
+    const actualizados = [nuevo, ...this.getMetasActuales()];
+    this.setMetas(actualizados);
+  }
+
+  // ✅ Editar consumo
+  actualizarMetas(actualizado: Meta) {
+    const lista = this.getMetasActuales().map(m =>
+      m.id === actualizado.id ? actualizado : m
+    );
+    this.setMetas(lista);
+  }
+
+  // ✅ Eliminar consumo
+  eliminarMetas(id: number | string) {
+    const lista = this.getMetasActuales().filter(m => m.id !== id);
+    this.setMetas(lista);
+  }
+
+  // @endsection
+
+
+  // @section: ahorros
+
+  // ✅ Subject para los ahorros
+  private ahorrosSubject = new BehaviorSubject<Ahorro[]>([]);
+  ahorros$ = this.ahorrosSubject.asObservable();
+
+  // ✅ Obtener los consumos actuales
+  getAhorrosActuales(): Ahorro[] {
+    return this.ahorrosSubject.getValue();
+  }
+
+  // ✅ Establecer consumo
+  setAhorros(consumos: Ahorro[]) {
+    this.ahorrosSubject.next(consumos);
+  }
+  // ✅ Agregar consumo (opcional helper)
+  agregarAhorros(nuevo: Ahorro) {
+    const actualizados = [nuevo, ...this.getAhorrosActuales()];
+    this.setAhorros(actualizados);
+  }
+
+  // ✅ Editar consumo
+  actualizarAhorros(actualizado: Ahorro) {
+    const lista = this.getAhorrosActuales().map(m =>
+      m.id === actualizado.id ? actualizado : m
+    );
+    this.setAhorros(lista);
+  }
+
+  // ✅ Eliminar consumo
+  eliminarAhorro(id: number | string) {
+    const lista = this.getAhorrosActuales().filter(m => m.id !== id);
+    this.setAhorros(lista);
+  }
+
+
+  // @endsection
+
+
+  // @section: herramientas
+
+  // Spinner loading
+  loading() {
+    return this.loadingCtrl.create({ spinner: 'crescent' })
+  }
+
+  // Toast notificación
+  async presentToast(opts?: ToastOptions) {
+    const toast = await this.toastCtrl.create(opts)
+    toast.present();
+  }
+
+  // Navegación
+  routerLink(url: string) {
+    return this.router.navigateByUrl(url);
+  }
+
+  // @endsection
+
+
+  // @section: local storage
+
+  // Guardar datos en localStorage
+  guardarDatosLS(key: string, value: any) {
+    localStorage.setItem(key, JSON.stringify(value));
+
+    // NUEVO: si es el usuario, notificamos el cambio
+    if (key === 'user') {
+      this.userSubject.next(value);
+    }
+  }
+
+  // Obtener datos desde localStorage
+  obtenerDatosLS(key: string) {
+    return JSON.parse(localStorage.getItem(key));
+  }
+
+
+  // @endsection
+
+
+  // @section: modal
+
+  // Mostrar modal
+  async presentModal(opts: ModalOptions) {
+    const modal = await this.modalsCtrl.create(opts);
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+    if (data) return data;
+  }
+
+  // Cerrar modal
+  dismissModal(data?: any) {
+    return this.modalsCtrl.dismiss(data);
+  }
+
+  // @endsection
+
 
 }
 

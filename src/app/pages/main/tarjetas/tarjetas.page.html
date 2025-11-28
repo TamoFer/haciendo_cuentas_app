@@ -12,7 +12,7 @@
           Consumo</ion-button>
       </div>
 
-
+      <!-- // MODAL PARA AGREGAR TARJETA -->
       <ion-modal #modal trigger="open-modal" [canDismiss]="canDismiss" [presentingElement]="page">
         <ng-template>
           <ion-header>
@@ -98,6 +98,7 @@
         </ng-template>
       </ion-modal>
 
+      <!-- // LISTA DE TARJETASk -->
       <ion-item-sliding *ngFor="let tarjeta of tarjetas">
         <ion-card class="tarjeta-card" [ngStyle]="{'background-color': getColorBanco(tarjeta.banco), color: 'white'}">
           <ion-card-header>
