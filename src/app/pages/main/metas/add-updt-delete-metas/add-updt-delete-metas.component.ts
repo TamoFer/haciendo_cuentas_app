@@ -12,6 +12,7 @@ import { FooterComponent } from 'src/app/shared/components/footer/footer.compone
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/ingreso-datos.component';
 import { MaskitoElementPredicate } from '@maskito/core';
+import { Meta } from 'src/app/models/metas.model';
 
 
 @Component({
@@ -22,20 +23,14 @@ import { MaskitoElementPredicate } from '@maskito/core';
 })
 export class AddUpdtDeleteMetasComponent {
 
-  @Input() meta: Movimiento;
+  @Input() meta: Meta;
 
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
 
   mostrarBack: boolean = true;
 
-
-  opcionesRubro = ['Sueldo', 'Venta', 'Prestamo', 'Apuesta', 'Changa', 'Saldo'];
-  opcionesTipo = ['Efectivo', 'Dinero en cuenta'];
-
   user = {} as User;
-
-
 
   mascara = maskitoNumberOptionsGenerator({
     decimalSeparator: ',',
@@ -47,14 +42,12 @@ export class AddUpdtDeleteMetasComponent {
 
   formulario = new FormGroup({
     id: new FormControl(''),
-    fecha: new FormControl(null, [Validators.required, Validators.min(0)]),
-    importe: new FormControl(null, [Validators.required, Validators.min(0)]),
+    fecha_comienzo: new FormControl(null),
+    valor: new FormControl(null, [Validators.required, Validators.min(1)]),
+    moneda: new FormControl('Pesos Argentinos'),
     detalle: new FormControl(null, [Validators.required, Validators.minLength(1)]),
-    rubro: new FormControl(null, Validators.required),
-    tipo: new FormControl(null, Validators.required),
-    fijo: new FormControl(false),
-    genero: new FormControl('meta')
-
+    nombre: new FormControl(null, [Validators.required, Validators.minLength(1)]),
+    ahorrado: new FormControl([]),
   });
 
 
@@ -64,13 +57,12 @@ export class AddUpdtDeleteMetasComponent {
     if (this.meta) {
       this.formulario.setValue({
         id: this.meta.id,
-        fecha: this.meta.fecha,
-        importe: this.meta.importe,
+        fecha_comienzo: this.meta.fecha_comienzo,
+        valor: String(this.meta.valor),
         detalle: this.meta.detalle,
-        rubro: this.meta.rubro,
-        tipo: this.meta.tipo,
-        fijo: this.meta.fijo ?? false,
-        genero: this.meta.genero
+        nombre: this.meta.nombre,
+        moneda: this.meta.moneda,
+        ahorrado: this.meta.ahorrado ?? [],
       });
     }
 
@@ -79,89 +71,40 @@ export class AddUpdtDeleteMetasComponent {
 
 
 
-  async editarIngreso() {
+
+
+  async crearMeta() {
 
     const loading = await this.utilsSVC.loading();
     await loading.present();
 
 
-    let path = `users/${this.user.uid}/movimientos/${this.meta.id}`;
-    this.actualizarMovimiento(this.meta);
-
-    this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
-
-
-      const movimiento: Movimiento = {
-        id: this.meta.id,
-        fecha: this.formulario.value.fecha!,
-        importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
-        detalle: this.formulario.value.detalle!,
-        rubro: this.formulario.value.rubro!,
-        tipo: this.formulario.value.tipo!,
-        fijo: this.formulario.value.fijo!,
-        genero: this.formulario.value.genero!
-      };
-
-      this.utilsSVC.actualizarMovimiento(movimiento);
-      this.utilsSVC.dismissModal({ success: true });
-
-      this.utilsSVC.presentToast({
-        message: 'Ingreso actualizado con exito',
-        duration: 1500,
-        color: 'success',
-        position: 'middle',
-        icon: 'checkmark-circle-outline'
-      })
-
-    }).catch(error => {
-      console.log(error);
-
-      this.utilsSVC.presentToast({
-        message: error.message,
-        duration: 2500,
-        color: 'primary',
-        position: 'middle',
-        icon: 'alert-circle-outline'
-      })
-
-    }).finally(() => {
-      loading.dismiss();
-    })
-
-
-  }
-
-  async crearIngreso() {
-
-    const loading = await this.utilsSVC.loading();
-    await loading.present();
-
-
-    let path = `users/${this.user.uid}/movimientos`;
+    let path = `users/${this.user.uid}/metas`;
 
     this.formulario.value.id = String(this.utilsSVC.crearId())
+    this.formulario.value.fecha_comienzo = Date.now();
+    this.formulario.value.valor = Number(this.formulario.value.valor.replace(/\./g, '').replace(',', '.'));
 
 
     this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
-      this.sumarSaldos(this.formulario.value);
-      const movimiento: Movimiento = {
+      const meta: Meta = {
         id: this.formulario.value.id,
-        fecha: this.formulario.value.fecha!,
-        importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
+        fecha_comienzo: this.formulario.value.fecha_comienzo!,
+        valor: this.formulario.value.valor!,
+        moneda: this.formulario.value.moneda!,
         detalle: this.formulario.value.detalle!,
-        rubro: this.formulario.value.rubro!,
-        tipo: this.formulario.value.tipo!,
-        fijo: this.formulario.value.fijo!,
-        genero: this.formulario.value.genero!
+        nombre: this.formulario.value.nombre!,
+        ahorrado: this.formulario.value.ahorrado!
       };
+      console.log(meta);
 
-      this.utilsSVC.agregarMovimiento(movimiento);
+      this.utilsSVC.agregarMetas(meta);
 
       this.utilsSVC.dismissModal({ success: true });
 
       this.utilsSVC.presentToast({
-        message: 'Gasto ingresado con exito',
+        message: 'Meta generada con exito',
         duration: 1500,
         color: 'success',
         position: 'middle',
@@ -186,81 +129,110 @@ export class AddUpdtDeleteMetasComponent {
 
   }
 
-  actualizarMovimiento(meta) {
-    const path = `users/${this.user.uid}`;
+  async editarMeta() {
 
-    const nuevo = this.formulario.value;
-    const original = Number(String(this.meta.importe).replace(/\./g, '').replace(',', '.'));
+    const loading = await this.utilsSVC.loading();
+    await loading.present();
 
-    let saldoEfectivoNuevo = this.user.saldo_efectivo
-    let saldoBancoNuevo = this.user.saldo_banco
 
-    const nuevoImporte = Number(nuevo.importe?.replace(/\./g, '').replace(',', '.'));
-    const importeAnterior = original;
+    let path = `users/${this.user.uid}/metas/${this.meta.id}`;
+    this.formulario.value.valor = Number(this.formulario.value.valor.replace(/\./g, '').replace(',', '.'));
 
-    const diferencia = Math.abs(nuevoImporte - importeAnterior);
+    this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
 
-    if (nuevo.tipo === 'Efectivo') {
-      if (nuevoImporte > importeAnterior) {
-        saldoEfectivoNuevo += diferencia
-      } else if (nuevoImporte < importeAnterior) {
-        saldoEfectivoNuevo -= diferencia
-      }
-    } else if (nuevo.tipo != 'Efectivo') {
-      if (nuevoImporte > importeAnterior) {
-        saldoBancoNuevo += diferencia
 
-      } else if (nuevoImporte < importeAnterior) {
-        saldoBancoNuevo -= diferencia
-      }
-    }
+      const meta: Meta = {
+        id: this.meta.id,
+        fecha_comienzo: this.meta.fecha_comienzo,
+        valor: this.formulario.value.valor,
+        detalle: this.formulario.value.detalle!,
+        nombre: this.formulario.value.nombre!,
+        moneda: this.formulario.value.moneda!,
+        ahorrado: this.meta.ahorrado!
+      };
 
-    this.firebaseSVC.updateDocument(path, {
-      ...this.user,
-      saldo_banco: saldoBancoNuevo,
-      saldo_efectivo: saldoEfectivoNuevo
+      this.utilsSVC.actualizarMetas(meta);
+      this.utilsSVC.dismissModal({ success: true });
+
+      this.utilsSVC.presentToast({
+        message: 'Meta actualizada con exito',
+        duration: 1500,
+        color: 'success',
+        position: 'middle',
+        icon: 'checkmark-circle-outline'
+      })
+
+    }).catch(error => {
+      console.log(error);
+
+      this.utilsSVC.presentToast({
+        message: error.message,
+        duration: 2500,
+        color: 'primary',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      })
+
+    }).finally(() => {
+      loading.dismiss();
     })
-
-    this.utilsSVC.setUser({
-      ... this.user,
-      saldo_banco: saldoBancoNuevo,
-      saldo_efectivo: saldoEfectivoNuevo
-    })
-
 
 
   }
 
-  sumarSaldos(movimiento) {
-    const path = `users/${this.user.uid}`;
+  // actualizarMeta(meta) {
+  //   const path = `users/${this.user.uid}`;
 
-    let nuevoSaldoBco = this.user.saldo_banco;
-    let nuevoSaldoEfe = this.user.saldo_efectivo;
+  //   const nuevo = this.formulario.value;
+  //   const original = Number(String(this.meta.importe).replace(/\./g, '').replace(',', '.'));
 
-    movimiento.tipo === 'Efectivo' ?
-      nuevoSaldoEfe += Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')) :
-      nuevoSaldoBco += Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.'));
+  //   let saldoEfectivoNuevo = this.user.saldo_efectivo
+  //   let saldoBancoNuevo = this.user.saldo_banco
 
-    this.firebaseSVC.updateDocument(path, {
-      ...this.user,
-      saldo_banco: nuevoSaldoBco,
-      saldo_efectivo: nuevoSaldoEfe
-    })
+  //   const nuevoImporte = Number(nuevo.importe?.replace(/\./g, '').replace(',', '.'));
+  //   const importeAnterior = original;
 
-    this.utilsSVC.setUser({
-      ... this.user,
-      saldo_banco: nuevoSaldoBco,
-      saldo_efectivo: nuevoSaldoEfe
-    })
-  }
+  //   const diferencia = Math.abs(nuevoImporte - importeAnterior);
 
-  cambiarEstado() {
-    this.formulario.value.fijo = !this.formulario.value.fijo;
+  //   if (nuevo.tipo === 'Efectivo') {
+  //     if (nuevoImporte > importeAnterior) {
+  //       saldoEfectivoNuevo += diferencia
+  //     } else if (nuevoImporte < importeAnterior) {
+  //       saldoEfectivoNuevo -= diferencia
+  //     }
+  //   } else if (nuevo.tipo != 'Efectivo') {
+  //     if (nuevoImporte > importeAnterior) {
+  //       saldoBancoNuevo += diferencia
+
+  //     } else if (nuevoImporte < importeAnterior) {
+  //       saldoBancoNuevo -= diferencia
+  //     }
+  //   }
+
+  //   this.firebaseSVC.updateDocument(path, {
+  //     ...this.user,
+  //     saldo_banco: saldoBancoNuevo,
+  //     saldo_efectivo: saldoEfectivoNuevo
+  //   })
+
+  //   this.utilsSVC.setUser({
+  //     ... this.user,
+  //     saldo_banco: saldoBancoNuevo,
+  //     saldo_efectivo: saldoEfectivoNuevo
+  //   })
+
+
+
+  // }
+
+  cambiarMoneda() {
+    this.formulario.controls.moneda.setValue('USD');
+
   }
 
   submit() {
     if (this.formulario.valid) {
-      this.meta ? this.editarIngreso() : this.crearIngreso();
+      this.meta ? this.editarMeta() : this.crearMeta();
     }
   }
 

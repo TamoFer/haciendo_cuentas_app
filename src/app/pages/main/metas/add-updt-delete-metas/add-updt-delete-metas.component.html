@@ -1,31 +1,41 @@
-<app-header [title]="meta ? 'Modificar Ingreso':'Nuevo Ingreso'" [isModal]="mostrarBack"
+<app-header [title]="meta ? 'Modificar Meta':'Nueva Meta'" [isModal]="mostrarBack"
   (volverAccion)="cerrarModal()"></app-header>
 <ion-content>
   <form [formGroup]="formulario" (ngSubmit)="submit()">
 
 
-    <!-- fecha  -->
-    <app-meta-datos icon="calendar-number-outline" autocomplete="detail" label="Fecha"
-      [control]="formulario.controls.fecha" type="date"></app-meta-datos>
+    <!-- nombre meta  -->
+    <app-ingreso-datos icon="document-text-outline" autocomplete="detail" label="Nombre meta"
+      [control]="formulario.controls.nombre" inputmode="text" type='text'></app-ingreso-datos>
 
-    <div *ngIf="formulario.controls.fecha.errors && formulario.controls.fecha.touched">
-      <div class="errores" *ngIf="formulario.controls.fecha.errors?.['required']">La fecha es necesario</div>
+    <div *ngIf="formulario.controls.nombre.errors && formulario.controls.nombre.touched">
+      <div class="errores" *ngIf="formulario.controls.nombre.errors?.['required']">El nombre de la meta es necesario
+      </div>
+      <div class="errores" *ngIf="formulario.controls.nombre.errors?.['minlength']">El nombre de la meta debe tener al
+        menos 1
+        caracteres</div>
     </div>
 
-    <!-- importe  -->
-    <app-meta-datos icon="logo-usd" autocomplete="detail" label="Importe" [control]="formulario.controls.importe"
-      [maskito]="mascara" [maskitoElement]="maskPredicate" inputmode="decimal" type='text'></app-meta-datos>
+
+    <!-- valor   -->
+    <app-ingreso-datos icon="logo-usd" autocomplete="detail" label="Valor meta" [control]="formulario.controls.valor"
+      [maskito]="mascara" [maskitoElement]="maskPredicate" inputmode="decimal" type='text'></app-ingreso-datos>
 
 
-    <div *ngIf="formulario.controls.importe.errors && formulario.controls.importe.touched">
-      <div class="errores" *ngIf="formulario.controls.importe.errors?.['required']">El importe es necesario</div>
-      <div class="errores" *ngIf="formulario.controls.importe.errors?.['min']">El importe debe ser mayor a 0
+    <div *ngIf="formulario.controls.valor.errors && formulario.controls.valor.touched">
+      <div class="errores" *ngIf="formulario.controls.valor.errors?.['required']">El valor de la meta es necesario</div>
+      <div class="errores" *ngIf="formulario.controls.valor.errors?.['min']">El valor de la meta debe ser mayor a 0
       </div>
     </div>
 
+    <!-- cambiar moneda -->
+    <ion-toggle (click)="cambiarMoneda()">¿Es en dolares?</ion-toggle>
+
+
+
     <!-- detalle  -->
-    <app-meta-datos icon="document-text-outline" autocomplete="detail" label="Detalle"
-      [control]="formulario.controls.detalle" inputmode="text" type='text'></app-meta-datos>
+    <app-ingreso-datos icon="document-text-outline" autocomplete="detail" label="Detalle"
+      [control]="formulario.controls.detalle" inputmode="text" type='text'></app-ingreso-datos>
 
     <div *ngIf="formulario.controls.detalle.errors && formulario.controls.detalle.touched">
       <div class="errores" *ngIf="formulario.controls.detalle.errors?.['required']">El detalle es necesario</div>
@@ -34,27 +44,6 @@
         caracteres</div>
     </div>
 
-    <!-- rubro  -->
-    <app-meta-datos icon="list-outline" autocomplete="detail" label="Rubro" [type]="'select'" [options]="opcionesRubro"
-      [control]="formulario.controls.rubro">
-    </app-meta-datos>
-
-    <div *ngIf="formulario.controls.rubro.errors && formulario.controls.rubro.touched">
-      <div class="errores" *ngIf="formulario.controls.rubro.errors?.['required']">El rubro es necesario</div>
-
-    </div>
-
-
-    <!-- tipo-->
-    <app-meta-datos icon="list-outline" autocomplete="detail" label="Tipo" [type]="'select'" [options]="opcionesTipo"
-      [control]="formulario.controls.tipo" *ngIf="!meta">
-    </app-meta-datos>
-
-    <div *ngIf="formulario.controls.tipo.errors && formulario.controls.tipo.touched">
-      <div class="errores" *ngIf="formulario.controls.tipo.errors?.['required']">El tipo es necesario</div>
-    </div>
-
-    <ion-toggle (click)="cambiarEstado()">¿Es un meta fijo?</ion-toggle>
 
     <div style="width: max-content; display: flex; flex-direction: row ; justify-content: center; margin: 10px auto;">
       <ion-button type="submit" [disabled]="!formulario.valid" shape="round">

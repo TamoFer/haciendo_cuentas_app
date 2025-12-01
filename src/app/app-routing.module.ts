@@ -41,6 +41,10 @@ const routes: Routes = [
   {
     path: 'metas',
     loadChildren: () => import('./pages/main/metas/metas.module').then(m => m.MetasPageModule), canActivate: [AuthGuard]
+  },
+  {
+    path: 'ahorros',
+    loadChildren: () => import('./pages/main/ahorros/ahorros.module').then(m => m.AhorrosPageModule), canActivate: [AuthGuard]
   }
 
 
