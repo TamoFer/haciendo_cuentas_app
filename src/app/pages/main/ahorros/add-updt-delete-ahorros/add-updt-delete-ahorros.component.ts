@@ -4,7 +4,6 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { IonicModule } from '@ionic/angular';
 import { MaskitoDirective } from '@maskito/angular';
 import { maskitoNumberOptionsGenerator } from '@maskito/kit';
-import { Movimiento } from 'src/app/models/movimiento.model';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
@@ -13,6 +12,7 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
 import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/ingreso-datos.component';
 import { MaskitoElementPredicate } from '@maskito/core';
 import { Ahorro } from 'src/app/models/ahorro.model';
+import { Meta } from 'src/app/models/metas.model';
 
 
 @Component({
@@ -31,10 +31,12 @@ export class AddUpdtDeleteAhorrosComponent {
   mostrarBack: boolean = true;
 
 
-  opcionesRubro = ['Sueldo', 'Venta', 'Prestamo', 'Apuesta', 'Changa', 'Saldo'];
-  opcionesTipo = ['Efectivo', 'Dinero en cuenta'];
+  opcionesMoneda = ['Pesos Argentinos', 'Dolares'];
 
   user = {} as User;
+  listadoMetas = [];
+  metaRelacionada: Meta;
+  metas: Meta[] = [];
 
 
 
@@ -46,38 +48,51 @@ export class AddUpdtDeleteAhorrosComponent {
 
   readonly maskPredicate: MaskitoElementPredicate = async (el) => ((el as unknown) as HTMLIonInputElement).getInputElement();
 
-  // formulario = new FormGroup({
-  //   id: new FormControl(''),
-  //   fecha: new FormControl(null, [Validators.required, Validators.min(0)]),
-  //   importe: new FormControl(null, [Validators.required, Validators.min(0)]),
-  //   detalle: new FormControl(null, [Validators.required, Validators.minLength(1)]),
-  //   rubro: new FormControl(null, Validators.required),
-  //   tipo: new FormControl(null, Validators.required),
-  //   fijo: new FormControl(false),
-  //   genero: new FormControl('meta')
-
-  // });
+  formulario = new FormGroup({
+    id: new FormControl(''),
+    fecha: new FormControl(null, [Validators.required, Validators.min(0)]),
+    importe: new FormControl(null, [Validators.required, Validators.min(0)]),
+    detalle: new FormControl(null, Validators.required),
+    moneda: new FormControl(null, Validators.required),
+    meta: new FormControl(null),
+  });
 
 
   ngOnInit() {
     this.user = this.utilsSVC.obtenerDatosLS('user');
+    if (this.ahorro) {
+      this.formulario.setValue({
+        id: this.ahorro.id,
+        fecha: this.ahorro.fecha,
+        importe: this.ahorro.importe,
+        detalle: this.ahorro.detalle,
+        moneda: this.ahorro.moneda,
+        meta: this.ahorro.meta,
+      });
+    }
 
-    // if (this.meta) {
-    //   this.formulario.setValue({
-    //     id: this.meta.id,
-    //     fecha: this.meta.fecha,
-    //     importe: this.meta.importe,
-    //     detalle: this.meta.detalle,
-    //     rubro: this.meta.rubro,
-    //     tipo: this.meta.tipo,
-    //     fijo: this.meta.fijo ?? false,
-    //     genero: this.meta.genero
-    //   });
-    // }
+    this.utilsSVC.metas$.subscribe(metas => {
+      this.metas = metas;
+    });
 
-
+    this.obtenerMetasUsuario();
   }
 
+  obtenerMetasUsuario() {
+    const path = `users/${this.user.uid}/metas`;
+
+    this.firebaseSVC.getCollectionData(path).subscribe({
+      next: (res: Meta[]) => {
+        this.utilsSVC.setMetas(res);
+        for (let meta of res) {
+          this.listadoMetas.push(`${meta.nombre}`.toUpperCase())
+        }
+      },
+      error: err => {
+        console.error('Error obteniendo metas', err);
+      }
+    });
+  }
 
 
   // async editarIngreso() {
@@ -259,11 +274,11 @@ export class AddUpdtDeleteAhorrosComponent {
   //   this.formulario.value.fijo = !this.formulario.value.fijo;
   // }
 
-  // submit() {
-  //   if (this.formulario.valid) {
-  //     this.meta ? this.editarIngreso() : this.crearIngreso();
-  //   }
-  // }
+  submit() {
+    if (this.formulario.valid) {
+      // this.ahorro ? this.editarIngreso() : this.crearIngreso();
+    }
+  }
 
   cerrarModal() {
     this.utilsSVC.dismissModal();
