@@ -97,7 +97,6 @@ export class AddUpdtDeleteMetasComponent {
         nombre: this.formulario.value.nombre!,
         ahorrado: this.formulario.value.ahorrado!
       };
-      console.log(meta);
 
       this.utilsSVC.agregarMetas(meta);
 

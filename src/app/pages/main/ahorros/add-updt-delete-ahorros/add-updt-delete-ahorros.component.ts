@@ -95,112 +95,107 @@ export class AddUpdtDeleteAhorrosComponent {
   }
 
 
-  // async editarIngreso() {
+  async editarAhorro() {
 
-  //   const loading = await this.utilsSVC.loading();
-  //   await loading.present();
-
-
-  //   let path = `users/${this.user.uid}/movimientos/${this.meta.id}`;
-  //   this.actualizarMovimiento(this.meta);
-
-  //   this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
+    const loading = await this.utilsSVC.loading();
+    await loading.present();
 
 
-  //     const movimiento: Movimiento = {
-  //       id: this.meta.id,
-  //       fecha: this.formulario.value.fecha!,
-  //       importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
-  //       detalle: this.formulario.value.detalle!,
-  //       rubro: this.formulario.value.rubro!,
-  //       tipo: this.formulario.value.tipo!,
-  //       fijo: this.formulario.value.fijo!,
-  //       genero: this.formulario.value.genero!
-  //     };
+    let path = `users/${this.user.uid}/ahorros/${this.ahorro.id}`;
+    // this.actualizarMovimiento(this.ahorro);
 
-  //     this.utilsSVC.actualizarMovimiento(movimiento);
-  //     this.utilsSVC.dismissModal({ success: true });
-
-  //     this.utilsSVC.presentToast({
-  //       message: 'Ingreso actualizado con exito',
-  //       duration: 1500,
-  //       color: 'success',
-  //       position: 'middle',
-  //       icon: 'checkmark-circle-outline'
-  //     })
-
-  //   }).catch(error => {
-  //     console.log(error);
-
-  //     this.utilsSVC.presentToast({
-  //       message: error.message,
-  //       duration: 2500,
-  //       color: 'primary',
-  //       position: 'middle',
-  //       icon: 'alert-circle-outline'
-  //     })
-
-  //   }).finally(() => {
-  //     loading.dismiss();
-  //   })
+    this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
 
 
-  // }
+      const ahorro: Ahorro = {
+        id: this.formulario.value.id,
+        fecha: this.formulario.value.fecha!,
+        importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
+        detalle: this.formulario.value.detalle!,
+        moneda: this.formulario.value.moneda!,
+        meta: this.formulario.value.meta!,
+      };
 
-  // async crearIngreso() {
+      // this.utilsSVC.actualizarMovimiento(ahorro);
+      this.utilsSVC.dismissModal({ success: true });
 
-  //   const loading = await this.utilsSVC.loading();
-  //   await loading.present();
+      this.utilsSVC.presentToast({
+        message: 'Ingreso actualizado con exito',
+        duration: 1500,
+        color: 'success',
+        position: 'middle',
+        icon: 'checkmark-circle-outline'
+      })
 
+    }).catch(error => {
+      console.log(error);
 
-  //   let path = `users/${this.user.uid}/movimientos`;
+      this.utilsSVC.presentToast({
+        message: error.message,
+        duration: 2500,
+        color: 'primary',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      })
 
-  //   this.formulario.value.id = String(this.utilsSVC.crearId())
-
-
-  //   this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
-
-  //     this.sumarSaldos(this.formulario.value);
-  //     const movimiento: Movimiento = {
-  //       id: this.formulario.value.id,
-  //       fecha: this.formulario.value.fecha!,
-  //       importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
-  //       detalle: this.formulario.value.detalle!,
-  //       rubro: this.formulario.value.rubro!,
-  //       tipo: this.formulario.value.tipo!,
-  //       fijo: this.formulario.value.fijo!,
-  //       genero: this.formulario.value.genero!
-  //     };
-
-  //     this.utilsSVC.agregarMovimiento(movimiento);
-
-  //     this.utilsSVC.dismissModal({ success: true });
-
-  //     this.utilsSVC.presentToast({
-  //       message: 'Gasto ingresado con exito',
-  //       duration: 1500,
-  //       color: 'success',
-  //       position: 'middle',
-  //       icon: 'checkmark-circle-outline'
-  //     })
-
-  //   }).catch(error => {
-  //     console.log(error);
-
-  //     this.utilsSVC.presentToast({
-  //       message: error.message,
-  //       duration: 2500,
-  //       color: 'primary',
-  //       position: 'middle',
-  //       icon: 'alert-circle-outline'
-  //     })
-
-  //   }).finally(() => {
-  //     loading.dismiss();
-  //   })
+    }).finally(() => {
+      loading.dismiss();
+    })
 
 
-  // }
+  }
+
+  async crearAhorro() {
+
+    const loading = await this.utilsSVC.loading();
+    await loading.present();
+
+
+    let path = `users/${this.user.uid}/ahorros`;
+
+    this.formulario.value.id = String(this.utilsSVC.crearId())
+
+
+    this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
+
+      const ahorro: Ahorro = {
+        id: this.formulario.value.id,
+        fecha: this.formulario.value.fecha!,
+        importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
+        detalle: this.formulario.value.detalle!,
+        moneda: this.formulario.value.moneda!,
+        meta: this.formulario.value.meta!,
+      };
+
+      this.utilsSVC.agregarAhorros(ahorro);
+
+      this.utilsSVC.dismissModal({ success: true });
+
+      this.utilsSVC.presentToast({
+        message: 'Ahorro generado con exito',
+        duration: 1500,
+        color: 'success',
+        position: 'middle',
+        icon: 'checkmark-circle-outline'
+      })
+
+    }).catch(error => {
+      console.log(error);
+
+      this.utilsSVC.presentToast({
+        message: error.message,
+        duration: 2500,
+        color: 'primary',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      })
+
+    }).finally(() => {
+      loading.dismiss();
+    })
+
+
+  }
 
   // actualizarMovimiento(meta) {
   //   const path = `users/${this.user.uid}`;
@@ -276,7 +271,7 @@ export class AddUpdtDeleteAhorrosComponent {
 
   submit() {
     if (this.formulario.valid) {
-      // this.ahorro ? this.editarIngreso() : this.crearIngreso();
+      this.ahorro ? this.editarAhorro() : this.crearAhorro();
     }
   }
 
