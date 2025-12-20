@@ -35,7 +35,7 @@ export class AddUpdtDeleteAhorrosComponent {
 
   user = {} as User;
   listadoMetas = [];
-  metaRelacionada: Meta;
+  metaRelacionada = {} as Meta;
   metas: Meta[] = [];
 
 
@@ -95,6 +95,63 @@ export class AddUpdtDeleteAhorrosComponent {
   }
 
 
+
+  async crearAhorro() {
+
+    const loading = await this.utilsSVC.loading();
+    await loading.present();
+    this.asociarMeta(this.formulario.value.meta!);
+    console.log(this.metaRelacionada);
+
+
+
+    let path = `users/${this.user.uid}/ahorros`;
+
+    this.formulario.value.id = String(this.utilsSVC.crearId())
+
+
+
+    this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
+
+      const ahorro: Ahorro = {
+        id: this.formulario.value.id,
+        fecha: this.formulario.value.fecha!,
+        importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
+        detalle: this.formulario.value.detalle!,
+        moneda: this.formulario.value.moneda!,
+        meta: this.metaRelacionada,
+      };
+
+      this.utilsSVC.agregarAhorros(ahorro);
+
+      this.utilsSVC.dismissModal({ success: true });
+
+      this.utilsSVC.presentToast({
+        message: 'Ahorro generado con exito',
+        duration: 1500,
+        color: 'success',
+        position: 'middle',
+        icon: 'checkmark-circle-outline'
+      })
+
+    }).catch(error => {
+      console.log(error);
+
+      this.utilsSVC.presentToast({
+        message: error.message,
+        duration: 2500,
+        color: 'primary',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      })
+
+    }).finally(() => {
+      loading.dismiss();
+    })
+
+
+  }
+
   async editarAhorro() {
 
     const loading = await this.utilsSVC.loading();
@@ -145,129 +202,19 @@ export class AddUpdtDeleteAhorrosComponent {
 
   }
 
-  async crearAhorro() {
-
-    const loading = await this.utilsSVC.loading();
-    await loading.present();
 
 
-    let path = `users/${this.user.uid}/ahorros`;
-
-    this.formulario.value.id = String(this.utilsSVC.crearId())
-
-
-    this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
-
-      const ahorro: Ahorro = {
-        id: this.formulario.value.id,
-        fecha: this.formulario.value.fecha!,
-        importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
-        detalle: this.formulario.value.detalle!,
-        moneda: this.formulario.value.moneda!,
-        meta: this.formulario.value.meta!,
-      };
-
-      this.utilsSVC.agregarAhorros(ahorro);
-
-      this.utilsSVC.dismissModal({ success: true });
-
-      this.utilsSVC.presentToast({
-        message: 'Ahorro generado con exito',
-        duration: 1500,
-        color: 'success',
-        position: 'middle',
-        icon: 'checkmark-circle-outline'
-      })
-
-    }).catch(error => {
-      console.log(error);
-
-      this.utilsSVC.presentToast({
-        message: error.message,
-        duration: 2500,
-        color: 'primary',
-        position: 'middle',
-        icon: 'alert-circle-outline'
-      })
-
-    }).finally(() => {
-      loading.dismiss();
-    })
-
-
+  asociarMeta(meta: string) {
+    for (let m of this.metas) {
+      if (meta.toLowerCase() === m.nombre.toLocaleLowerCase()) {
+        this.metaRelacionada = m;
+      } else {
+        this.metaRelacionada = {} as Meta;
+        console.warn('No se encontró la meta asociada');
+      }
+    }
+    return this.metaRelacionada;
   }
-
-  // actualizarMovimiento(meta) {
-  //   const path = `users/${this.user.uid}`;
-
-  //   const nuevo = this.formulario.value;
-  //   const original = Number(String(this.meta.importe).replace(/\./g, '').replace(',', '.'));
-
-  //   let saldoEfectivoNuevo = this.user.saldo_efectivo
-  //   let saldoBancoNuevo = this.user.saldo_banco
-
-  //   const nuevoImporte = Number(nuevo.importe?.replace(/\./g, '').replace(',', '.'));
-  //   const importeAnterior = original;
-
-  //   const diferencia = Math.abs(nuevoImporte - importeAnterior);
-
-  //   if (nuevo.tipo === 'Efectivo') {
-  //     if (nuevoImporte > importeAnterior) {
-  //       saldoEfectivoNuevo += diferencia
-  //     } else if (nuevoImporte < importeAnterior) {
-  //       saldoEfectivoNuevo -= diferencia
-  //     }
-  //   } else if (nuevo.tipo != 'Efectivo') {
-  //     if (nuevoImporte > importeAnterior) {
-  //       saldoBancoNuevo += diferencia
-
-  //     } else if (nuevoImporte < importeAnterior) {
-  //       saldoBancoNuevo -= diferencia
-  //     }
-  //   }
-
-  //   this.firebaseSVC.updateDocument(path, {
-  //     ...this.user,
-  //     saldo_banco: saldoBancoNuevo,
-  //     saldo_efectivo: saldoEfectivoNuevo
-  //   })
-
-  //   this.utilsSVC.setUser({
-  //     ... this.user,
-  //     saldo_banco: saldoBancoNuevo,
-  //     saldo_efectivo: saldoEfectivoNuevo
-  //   })
-
-
-
-  // }
-
-  // sumarSaldos(movimiento) {
-  //   const path = `users/${this.user.uid}`;
-
-  //   let nuevoSaldoBco = this.user.saldo_banco;
-  //   let nuevoSaldoEfe = this.user.saldo_efectivo;
-
-  //   movimiento.tipo === 'Efectivo' ?
-  //     nuevoSaldoEfe += Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')) :
-  //     nuevoSaldoBco += Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.'));
-
-  //   this.firebaseSVC.updateDocument(path, {
-  //     ...this.user,
-  //     saldo_banco: nuevoSaldoBco,
-  //     saldo_efectivo: nuevoSaldoEfe
-  //   })
-
-  //   this.utilsSVC.setUser({
-  //     ... this.user,
-  //     saldo_banco: nuevoSaldoBco,
-  //     saldo_efectivo: nuevoSaldoEfe
-  //   })
-  // }
-
-  // cambiarEstado() {
-  //   this.formulario.value.fijo = !this.formulario.value.fijo;
-  // }
 
   submit() {
     if (this.formulario.valid) {

@@ -3,7 +3,6 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
-import { Meta } from 'src/app/models/metas.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
@@ -11,9 +10,9 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
 import { Ahorro } from 'src/app/models/ahorro.model';
 
 @Component({
-  selector: 'app-metas',
-  templateUrl: './metas.page.html',
-  styleUrls: ['./metas.page.scss'],
+  selector: 'app-ahorros',
+  templateUrl: './ahorros.page.html',
+  styleUrls: ['./ahorros.page.scss'],
   imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor, CommonModule, RouterLink, ReactiveFormsModule]
 
 })
@@ -45,8 +44,26 @@ export class AhorrosPage implements OnInit {
       this.usuarioLogeado = true;
     }
 
+    this.utilsSVC.ahorros$.subscribe(ahorros => {
+      this.ahorros = ahorros;
+    });
+
+    this.obtenerAhorrosUsuario()
 
 
+  }
+
+  obtenerAhorrosUsuario() {
+    const path = `users/${this.usuario.uid}/ahorros`;
+
+    this.firebaseSVC.getCollectionData(path).subscribe({
+      next: (res: Ahorro[]) => {
+        this.utilsSVC.setAhorros(res);
+      },
+      error: err => {
+        console.error('Error obteniendo ahorros', err);
+      }
+    });
   }
 
   // async crearMeta(meta?: Meta) {

@@ -1,4 +1,4 @@
-<app-header title="Ahorros" [mostrarVolver]="usuarioLogeado" [routerLink]="['/metas']"></app-header>
+<app-header title="Ahorros" [mostrarVolver]="usuarioLogeado" [routerLink]="['/home']"></app-header>
 <ion-content>
 
 
@@ -76,7 +76,9 @@
 
   @endsection -->
 
-
+  <ion-item-sliding *ngFor="let ahorro of ahorros">
+    <p>{{ahorro.meta | json}}</p>
+  </ion-item-sliding>
 
 
 
