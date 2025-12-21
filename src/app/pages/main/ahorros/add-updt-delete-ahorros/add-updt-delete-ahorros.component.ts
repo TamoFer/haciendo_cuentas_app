@@ -100,27 +100,23 @@ export class AddUpdtDeleteAhorrosComponent {
 
     const loading = await this.utilsSVC.loading();
     await loading.present();
-    this.asociarMeta(this.formulario.value.meta!);
-    console.log(this.metaRelacionada);
-
-
+    this.asociarMeta(this.formulario.value.meta);
 
     let path = `users/${this.user.uid}/ahorros`;
 
     this.formulario.value.id = String(this.utilsSVC.crearId())
 
+    const ahorro: Ahorro = {
+      id: this.formulario.value.id,
+      fecha: this.formulario.value.fecha!,
+      importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
+      detalle: this.formulario.value.detalle!,
+      moneda: this.formulario.value.moneda!,
+      meta: this.metaRelacionada,
+    };
 
 
-    this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
-
-      const ahorro: Ahorro = {
-        id: this.formulario.value.id,
-        fecha: this.formulario.value.fecha!,
-        importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
-        detalle: this.formulario.value.detalle!,
-        moneda: this.formulario.value.moneda!,
-        meta: this.metaRelacionada,
-      };
+    this.firebaseSVC.addDocument(path, ahorro).then(async res => {
 
       this.utilsSVC.agregarAhorros(ahorro);
 
