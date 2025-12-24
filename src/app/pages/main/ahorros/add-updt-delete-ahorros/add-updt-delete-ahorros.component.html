@@ -47,13 +47,21 @@
 
 
     <!-- meta-->
-    <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Meta" [type]="'select'" [options]="listadoMetas"
-      [control]="formulario.controls.meta" *ngIf="!ahorro">
-    </app-ingreso-datos>
+    <form [formGroup]="metaFormulario">
 
-    <div *ngIf="formulario.controls.meta.errors && formulario.controls.meta.touched">
-      <div class="errores" *ngIf="formulario.controls.meta.errors?.['required']">El tipo es necesario</div>
-    </div>
+      <ion-toggle (click)="metaCondicion()">¿Es para alguna meta ya
+        registrada?</ion-toggle>
+
+
+      <div *ngIf="mostrarOpcionesMeta">
+        <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Meta" [type]="'select'"
+          [options]="listadoMetas" [control]="metaFormulario.controls.meta" *ngIf="!ahorro">
+        </app-ingreso-datos>
+        <div *ngIf="metaFormulario.controls.meta.errors && metaFormulario.controls.meta.touched">
+          <div class="errores" *ngIf="metaFormulario.controls.meta.errors?.['required']">La meta es necesaria</div>
+        </div>
+      </div>
+    </form>
 
 
     <div style="width: max-content; display: flex; flex-direction: row ; justify-content: center; margin: 10px auto;">
@@ -65,4 +73,5 @@
 
   </form>
 </ion-content>
+
 <app-footer></app-footer>

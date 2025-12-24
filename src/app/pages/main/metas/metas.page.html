@@ -41,8 +41,8 @@
                     }}
                   </ion-label>
                   <ion-label>Ahorrado hasta ahora: {{meta.moneda === 'Pesos Argentinos'
-                    ? (valorMeta | currency:'ARS')
-                    : (valorMeta | currency:'USD')
+                    ? (sumarAhorradoMeta(meta) | currency:'ARS')
+                    : (sumarAhorradoMeta(meta) | currency:'USD')
                     }} </ion-label>
                 </div>
               </div>

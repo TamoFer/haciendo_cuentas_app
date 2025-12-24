@@ -12,6 +12,7 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
 import { AddUpdtDeleteMetasComponent } from './add-updt-delete-metas/add-updt-delete-metas.component';
 import { Ahorro } from 'src/app/models/ahorro.model';
 import { AddUpdtDeleteAhorrosComponent } from '../ahorros/add-updt-delete-ahorros/add-updt-delete-ahorros.component';
+import { CotizacionService } from 'src/app/services/cotizacion.service';
 
 @Component({
   selector: 'app-metas',
@@ -25,6 +26,7 @@ export class MetasPage implements OnInit {
   // @section: services
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
+  cotizacionSVC = inject(CotizacionService);
 
   // @endsection
 
@@ -34,6 +36,8 @@ export class MetasPage implements OnInit {
   usuario = this.utilsSVC.obtenerDatosLS('user');
   metas: Meta[] = [];
   valorMeta: number = 0;
+  dolarOficial: number = 0;
+
 
   // @endsection
 
@@ -53,6 +57,15 @@ export class MetasPage implements OnInit {
     });
 
     this.obtenerMetasUsuario();
+
+    this.cotizacionSVC.obtenerCotizacionDolarOficial().subscribe({
+      next: (cotizacion) => {
+        this.dolarOficial = cotizacion.venta;
+      },
+      error: (err) => {
+        console.error('Error al obtener la cotización del dólar:', err);
+      }
+    })
   }
 
 
@@ -147,9 +160,6 @@ export class MetasPage implements OnInit {
   // @endsection
 
 
-
-
-
   obtenerMetasUsuario() {
     const path = `users/${this.usuario.uid}/metas`;
 
@@ -163,7 +173,27 @@ export class MetasPage implements OnInit {
     });
   }
 
+  sumarAhorradoMeta(meta: Meta) {
+    let valorAhorrado = 0;
+    let monedaMeta = meta.moneda;
+    for (let ahorro of meta.ahorrado) {
+      if (monedaMeta === 'USD') {
+        ahorro.moneda === 'Pesos Argentinos' ? valorAhorrado += this.conversionMetaUSD(Number(ahorro.importe)) : valorAhorrado += Number(ahorro.importe);
+      } else {
+        ahorro.moneda === 'USD' ? valorAhorrado += this.conversionMetaARS(Number(ahorro.importe)) : valorAhorrado += Number(ahorro.importe);
+      }
+    }
+    this.valorMeta = ((valorAhorrado * 100) / meta.valor) / 100;
+    return valorAhorrado;
+  }
 
+  conversionMetaUSD(importeARS: number) {
+    return importeARS / this.dolarOficial
+  }
+
+  conversionMetaARS(importeUSD: number) {
+    return importeUSD * this.dolarOficial
+  }
 
   cerrarModal() {
     this.utilsSVC.dismissModal();

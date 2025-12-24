@@ -37,6 +37,7 @@ export class AddUpdtDeleteAhorrosComponent {
   listadoMetas = [];
   metaRelacionada = {} as Meta;
   metas: Meta[] = [];
+  mostrarOpcionesMeta: boolean = false;
 
 
 
@@ -54,6 +55,10 @@ export class AddUpdtDeleteAhorrosComponent {
     importe: new FormControl(null, [Validators.required, Validators.min(0)]),
     detalle: new FormControl(null, Validators.required),
     moneda: new FormControl(null, Validators.required),
+  });
+
+  metaFormulario = new FormGroup({
+    condicional: new FormControl(false),
     meta: new FormControl(null),
   });
 
@@ -67,7 +72,6 @@ export class AddUpdtDeleteAhorrosComponent {
         importe: this.ahorro.importe,
         detalle: this.ahorro.detalle,
         moneda: this.ahorro.moneda,
-        meta: this.ahorro.meta,
       });
     }
 
@@ -94,13 +98,11 @@ export class AddUpdtDeleteAhorrosComponent {
     });
   }
 
-
-
+  // @section: crud ahorro
   async crearAhorro() {
 
     const loading = await this.utilsSVC.loading();
     await loading.present();
-    this.asociarMeta(this.formulario.value.meta);
 
     let path = `users/${this.user.uid}/ahorros`;
 
@@ -112,9 +114,9 @@ export class AddUpdtDeleteAhorrosComponent {
       importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
       detalle: this.formulario.value.detalle!,
       moneda: this.formulario.value.moneda!,
-      meta: this.metaRelacionada,
     };
 
+    this.asociarMeta(this.metaFormulario.value.meta, ahorro);
 
     this.firebaseSVC.addDocument(path, ahorro).then(async res => {
 
@@ -166,7 +168,6 @@ export class AddUpdtDeleteAhorrosComponent {
         importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
         detalle: this.formulario.value.detalle!,
         moneda: this.formulario.value.moneda!,
-        meta: this.formulario.value.meta!,
       };
 
       // this.utilsSVC.actualizarMovimiento(ahorro);
@@ -198,22 +199,27 @@ export class AddUpdtDeleteAhorrosComponent {
 
   }
 
+  // @endsection
+
+  metaCondicion() {
+    this.mostrarOpcionesMeta = !this.mostrarOpcionesMeta;
+    this.metaFormulario.value.condicional = !this.metaFormulario.value.condicional;
+  }
 
 
-  asociarMeta(meta: string) {
+
+  asociarMeta(meta: string, Ahorro: Ahorro) {
     for (let m of this.metas) {
       if (meta.toLowerCase() === m.nombre.toLocaleLowerCase()) {
         this.metaRelacionada = m;
+        this.metaRelacionada.ahorrado.push(Ahorro);
+        this.firebaseSVC.updateDocument(`users/${this.user.uid}/metas/${this.metaRelacionada.id}`, this.metaRelacionada)
 
       } else {
         this.metaRelacionada = {} as Meta;
         console.warn('No se encontró la meta asociada');
       }
     }
-    return this.metaRelacionada;
-  }
-
-  asociarAhorro(ahorro: Ahorro) {
 
   }
 
