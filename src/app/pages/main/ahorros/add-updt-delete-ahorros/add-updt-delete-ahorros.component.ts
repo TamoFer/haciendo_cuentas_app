@@ -204,12 +204,17 @@ export class AddUpdtDeleteAhorrosComponent {
     for (let m of this.metas) {
       if (meta.toLowerCase() === m.nombre.toLocaleLowerCase()) {
         this.metaRelacionada = m;
+
       } else {
         this.metaRelacionada = {} as Meta;
         console.warn('No se encontró la meta asociada');
       }
     }
     return this.metaRelacionada;
+  }
+
+  asociarAhorro(ahorro: Ahorro) {
+
   }
 
   submit() {

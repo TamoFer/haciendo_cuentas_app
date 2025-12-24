@@ -80,9 +80,6 @@ export class MetasPage implements OnInit {
     await modal.present();
   }
 
-  // @endsection
-
-
   async confirmarDelete(meta) {
 
     const alert = await this.utilsSVC.alertasCtrl.create({
@@ -146,6 +143,11 @@ export class MetasPage implements OnInit {
 
     this.obtenerMetasUsuario()
   }
+
+  // @endsection
+
+
+
 
 
   obtenerMetasUsuario() {
