@@ -13,7 +13,7 @@ import { Ahorro } from 'src/app/models/ahorro.model';
   selector: 'app-ahorros',
   templateUrl: './ahorros.page.html',
   styleUrls: ['./ahorros.page.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor, CommonModule, RouterLink, ReactiveFormsModule]
+  imports: [IonicModule, HeaderComponent, FooterComponent, NgFor, CommonModule, RouterLink, ReactiveFormsModule]
 
 })
 export class AhorrosPage implements OnInit {

@@ -76,11 +76,23 @@
 
   @endsection -->
 
-  <ion-item-sliding *ngFor="let ahorro of ahorros">
+  <!-- <ion-item-sliding *ngFor="let ahorro of ahorros">
     <p>{{ahorro | json}}</p>
-  </ion-item-sliding>
+  </ion-item-sliding> -->
 
 
+
+  <ion-content color="light">
+    <ion-list [inset]="true" *ngFor="let ahorro of ahorros">
+      <ion-item>
+        <ion-label>{{ahorro.fecha | date:'dd/MM'}} {{ahorro.detalle}} {{ahorro.moneda==="Dolares"? 'U$S' : '$'}}
+          {{ahorro.importe}} </ion-label>
+        <ion-icon name="nuevoAhorro" color="primary"></ion-icon>
+
+      </ion-item>
+
+    </ion-list>
+  </ion-content>
 
 </ion-content>
 <app-footer></app-footer>

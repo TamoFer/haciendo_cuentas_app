@@ -18,7 +18,7 @@ import { CotizacionService } from 'src/app/services/cotizacion.service';
   selector: 'app-metas',
   templateUrl: './metas.page.html',
   styleUrls: ['./metas.page.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor, CommonModule, RouterLink, ReactiveFormsModule]
+  imports: [IonicModule, HeaderComponent, FooterComponent, NgFor, CommonModule, RouterLink, ReactiveFormsModule]
 
 })
 export class MetasPage implements OnInit {
