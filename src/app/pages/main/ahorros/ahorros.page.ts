@@ -30,7 +30,6 @@ export class AhorrosPage implements OnInit {
   usuario = this.utilsSVC.obtenerDatosLS('user');
   ahorros: Ahorro[] = [];
 
-
   // @endsection
 
 
@@ -49,7 +48,6 @@ export class AhorrosPage implements OnInit {
     });
 
     this.obtenerAhorrosUsuario()
-
 
   }
 

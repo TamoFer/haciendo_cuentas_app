@@ -84,10 +84,11 @@
 
   <ion-content color="light">
     <ion-list [inset]="true" *ngFor="let ahorro of ahorros">
-      <ion-item>
+      <ion-item style="height: 4rem;">
         <ion-label>{{ahorro.fecha | date:'dd/MM'}} {{ahorro.detalle}} {{ahorro.moneda==="Dolares"? 'U$S' : '$'}}
           {{ahorro.importe}} </ion-label>
-        <ion-icon name="nuevoAhorro" color="primary"></ion-icon>
+        <ion-img slot="end" src="assets/icons/ahorro.svg"
+          style="width: 2rem; height: 2rem; margin-top: 1rem;"></ion-img>
 
       </ion-item>
 
