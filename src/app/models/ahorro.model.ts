@@ -6,5 +6,6 @@ export interface Ahorro {
   fecha: Date;
   detalle: string;
   moneda: string;
+  idMeta?: string;
 
 }

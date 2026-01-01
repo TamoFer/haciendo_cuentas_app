@@ -47,21 +47,20 @@
 
 
     <!-- meta-->
-    <form [formGroup]="metaFormulario">
-
-      <ion-toggle (click)="metaCondicion()">¿Es para alguna meta ya
-        registrada?</ion-toggle>
-
-
-      <div *ngIf="mostrarOpcionesMeta">
-        <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Meta" [type]="'select'"
-          [options]="listadoMetas" [control]="metaFormulario.controls.meta" *ngIf="!ahorro">
-        </app-ingreso-datos>
-        <div *ngIf="metaFormulario.controls.meta.errors && metaFormulario.controls.meta.touched">
-          <div class="errores" *ngIf="metaFormulario.controls.meta.errors?.['required']">La meta es necesaria</div>
+    <div *ngIf="!ahorro && listadoMetas.length > 0">
+      <form [formGroup]="metaFormulario">
+        <ion-toggle (click)="metaCondicion()">¿Es para alguna meta ya
+          registrada?</ion-toggle>
+        <div *ngIf="mostrarOpcionesMeta">
+          <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Meta" [type]="'select'"
+            [options]="listadoMetas" [control]="metaFormulario.controls.meta" *ngIf="!ahorro">
+          </app-ingreso-datos>
+          <div *ngIf="metaFormulario.controls.meta.errors && metaFormulario.controls.meta.touched">
+            <div class="errores" *ngIf="metaFormulario.controls.meta.errors?.['required']">La meta es necesaria</div>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
 
 
     <div style="width: max-content; display: flex; flex-direction: row ; justify-content: center; margin: 10px auto;">

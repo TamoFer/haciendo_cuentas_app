@@ -80,6 +80,8 @@ export class AddUpdtDeleteAhorrosComponent {
     });
 
     this.obtenerMetasUsuario();
+    console.log(this.listadoMetas.length);
+
   }
 
   obtenerMetasUsuario() {
