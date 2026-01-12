@@ -9,6 +9,7 @@ import { FooterComponent } from 'src/app/shared/components/footer/footer.compone
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { Ahorro } from 'src/app/models/ahorro.model';
 import { AddUpdtDeleteAhorrosComponent } from './add-updt-delete-ahorros/add-updt-delete-ahorros.component';
+import { Meta } from 'src/app/models/metas.model';
 
 @Component({
   selector: 'app-ahorros',
@@ -30,6 +31,7 @@ export class AhorrosPage implements OnInit {
   usuarioLogeado: boolean = false;
   usuario = this.utilsSVC.obtenerDatosLS('user');
   ahorros: Ahorro[] = [];
+  metas: Meta[] = [];
 
   // @endsection
 
@@ -51,6 +53,11 @@ export class AhorrosPage implements OnInit {
 
     this.obtenerAhorrosUsuario()
 
+    this.utilsSVC.metas$.subscribe(metas => {
+      this.metas = metas;
+    });
+
+    this.obtenerMetasUsuario();
   }
 
   obtenerAhorrosUsuario() {
@@ -66,7 +73,18 @@ export class AhorrosPage implements OnInit {
     });
   }
 
+  obtenerMetasUsuario() {
+    const path = `users/${this.usuario.uid}/metas`;
 
+    this.firebaseSVC.getCollectionData(path).subscribe({
+      next: (res: Meta[]) => {
+        this.utilsSVC.setMetas(res);
+      },
+      error: err => {
+        console.error('Error obteniendo metas', err);
+      }
+    });
+  }
 
   async crearAhorro(ahorro?: Ahorro) {
     const modal = await this.utilsSVC.modalsCtrl.create({
@@ -83,24 +101,24 @@ export class AhorrosPage implements OnInit {
     const loading = await this.utilsSVC.loading();
     await loading.present();
 
-    console.log(ahorro.id);
+    const path = `users/${this.usuario.uid}/ahorros/${ahorro.id}`;
 
-    let path = `users/${this.usuario.uid}/ahorros/${ahorro.id}`;
+    try {
+      // 1. Eliminar ahorro
+      await this.firebaseSVC.deleteDocument(path);
 
-
-    this.firebaseSVC.deleteDocument(path).then(async res => {
-
+      // 2. Si pertenece a una meta, eliminarlo de la meta
 
       this.utilsSVC.presentToast({
-        message: 'Ahorro eliminado con exito',
+        message: 'Ahorro eliminado con éxito',
         duration: 1500,
         color: 'success',
         position: 'middle',
         icon: 'checkmark-circle-outline'
-      })
+      });
 
-    }).catch(error => {
-      console.log(error);
+    } catch (error: any) {
+      console.error(error);
 
       this.utilsSVC.presentToast({
         message: error.message,
@@ -108,13 +126,13 @@ export class AhorrosPage implements OnInit {
         color: 'primary',
         position: 'middle',
         icon: 'alert-circle-outline'
-      })
+      });
 
-    }).finally(() => {
+    } finally {
       loading.dismiss();
-    })
-
+    }
   }
+
 
   async confirmarDelete(ahorro: Ahorro) {
     const alert = await this.utilsSVC.alertasCtrl.create({

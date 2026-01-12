@@ -80,7 +80,6 @@ export class AddUpdtDeleteAhorrosComponent {
     });
 
     this.obtenerMetasUsuario();
-    console.log(this.listadoMetas.length);
 
   }
 
@@ -118,7 +117,7 @@ export class AddUpdtDeleteAhorrosComponent {
       moneda: this.formulario.value.moneda!,
     };
 
-    this.asociarMeta(this.metaFormulario.value.meta, ahorro);
+    this.metaFormulario.value.meta ? this.asociarMeta(this.metaFormulario.value.meta, ahorro) : null;
 
     this.firebaseSVC.addDocument(path, ahorro).then(async res => {
 
@@ -214,6 +213,7 @@ export class AddUpdtDeleteAhorrosComponent {
     for (let m of this.metas) {
       if (meta.toLowerCase() === m.nombre.toLocaleLowerCase()) {
         this.metaRelacionada = m;
+        Ahorro.idMeta = this.metaRelacionada.id;
         this.metaRelacionada.ahorrado.push(Ahorro);
         this.firebaseSVC.updateDocument(`users/${this.user.uid}/metas/${this.metaRelacionada.id}`, this.metaRelacionada)
 
