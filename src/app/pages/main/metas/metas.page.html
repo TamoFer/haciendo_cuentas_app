@@ -5,70 +5,73 @@
 
   <!-- @section: mostrar metas -->
 
-  <ion-item-sliding *ngFor="let meta of metas">
-    <ion-item>
-      <ion-card style="width: 100%;">
-        <div style="display: flex;flex-direction: row; justify-content: space-between;">
-          <div>
-            <ion-card-header>
-              <ion-card-title>{{meta.nombre | titlecase }}</ion-card-title>
-              <ion-card-subtitle>{{meta.fecha_comienzo | date}}</ion-card-subtitle>
-            </ion-card-header>
+
+  <div *ngIf="!loading">
+    <ion-item-sliding *ngFor="let meta of metas">
+      <ion-item>
+        <ion-card style="width: 100%;">
+          <div style="display: flex;flex-direction: row; justify-content: space-between;">
+            <div>
+              <ion-card-header>
+                <ion-card-title>{{meta.nombre | titlecase }}</ion-card-title>
+                <ion-card-subtitle>{{meta.fecha_comienzo | date}}</ion-card-subtitle>
+              </ion-card-header>
+            </div>
+            <div style="margin: 1rem;">
+              <ion-avatar style="width: 5rem; height: 5rem;">
+                <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+              </ion-avatar>
+            </div>
           </div>
-          <div style="margin: 1rem;">
-            <ion-avatar style="width: 5rem; height: 5rem;">
-              <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
-            </ion-avatar>
-          </div>
-        </div>
-        <ion-card-content>
-          <ion-accordion-group>
-            <ion-accordion value="first">
-              <ion-item slot="header" color="light">
-                <ion-label>Hasta ahora</ion-label>
-              </ion-item>
-              <div class="ion-padding" slot="content">
-                <div style="display: flex; flex-direction: row;">
-                  <ion-progress-bar [value]="valorMeta" color="success"></ion-progress-bar>
-                  <ion-icon name="trophy-outline"
-                    style="font-size: 1.5rem;top: 50%; transform: translateY(-50%);"></ion-icon>
+          <ion-card-content>
+            <ion-accordion-group>
+              <ion-accordion value="first">
+                <ion-item slot="header" color="light">
+                  <ion-label>Hasta ahora</ion-label>
+                </ion-item>
+                <div class="ion-padding" slot="content">
+                  <div style="display: flex; flex-direction: row;">
+                    <ion-progress-bar [value]="valorMeta" color="success"></ion-progress-bar>
+                    <ion-icon name="trophy-outline"
+                      style="font-size: 1.5rem;top: 50%; transform: translateY(-50%);"></ion-icon>
+                  </div>
+                  <div style="display: flex; flex-direction: column;margin-top: 0.5rem;">
+                    <ion-label>
+                      Valor : {{meta.moneda === 'Pesos Argentinos'
+                      ? (meta.valor | currency:'ARS')
+                      : (meta.valor | currency:'USD')
+                      }}
+                    </ion-label>
+                    <ion-label>
+                      Ahorrado hasta ahora:
+                      {{ meta.moneda === 'Pesos Argentinos'
+                      ? (meta.totalAhorrado | currency:'ARS')
+                      : (meta.totalAhorrado | currency:'USD')
+                      }}
+                    </ion-label>
+                  </div>
                 </div>
-                <div style="display: flex; flex-direction: column;margin-top: 0.5rem;">
-                  <ion-label>
-                    Valor : {{meta.moneda === 'Pesos Argentinos'
-                    ? (meta.valor | currency:'ARS')
-                    : (meta.valor | currency:'USD')
-                    }}
-                  </ion-label>
-                  <ion-label>Ahorrado hasta ahora: {{meta.moneda === 'Pesos Argentinos'
-                    ? (sumarAhorradoMeta(meta) | currency:'ARS')
-                    : (sumarAhorradoMeta(meta) | currency:'USD')
-                    }} </ion-label>
-                </div>
-              </div>
-            </ion-accordion>
-          </ion-accordion-group>
-        </ion-card-content>
-      </ion-card>
-    </ion-item>
-
-    <ion-item-options>
-      <ion-item-option color="#FFFFF">
-        <ion-chip color="#F0EBEB">
-          <ion-icon name="create-outline" color="dark" style="font-weight: 800; font-size: 1.5rem;"
-            (click)="crearMeta(meta)"></ion-icon>
-        </ion-chip>
-      </ion-item-option>
-      <ion-item-option color="#FFFFF">
-        <ion-chip color="#FFFFF">
-          <ion-icon name="trash-outline" color="danger" style="font-weight: 800; font-size: 1.5rem;"
-            (click)="confirmarDelete(meta)"></ion-icon>
-        </ion-chip>
-      </ion-item-option>
-    </ion-item-options>
-
-
-  </ion-item-sliding>
+              </ion-accordion>
+            </ion-accordion-group>
+          </ion-card-content>
+        </ion-card>
+      </ion-item>
+      <ion-item-options>
+        <ion-item-option color="#FFFFF">
+          <ion-chip color="#F0EBEB">
+            <ion-icon name="create-outline" color="dark" style="font-weight: 800; font-size: 1.5rem;"
+              (click)="crearMeta(meta)"></ion-icon>
+          </ion-chip>
+        </ion-item-option>
+        <ion-item-option color="#FFFFF">
+          <ion-chip color="#FFFFF">
+            <ion-icon name="trash-outline" color="danger" style="font-weight: 800; font-size: 1.5rem;"
+              (click)="confirmarDelete(meta)"></ion-icon>
+          </ion-chip>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </div>
 
 
 

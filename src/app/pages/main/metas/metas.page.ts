@@ -1,18 +1,20 @@
-import { CommonModule, NgFor, NgIf } from '@angular/common';
+import { CommonModule, NgFor } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ReactiveFormsModule, } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { Meta } from 'src/app/models/metas.model';
-import { Movimiento } from 'src/app/models/movimiento.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { AddUpdtDeleteMetasComponent } from './add-updt-delete-metas/add-updt-delete-metas.component';
 import { Ahorro } from 'src/app/models/ahorro.model';
-import { AddUpdtDeleteAhorrosComponent } from '../ahorros/add-updt-delete-ahorros/add-updt-delete-ahorros.component';
 import { CotizacionService } from 'src/app/services/cotizacion.service';
+import { combineLatest } from 'rxjs';
+
+
+
 
 @Component({
   selector: 'app-metas',
@@ -34,10 +36,12 @@ export class MetasPage implements OnInit {
   nombreUser: string = '';
   usuarioLogeado: boolean = false;
   usuario = this.utilsSVC.obtenerDatosLS('user');
-  metas: Meta[] = [];
+
   valorMeta: number = 0;
   dolarOficial: number = 0;
-
+  loading = true;
+  metas: Meta[] = [];
+  ahorros: Ahorro[] = [];
 
   // @endsection
 
@@ -52,25 +56,36 @@ export class MetasPage implements OnInit {
       this.usuarioLogeado = true;
     }
 
-    this.utilsSVC.metas$.subscribe(metas => {
+    combineLatest([
+      this.utilsSVC.metas$,
+      this.utilsSVC.ahorros$
+    ]).subscribe(([metas, ahorros]) => {
+
+      console.log('METAS:', metas);
+      console.log('AHORROS:', ahorros);
+
       this.metas = metas;
+      this.ahorros = ahorros;
+
+      this.metas.forEach(meta => {
+        console.log('Meta:', meta.nombre);
+        console.log('IDs ahorrados:', meta.ahorrado);
+
+        meta.totalAhorrado = this.sumarAhorradoMeta(meta);
+
+        console.log('Total calculado:', meta.totalAhorrado);
+      });
+
+      this.loading = false;
+
     });
-
     this.obtenerMetasUsuario();
-
-    this.cotizacionSVC.obtenerCotizacionDolarOficial().subscribe({
-      next: (cotizacion) => {
-        this.dolarOficial = cotizacion.venta;
-      },
-      error: (err) => {
-        console.error('Error al obtener la cotización del dólar:', err);
-      }
-    })
+    this.ObtenerAhorrosUsuario();
   }
 
 
 
-  // @section: crud metas y ahorros
+  // @section: crud metas 
   async crearMeta(meta?: Meta) {
     const modal = await this.utilsSVC.modalsCtrl.create({
       component: AddUpdtDeleteMetasComponent,
@@ -82,16 +97,7 @@ export class MetasPage implements OnInit {
     await modal.present();
   }
 
-  async crearAhorro(ahorro?: Ahorro) {
-    const modal = await this.utilsSVC.modalsCtrl.create({
-      component: AddUpdtDeleteAhorrosComponent,
-      componentProps: {
-        ahorro: ahorro
-      }
-    });
 
-    await modal.present();
-  }
 
   async confirmarDelete(meta) {
 
@@ -173,25 +179,53 @@ export class MetasPage implements OnInit {
     });
   }
 
+  ObtenerAhorrosUsuario() {
+    const path = `users/${this.usuario.uid}/ahorros`;
+
+    this.firebaseSVC.getCollectionData(path).subscribe({
+      next: (res: Ahorro[]) => {
+        this.utilsSVC.setAhorros(res);
+      },
+      error: err => {
+        console.error('Error obteniendo ahorros', err);
+      }
+    });
+  }
+
   sumarAhorradoMeta(meta: Meta) {
     let valorAhorrado = 0;
     let monedaMeta = meta.moneda;
+
     for (let ahorro of meta.ahorrado) {
+      // console.log(typeof (ahorro));
       if (monedaMeta === 'USD') {
-        ahorro.moneda === 'Pesos Argentinos' ? valorAhorrado += this.conversionMetaUSD(Number(ahorro.importe)) : valorAhorrado += Number(ahorro.importe);
+        valorAhorrado += this.conversionUSD(this.valorAhorradoMeta(ahorro));
       } else {
-        ahorro.moneda === 'USD' ? valorAhorrado += this.conversionMetaARS(Number(ahorro.importe)) : valorAhorrado += Number(ahorro.importe);
+        valorAhorrado += this.valorAhorradoMeta(ahorro);
       }
     }
+
     this.valorMeta = ((valorAhorrado * 100) / meta.valor) / 100;
+
     return valorAhorrado;
   }
 
-  conversionMetaUSD(importeARS: number) {
+  valorAhorradoMeta(idAhorro: string) {
+
+    for (let ahorro of this.ahorros) {
+      if (ahorro.id === idAhorro) {
+        return Number(ahorro.moneda === 'USD' ? this.conversionARS(Number(ahorro.importe)) : ahorro.importe);
+      }
+
+    }
+    return 0;
+  }
+
+  conversionUSD(importeARS: number) {
     return importeARS / this.dolarOficial
   }
 
-  conversionMetaARS(importeUSD: number) {
+  conversionARS(importeUSD: number) {
     return importeUSD * this.dolarOficial
   }
 

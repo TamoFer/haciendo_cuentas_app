@@ -107,7 +107,7 @@ export class AddUpdtDeleteAhorrosComponent {
 
     let path = `users/${this.user.uid}/ahorros`;
 
-    this.formulario.value.id = String(this.utilsSVC.crearId())
+    // this.formulario.value.id = String(this.utilsSVC.crearId());
 
     const ahorro: Ahorro = {
       id: this.formulario.value.id,
@@ -214,7 +214,7 @@ export class AddUpdtDeleteAhorrosComponent {
       if (meta.toLowerCase() === m.nombre.toLocaleLowerCase()) {
         this.metaRelacionada = m;
         Ahorro.idMeta = this.metaRelacionada.id;
-        this.metaRelacionada.ahorrado.push(Ahorro);
+        this.metaRelacionada.ahorrado.push(Ahorro.id);
         this.firebaseSVC.updateDocument(`users/${this.user.uid}/metas/${this.metaRelacionada.id}`, this.metaRelacionada)
 
       } else {

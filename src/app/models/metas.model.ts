@@ -7,6 +7,7 @@ export interface Meta {
   fecha_comienzo: Date;
   nombre: string;
   detalle: string;
-  ahorrado?: Ahorro[];
+  ahorrado?: string[];
+  totalAhorrado?: number;
 
 }
