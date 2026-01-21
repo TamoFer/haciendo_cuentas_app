@@ -53,11 +53,11 @@ export class AhorrosPage implements OnInit {
 
     this.obtenerAhorrosUsuario()
 
-    this.utilsSVC.metas$.subscribe(metas => {
-      this.metas = metas;
-    });
+    // this.utilsSVC.metas$.subscribe(metas => {
+    //   this.metas = metas;
+    // });
 
-    this.obtenerMetasUsuario();
+    // this.obtenerMetasUsuario();
   }
 
   obtenerAhorrosUsuario() {
@@ -73,18 +73,18 @@ export class AhorrosPage implements OnInit {
     });
   }
 
-  obtenerMetasUsuario() {
-    const path = `users/${this.usuario.uid}/metas`;
+  // obtenerMetasUsuario() {
+  //   const path = `users/${this.usuario.uid}/metas`;
 
-    this.firebaseSVC.getCollectionData(path).subscribe({
-      next: (res: Meta[]) => {
-        this.utilsSVC.setMetas(res);
-      },
-      error: err => {
-        console.error('Error obteniendo metas', err);
-      }
-    });
-  }
+  //   this.firebaseSVC.getCollectionData(path).subscribe({
+  //     next: (res: Meta[]) => {
+  //       this.utilsSVC.setMetas(res);
+  //     },
+  //     error: err => {
+  //       console.error('Error obteniendo metas', err);
+  //     }
+  //   });
+  // }
 
   async crearAhorro(ahorro?: Ahorro) {
     const modal = await this.utilsSVC.modalsCtrl.create({

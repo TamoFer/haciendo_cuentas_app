@@ -35,18 +35,19 @@
         </div>
 
         <!-- rubro  -->
-        <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Rubro" [type]="'select'"
+        <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Clasificacion" [type]="'select'"
             [options]="opcionesRubro" [control]="formulario.controls.rubro">
         </app-ingreso-datos>
 
         <div *ngIf="formulario.controls.rubro.errors && formulario.controls.rubro.touched">
-            <div class="errores" *ngIf="formulario.controls.rubro.errors?.['required']">El rubro es necesario</div>
+            <div class="errores" *ngIf="formulario.controls.rubro.errors?.['required']">Una clasificacion es necesario
+            </div>
 
         </div>
 
 
         <!-- tipo-->
-        <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Tipo" [type]="'select'"
+        <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Dinero en" [type]="'select'"
             [options]="opcionesTipo" [control]="formulario.controls.tipo" *ngIf="!ingreso">
         </app-ingreso-datos>
 
@@ -54,7 +55,7 @@
             <div class="errores" *ngIf="formulario.controls.tipo.errors?.['required']">El tipo es necesario</div>
         </div>
 
-        <ion-toggle (click)="cambiarEstado()">¿Es un ingreso fijo?</ion-toggle>
+        <!-- <ion-toggle (click)="cambiarEstado()">¿Es un ingreso fijo?</ion-toggle> -->
 
         <div
             style="width: max-content; display: flex; flex-direction: row ; justify-content: center; margin: 10px auto;">

@@ -30,8 +30,8 @@ export class AddUpdtDeleteIngresosComponent {
   mostrarBack: boolean = true;
 
 
-  opcionesRubro = ['Sueldo', 'Venta', 'Prestamo', 'Apuesta', 'Changa', 'Saldo'];
-  opcionesTipo = ['Efectivo', 'Dinero en cuenta'];
+  opcionesRubro = ['Ahorro', 'Prestamo', 'Sueldo', 'Venta', 'Otro'];
+  opcionesTipo = ['Banco', 'Efectivo'];
 
   user = {} as User;
 

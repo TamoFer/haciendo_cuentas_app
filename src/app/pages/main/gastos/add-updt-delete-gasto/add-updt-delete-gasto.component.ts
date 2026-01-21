@@ -35,8 +35,10 @@ export class AddUpdtDeleteGastoComponent {
   mostrarBack: boolean = true;
   user = {} as User;
 
-  opcionesRubro = ['Compra', 'Regalo', 'Deudas', 'Servicios'];
-  opcionesTipo = ['Efectivo', 'Dinero en cuenta'];
+  opcionesRubro = ['A medias', 'Compra', 'Deudas', 'Regalo', 'Servicios'];
+  opcionesTipo = ['Banco', 'Efectivo'];
+
+
 
   formulario = new FormGroup({
     id: new FormControl(null),

@@ -10,14 +10,14 @@
         <ion-item>
           <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%;">
             <p>{{ahorro.fecha | date:'dd/MM'}}</p>
-            <p>{{ahorro.detalle | uppercase}}</p>
-            <p style="color: green;">+ {{ahorro.moneda==="Dolares"? 'U$S' : '$'}}
-              {{ahorro.importe}}</p>
+            <p>{{ahorro.detalle | uppercase | slice:0:15}}</p>
+            <p style="color: green;">+
+              {{ahorro.moneda==="Dolares"? (ahorro.importe | currency: 'USD') : (ahorro.importe | currency: 'ARS') }}
+            </p>
             <ion-img slot="end" src="assets/icons/ahorro.svg"
               style="width: 2rem; height: 2rem; margin-top: 1rem;"></ion-img>
           </div>
         </ion-item>
-
         <ion-item-options>
           <ion-item-option color="#FFFFF">
             <ion-chip color="#F0EBEB">

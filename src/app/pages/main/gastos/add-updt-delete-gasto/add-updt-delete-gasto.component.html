@@ -37,18 +37,18 @@
 
 
         <!-- rubro  -->
-        <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Rubro" [type]="'select'"
+        <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Motivo" [type]="'select'"
             [options]="opcionesRubro" [control]="formulario.controls.rubro">
         </app-ingreso-datos>
 
         <div *ngIf="formulario.controls.rubro.errors && formulario.controls.rubro.touched">
-            <div class="errores" *ngIf="formulario.controls.rubro.errors?.['required']">El rubro es necesario</div>
+            <div class="errores" *ngIf="formulario.controls.rubro.errors?.['required']">El motivo es necesario</div>
 
         </div>
 
 
         <!-- tipo-->
-        <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Tipo" [type]="'select'"
+        <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Dinero en" [type]="'select'"
             [options]="opcionesTipo" [control]="formulario.controls.tipo" *ngIf="!gasto">
         </app-ingreso-datos>
 
@@ -57,7 +57,7 @@
         </div>
 
         <!-- gasto fijo -->
-        <ion-toggle (click)="cambiarEstado()">¿Es un gasto fijo?</ion-toggle>
+        <!-- <ion-toggle (click)="cambiarEstado()">¿Es un gasto fijo?</ion-toggle> -->
 
         <div
             style="width: max-content; display: flex; flex-direction: row ; justify-content: center; margin: 10px auto;">

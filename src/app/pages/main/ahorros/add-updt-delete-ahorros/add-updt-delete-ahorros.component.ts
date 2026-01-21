@@ -31,7 +31,7 @@ export class AddUpdtDeleteAhorrosComponent {
   mostrarBack: boolean = true;
 
 
-  opcionesMoneda = ['Pesos Argentinos', 'Dolares'];
+  opcionesMoneda = ['Pesos', 'Dolares'];
 
   user = {} as User;
   listadoMetas = [];
