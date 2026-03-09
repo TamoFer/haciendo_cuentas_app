@@ -59,6 +59,29 @@
         <div class="movimientos-detalles-forma">FORMA</div>
       </div>
 
+      <ion-item-sliding *ngFor="let cambio of movimientosCambios | slice:0:5">
+        <ion-item>
+          <div class="detalle-style">
+            <ion-label color="dark" class="detalle-style-fecha"> {{ cambio.fecha | date:'dd/MM'}} </ion-label>
+            <ion-label color="dark" class="detalle-style-rubro"> {{cambio.desde!='efectivo'? 'Retiro' : 'Depósito'}}
+            </ion-label>
+            <ion-label class="detalle-style-importe"> {{cambio.importe | currency:'ARS'}} </ion-label>
+            <ion-label class="detalle-style-icono">
+              <ion-icon name="repeat" color="dark"></ion-icon>
+            </ion-label>
+
+          </div>
+        </ion-item>
+        <ion-item-options>
+          <ion-item-option (click)="infoCambio(cambio)" color="#FFFFF">
+            <ion-icon color="warning" style="font-size: 1.5rem;" name="information-circle-outline"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="#FFFFF">
+            <ion-icon color="danger" style="font-size: 1.5rem;" name="trash-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+
+      </ion-item-sliding>
 
       <ion-item-sliding *ngFor="let mov of movimientosCuenta | slice:0:5">
         <!-- {{mov | json}} -->
@@ -89,25 +112,25 @@
           </div>
         </ion-item>
         <ion-item-options *ngIf="mov.genero == 'gasto' ">
-          <ion-item-option color="warning" (click)="infoMovimiento(mov)">
-            <ion-icon name="information-circle-outline"></ion-icon>
+          <ion-item-option (click)="infoMovimiento(mov)" color="#FFFFF">
+            <ion-icon color="warning" style="font-size: 1.5rem;" name="information-circle-outline"></ion-icon>
           </ion-item-option>
-          <ion-item-option color="secondary" (click)="agregarGastos(mov)">
-            <ion-icon name="create-outline"></ion-icon>
+          <ion-item-option (click)="agregarGastos(mov)" color="#FFFFF">
+            <ion-icon color="secondary" style="font-size: 1.5rem;" name="create-outline"></ion-icon>
           </ion-item-option>
-          <ion-item-option color="danger" (click)="confirmarDelete(mov)">
-            <ion-icon name="trash-outline"></ion-icon>
+          <ion-item-option (click)="confirmarDelete(mov)" color="#FFFFF">
+            <ion-icon color="danger" style="font-size: 1.5rem;" name="trash-outline"></ion-icon>
           </ion-item-option>
         </ion-item-options>
         <ion-item-options *ngIf="mov.genero != 'gasto' ">
-          <ion-item-option color="warning">
-            <ion-icon name="information-circle-outline" (click)="infoMovimiento(mov)"></ion-icon>
+          <ion-item-option (click)="infoMovimiento(mov)" color="#FFFFF">
+            <ion-icon color="warning" style="font-size: 1.5rem;" name="information-circle-outline"></ion-icon>
           </ion-item-option>
-          <ion-item-option color="secondary" (click)="agregarIngresos(mov)">
-            <ion-icon name="create-outline"></ion-icon>
+          <ion-item-option (click)="agregarIngresos(mov)" color="#FFFFF">
+            <ion-icon color="secondary" style="font-size: 1.5rem;" name="create-outline"></ion-icon>
           </ion-item-option>
-          <ion-item-option color="danger" (click)="confirmarDelete(mov)">
-            <ion-icon name="trash-outline"></ion-icon>
+          <ion-item-option (click)="confirmarDelete(mov)" color="#FFFFF">
+            <ion-icon color="danger" style="font-size: 1.5rem;" name="trash-outline"></ion-icon>
           </ion-item-option>
         </ion-item-options>
       </ion-item-sliding>
