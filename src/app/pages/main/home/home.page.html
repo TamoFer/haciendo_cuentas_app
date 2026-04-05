@@ -59,7 +59,7 @@
         <div class="movimientos-detalles-forma">FORMA</div>
       </div>
 
-      <ion-item-sliding *ngFor="let cambio of movimientosCambios | slice:0:5">
+      <ion-item-sliding *ngFor="let cambio of movimientosCambios | slice:0:2">
         <ion-item>
           <div class="detalle-style">
             <ion-label color="dark" class="detalle-style-fecha"> {{ cambio.fecha | date:'dd/MM'}} </ion-label>
