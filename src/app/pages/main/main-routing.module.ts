@@ -19,13 +19,18 @@ const routes: Routes = [
   {
     path: 'ingresos',
     loadChildren: () => import('./ingresos/ingresos.module').then(m => m.IngresosPageModule)
-  },  {
+  },
+  {
     path: 'tarjetas',
-    loadChildren: () => import('./tarjetas/tarjetas.module').then( m => m.TarjetasPageModule)
+    loadChildren: () => import('./tarjetas/tarjetas.module').then(m => m.TarjetasPageModule)
   },
   {
     path: 'balances',
-    loadChildren: () => import('./balances/balances.module').then( m => m.BalancesPageModule)
+    loadChildren: () => import('./balances/balances.module').then(m => m.BalancesPageModule)
+  },
+  {
+    path: 'meses',
+    loadChildren: () => import('./meses/meses.module').then(m => m.MesesModule)
   }
 
 

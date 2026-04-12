@@ -45,6 +45,11 @@ const routes: Routes = [
   {
     path: 'ahorros',
     loadChildren: () => import('./pages/main/ahorros/ahorros.module').then(m => m.AhorrosPageModule), canActivate: [AuthGuard]
+  },
+
+  {
+    path: 'meses',
+    loadChildren: () => import('./pages/main/meses/meses.module').then(m => m.MesesModule)
   }
 
 
