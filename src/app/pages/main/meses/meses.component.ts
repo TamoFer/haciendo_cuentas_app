@@ -37,8 +37,7 @@ export class MesesComponent implements OnInit {
     this.subscripcionUser = this.utilsSVC.user$.subscribe((user) => {
       if (user) {
         this.user = user;
-
-
+        this.mes = new Date().toLocaleDateString('es-ES', { month: 'long' });
         this.obtenerDatosUsuario(user);
       }
     });
