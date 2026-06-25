@@ -1,0 +1,162 @@
+.simulador-container {
+  padding: 16px;
+}
+
+.input-section {
+  margin-bottom: 16px;
+}
+
+.gastos-section {
+  margin-bottom: 16px;
+
+  ion-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    ion-card-title {
+      font-size: 1rem;
+    }
+  }
+}
+
+.sin-gastos {
+  color: var(--ion-color-medium);
+  text-align: center;
+  padding: 16px;
+  font-style: italic;
+}
+
+.total-gastos {
+  text-align: right;
+  padding: 8px 16px;
+  background: var(--ion-color-light);
+  border-radius: 8px;
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+.proyecciones-section {
+  margin-bottom: 80px;
+}
+
+.mes-card {
+  background: var(--ion-color-light);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &.negativo {
+    background: rgba(var(--ion-color-danger-rgb), 0.1);
+    border-left: 4px solid var(--ion-color-danger);
+  }
+
+  &.expandido {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.mes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  ion-icon {
+    font-size: 1.2rem;
+    color: var(--ion-color-medium);
+  }
+}
+
+.mes-resumen {
+  .resumen-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 0.9rem;
+
+    &.total {
+      border-top: 1px solid var(--ion-color-medium);
+      margin-top: 8px;
+      padding-top: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+  }
+
+  .monto-positivo {
+    color: var(--ion-color-success);
+  }
+
+  .monto-negativo {
+    color: var(--ion-color-danger);
+  }
+}
+
+.presupuesto-diario {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ion-color-success);
+  color: white;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-top: 12px;
+  font-size: 0.85rem;
+
+  ion-icon {
+    font-size: 1.2rem;
+  }
+
+  strong {
+    font-size: 1.1rem;
+  }
+}
+
+.alerta-negativo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ion-color-danger);
+  color: white;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-top: 12px;
+  font-size: 0.85rem;
+
+  ion-icon {
+    font-size: 1.2rem;
+  }
+}
+
+.mes-detalle {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ion-color-medium);
+
+  h4 {
+    margin: 0 0 8px 0;
+    font-size: 0.95rem;
+  }
+
+  .subtitulo {
+    font-size: 0.8rem;
+    color: var(--ion-color-medium);
+    margin: 8px 0 4px 0;
+  }
+
+  .gasto-detalle {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+  }
+}

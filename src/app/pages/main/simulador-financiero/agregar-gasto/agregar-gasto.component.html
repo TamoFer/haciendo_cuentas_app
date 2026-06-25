@@ -1,0 +1,63 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Agregar Gasto</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">Cancelar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-label position="stacked">Nombre del gasto *</ion-label>
+      <ion-input [(ngModel)]="nombre" placeholder="Ej: Alquiler, Préstamo"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Categoría</ion-label>
+      <ion-select [(ngModel)]="categoria" interface="popover">
+        @for (cat of categorias; track cat) {
+          <ion-select-option [value]="cat">{{ cat }}</ion-select-option>
+        }
+        <ion-select-option value="Otros">Otros</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Importe ($) *</ion-label>
+      <ion-input type="number" [(ngModel)]="importe" placeholder="0"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Fecha de inicio</ion-label>
+      <ion-input type="date" [(ngModel)]="fechaInicio"></ion-input>
+    </ion-item>
+
+    @if (tipo === 'temporal') {
+      <ion-item>
+        <ion-label position="stacked">Cantidad de cuotas/meses</ion-label>
+        <ion-input type="number" [(ngModel)]="cantidadCuotas" placeholder="Ej: 12"></ion-input>
+      </ion-item>
+
+      @if (cantidadCuotas > 0) {
+        <ion-item>
+          <ion-label position="stacked">O fecha de fin (opcional)</ion-label>
+          <ion-input type="date" [(ngModel)]="fechaFin"></ion-input>
+        </ion-item>
+      }
+    }
+
+    <ion-item>
+      <ion-label position="stacked">Detalles (opcional)</ion-label>
+      <ion-textarea [(ngModel)]="detalles" placeholder="Notas adicionales..." rows="3"></ion-textarea>
+    </ion-item>
+  </ion-list>
+
+  <div class="botonera">
+    <ion-button expand="block" (click)="guardar()">
+      <ion-icon slot="start" name="checkmark"></ion-icon>
+      Agregar
+    </ion-button>
+  </div>
+</ion-content>
