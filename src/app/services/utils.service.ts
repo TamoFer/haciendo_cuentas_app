@@ -9,6 +9,7 @@ import { Consumo } from '../models/consumoTarjeta.model';
 import { MetasPageModule } from '../pages/main/metas/metas.module';
 import { Meta } from '../models/metas.model';
 import { Ahorro } from '../models/ahorro.model';
+import { Cambio } from '../models/cambio';
 
 @Injectable({
   providedIn: 'root'
@@ -302,6 +303,41 @@ export class UtilsService {
 
   // @endsection
 
+
+
+  // @section: registros
+  // ✅ Subject para los cambios
+  private cambiosSubject = new BehaviorSubject<Cambio[]>([]);
+  cambios$ = this.cambiosSubject.asObservable();
+
+  // ✅ Obtener los consumos cambios actuales
+  getCambiosActuales(): Cambio[] {
+    return this.cambiosSubject.getValue();
+  }
+
+  // ✅ Establecer cambio
+  setCambios(cambios: Cambio[]) {
+    this.cambiosSubject.next(cambios);
+  }
+  // ✅ Agregar cambio (opcional helper)
+  agregarCambios(nuevo: Cambio) {
+    const actualizados = [nuevo, ...this.getCambiosActuales()];
+    this.setCambios(actualizados);
+  }
+
+  // ✅ Editar cambio
+  actualizarCambios(actualizado: Cambio) {
+    const lista = this.getCambiosActuales().map(c =>
+      c.id === actualizado.id ? actualizado : c
+    );
+    this.setCambios(lista);
+  }
+
+  // ✅ Eliminar cambio
+  eliminarCambio(id: number | string) {
+    const lista = this.getCambiosActuales().filter(m => m.id !== id);
+    this.setCambios(lista);
+  }
 
 }
 

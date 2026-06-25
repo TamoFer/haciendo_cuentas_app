@@ -11,6 +11,7 @@ import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { Router } from '@angular/router';
+import { Cambio } from 'src/app/models/cambio';
 
 
 
@@ -70,6 +71,8 @@ export class CambioDivisaComponent implements OnInit {
       saldo_efectivo: saldoEfectivoNuevo
     })
 
+    this.crearCambioRegistro(importeCambio, 'efectivo', 'banco', saldoEfectivoOriginal, saldoEfectivoNuevo, saldoBancoOriginal, saldoBancoNuevo)
+
 
     this.firebaseSVC.updateDocument(path, {
       ...this.user,
@@ -116,12 +119,16 @@ export class CambioDivisaComponent implements OnInit {
 
     const saldoBancoNuevo = Math.abs(saldoBancoOriginal - importeCambio);
 
+
+
     this.utilsSVC.setUser({
       ... this.user,
       saldo_banco: saldoBancoNuevo,
       saldo_efectivo: saldoEfectivoNuevo
     })
 
+
+    this.crearCambioRegistro(importeCambio, 'banco', 'efectivo', saldoEfectivoOriginal, saldoEfectivoNuevo, saldoBancoOriginal, saldoBancoNuevo)
 
     this.firebaseSVC.updateDocument(path, {
       ...this.user,
@@ -177,6 +184,38 @@ export class CambioDivisaComponent implements OnInit {
     }
 
   }
+
+  async crearCambioRegistro(importe, desde, hacia, saldoEfectivoAnterior, saldoEfectivoNuevo, saldoBancoAnterior, saldoBancoNuevo) {
+    const loading = await this.utilsSVC.loading();
+
+    const path = `users/${this.user.uid}/cambios`;
+
+    const cambio: Cambio = {
+      id: String(this.utilsSVC.crearId()),
+      importe: importe,
+      fecha: new Date().toISOString(),
+      desde: desde,
+      hacia: hacia,
+      saldo_efectivo_anterior: saldoEfectivoAnterior,
+      saldo_efectivo_actualizado: saldoEfectivoNuevo,
+      saldo_banco_anterior: saldoBancoAnterior,
+      saldo_banco_actualizado: saldoBancoNuevo
+    };
+
+
+    this.firebaseSVC.addDocument(path, cambio).then(async res => {
+      this.utilsSVC.agregarCambios(cambio);
+      this.utilsSVC.dismissModal({ success: true });
+
+    }).catch(error => {
+      console.log(error);
+
+    }).finally(() => {
+      loading.dismiss();
+    })
+
+  }
+
 
   cerrarModal() {
     this.utilsSVC.dismissModal();

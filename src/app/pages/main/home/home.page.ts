@@ -10,8 +10,9 @@ import { AddUpdtDeleteGastoComponent } from '../gastos/add-updt-delete-gasto/add
 import { AddUpdtDeleteIngresosComponent } from '../ingresos/add-updt-delete-ingresos/add-updt-delete-ingresos.component';
 import { User } from 'src/app/models/user.model';
 import { Subscription } from 'rxjs';
-import { CambioDivisaComponent } from '../intercambio/cambio-divisa/cambio-divisa.component';
+import { CambioDivisaComponent } from '../intercambio/cambio-divisa.component';
 import { IdleTimeoutService } from 'src/app/services/idle-timeout.service';
+import { Cambio } from 'src/app/models/cambio';
 
 @Component({
   selector: 'app-home',
@@ -41,6 +42,7 @@ export class HomePage implements OnInit, OnDestroy {
   usuarioLogeado: boolean = false;
   mostrarDetalle: boolean = false;
   movimientosCuenta: Movimiento[] = [];
+  movimientosCambios: Cambio[] = [];
   user: User;
   subscripcionUser: Subscription;
   mostrarSaldos: boolean = false;
@@ -73,8 +75,17 @@ export class HomePage implements OnInit, OnDestroy {
       );
     });
 
+    this.utilsSVC.cambios$.subscribe(movs => {
+      this.movimientosCambios = movs.sort((a, b) =>
+        new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+      );
+    });
+
+
     // Cargar movimientos una vez (al iniciar)
     this.obtenerMovimientosCuenta();
+
+    this.obtenerMovimientosCambios();
   }
 
   obtenerDatosUsuario(user: User) {
@@ -86,6 +97,7 @@ export class HomePage implements OnInit, OnDestroy {
     this.usuarioLogeado = true;
     this.mostrarSaldos = user.censurar_montos;
     this.obtenerMovimientosCuenta();
+    this.obtenerMovimientosCambios();
   }
 
 
@@ -98,6 +110,19 @@ export class HomePage implements OnInit, OnDestroy {
       },
       error: err => {
         console.error('Error obteniendo movimientos', err);
+      }
+    });
+  }
+
+  obtenerMovimientosCambios() {
+    const path = `users/${this.user.uid}/cambios`;
+
+    this.firebaseSVC.getCollectionData(path).subscribe({
+      next: (res: Cambio[]) => {
+        this.utilsSVC.setCambios(res);
+      },
+      error: err => {
+        console.error('Error obteniendo cambios', err);
       }
     });
   }
@@ -191,6 +216,32 @@ export class HomePage implements OnInit, OnDestroy {
     }
   }
 
+  async infoCambio(cambio) {
+    const importeARS = new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'ARS'
+    }).format(cambio.importe);
+
+
+    if (cambio.desde === 'efectivo') {
+      const alert = await this.utilsSVC.alertasCtrl.create({
+
+        header: 'Deposito de efectivo ',
+        subHeader: `Importe ${importeARS}`,
+        buttons: ['OK']
+      })
+      await alert.present();
+
+    } else {
+      const alert = await this.utilsSVC.alertasCtrl.create({
+
+        header: 'Retiro de efectivo ',
+        subHeader: `Importe ${importeARS}`,
+        buttons: ['OK']
+      })
+      await alert.present();
+    }
+  }
 
   async confirmarDelete(movimiento) {
 
