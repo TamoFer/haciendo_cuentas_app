@@ -4,192 +4,231 @@
   <div class="simulador-container">
 
     <div class="input-section">
-      <ion-card>
-        <ion-card-header>
-          <ion-card-title>Ingresá tu proyección</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-item>
-            <ion-label position="stacked">Ingreso mensual estimado ($)</ion-label>
-            <ion-input
-              type="number"
-              [(ngModel)]="ingresoMensual"
-              placeholder="Ej: 1,200,000"
-              (ionInput)="calcularProyeccion()">
-            </ion-input>
-          </ion-item>
+      <div class="input-header">
+        <ion-icon name="calculator-outline"></ion-icon>
+        <span>Tu Proyección</span>
+      </div>
 
-          <ion-item>
-            <ion-label position="stacked">Meses a proyectar</ion-label>
+      <div class="input-card">
+        <div class="input-row full">
+          <app-ingreso-datos icon="wallet-outline" autocomplete="detail" label="Ingreso mensual"
+            [control]="ingresoMensualControl" [maskito]="mascara" [maskitoElement]="maskPredicate" inputmode="decimal"
+            type='text' (ionInput)="calcularProyeccion()"></app-ingreso-datos>
+        </div>
+
+        <div class="input-row split">
+          <div class="input-item">
+            <ion-label position="stacked">Meses</ion-label>
             <ion-select [(ngModel)]="mesesProyeccion" (ionChange)="calcularProyeccion()" interface="popover">
               <ion-select-option [value]="3">3 meses</ion-select-option>
               <ion-select-option [value]="6">6 meses</ion-select-option>
               <ion-select-option [value]="12">12 meses</ion-select-option>
               <ion-select-option [value]="24">24 meses</ion-select-option>
             </ion-select>
-          </ion-item>
-        </ion-card-content>
-      </ion-card>
+          </div>
+
+          <div class="input-item">
+            <ion-label position="stacked">Día cierre</ion-label>
+            <ion-input type="date" [(ngModel)]="fechaCierre" (ionChange)="onFechaCierreChange($event)"></ion-input>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="gastos-section">
-      <ion-card>
-        <ion-card-header>
-          <ion-card-title>Gastos Fijos (se repiten cada mes)</ion-card-title>
-          <ion-button size="small" (click)="abrirModalGasto('fijo')">
-            <ion-icon slot="start" name="add"></ion-icon>
-            Agregar
-          </ion-button>
-        </ion-card-header>
-        <ion-card-content>
-          @if (gastosFijos.length === 0) {
-            <p class="sin-gastos">No hay gastos fijos agregados</p>
-          } @else {
-            <ion-list>
-              @for (gasto of gastosFijos; track gasto.id) {
-                <ion-item>
-                  <ion-label>
-                    <h2>{{ gasto.nombre }}</h2>
-                    <p>{{ gasto.categoria }} - {{ formatearMonto(gasto.importe) }}</p>
-                  </ion-label>
-                  <ion-button slot="end" fill="clear" color="danger" (click)="eliminarGastoFijo(gasto.id)">
-                    <ion-icon name="trash-outline"></ion-icon>
-                  </ion-button>
-                </ion-item>
-              }
-            </ion-list>
-            <div class="total-gastos">
-              <strong>Total fijos: </strong>{{ formatearMonto(getTotalGastosFijos()) }}
-            </div>
-          }
-        </ion-card-content>
-      </ion-card>
+      <div class="section-header fijo">
+        <div class="section-title">
+          <ion-icon name="link-outline"></ion-icon>
+          <span>Gastos Fijos</span>
+        </div>
+        <ion-button size="small" (click)="abrirModalGasto('fijo')">
+          <ion-icon slot="start" name="add-outline"></ion-icon>
+          Agregar
+        </ion-button>
+      </div>
 
-      <ion-card>
-        <ion-card-header>
-          <ion-card-title>Gastos Proyectados (cuotas, préstamos)</ion-card-title>
-          <ion-button size="small" (click)="abrirModalGasto('temporal')">
-            <ion-icon slot="start" name="add"></ion-icon>
-            Agregar
-          </ion-button>
-        </ion-card-header>
-        <ion-card-content>
-          @if (gastosTemporales.length === 0) {
-            <p class="sin-gastos">No hay gastos proyectados agregados</p>
-          } @else {
-            <ion-list>
-              @for (gasto of gastosTemporales; track gasto.id) {
-                <ion-item>
-                  <ion-label>
-                    <h2>{{ gasto.nombre }}</h2>
-                    <p>{{ gasto.categoria }} - {{ formatearMonto(gasto.importe) }}
-                      @if (gasto.fechaFin) {
-                        - Hasta {{ gasto.fechaFin | date:'MM/yyyy' }}
-                      }
-                    </p>
-                  </ion-label>
-                  <ion-button slot="end" fill="clear" color="danger" (click)="eliminarGastoTemporal(gasto.id)">
-                    <ion-icon name="trash-outline"></ion-icon>
-                  </ion-button>
-                </ion-item>
+      @if (gastosFijos.length === 0) {
+      <div class="empty-state">
+        <ion-icon name="link-outline"></ion-icon>
+        <p>No hay gastos fijos</p>
+      </div>
+      } @else {
+      <ion-list class="gastos-list">
+        @for (gasto of gastosFijos; track gasto.id) {
+        <ion-item class="gasto-item" detail (click)="abrirModalGasto('fijo', null, gasto)">
+          <div slot="start" class="gasto-icon fijo">
+            <ion-icon name="link-outline"></ion-icon>
+          </div>
+          <ion-label>
+            <h3>{{ gasto.nombre | uppercase }}</h3>
+            <p>{{ gasto.categoria }}</p>
+          </ion-label>
+          <ion-note slot="end" class="gasto-monto">{{ formatearMonto(gasto.importe) }}</ion-note>
+        </ion-item>
+        }
+      </ion-list>
+      <div class="total-bar fijo">
+        <span>Total Fijos</span>
+        <span class="total-monto">{{ formatearMonto(getTotalGastosFijos()) }}</span>
+      </div>
+      }
+
+      <div class="section-header proy">
+        <div class="section-title">
+          <ion-icon name="time-outline"></ion-icon>
+          <span>Gastos Proyectados</span>
+        </div>
+        <ion-button size="small" (click)="abrirModalGasto('temporal')">
+          <ion-icon slot="start" name="add-outline"></ion-icon>
+          Agregar
+        </ion-button>
+      </div>
+
+      @if (gastosTemporales.length === 0) {
+      <div class="empty-state">
+        <ion-icon name="time-outline"></ion-icon>
+        <p>No hay gastos proyectados</p>
+      </div>
+      } @else {
+      <ion-list class="gastos-list">
+        @for (gasto of gastosTemporales; track gasto.id) {
+        <ion-item class="gasto-item" detail (click)="abrirModalGasto('temporal', null, gasto)">
+          <div slot="start" class="gasto-icon proy">
+            <ion-icon name="time-outline"></ion-icon>
+          </div>
+          <ion-label>
+            <h3>{{ gasto.nombre | uppercase }}</h3>
+            <p>
+              {{ gasto.categoria }}
+              @if (gasto.cantidadCuotas) {
+                · {{ gasto.cantidadCuotas }} cuotas
               }
-            </ion-list>
-            <div class="total-gastos">
-              <strong>Total proyectados: </strong>{{ formatearMonto(getTotalGastosTemporales()) }}
-            </div>
-          }
-        </ion-card-content>
-      </ion-card>
+            </p>
+          </ion-label>
+          <ion-note slot="end" class="gasto-monto">{{ formatearMonto(gasto.importe) }}</ion-note>
+        </ion-item>
+        }
+      </ion-list>
+      <div class="total-bar proy">
+        <span>Total Proyectados</span>
+        <span class="total-monto">{{ formatearMonto(getTotalGastosTemporales()) }}</span>
+      </div>
+      }
     </div>
 
     @if (proyecciones.length > 0) {
-      <div class="proyecciones-section">
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>Proyección Mes por Mes</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            @for (proyeccion of proyecciones; track proyeccion.mes.toString()) {
-              <div class="mes-card"
-                   [class.negativo]="proyeccion.esNegativo"
-                   [class.expandido]="mesDetalle === proyeccion"
-                   (click)="toggleDetalle(proyeccion)">
+    <div class="proyecciones-section">
+      <div class="section-header analytics">
+        <div class="section-title">
+          <ion-icon name="analytics-outline"></ion-icon>
+          <span>Proyección Mes por Mes</span>
+        </div>
+      </div>
 
-                <div class="mes-header">
-                  <h3>{{ proyeccion.nombreMes }}</h3>
-                  <ion-icon [name]="mostrarDetalle && mesDetalle === proyeccion ? 'chevron-up' : 'chevron-down'"></ion-icon>
+      <ion-list class="proyecciones-list">
+        @for (proyeccion of proyecciones; track proyeccion.mes.toString()) {
+        <ion-item class="mes-card" [class.negativo]="proyeccion.esNegativo" [class.expandido]="mesDetalle === proyeccion"
+          (click)="toggleDetalle(proyeccion)" detail>
+          <div slot="start" class="mes-icon" [class.negativo]="proyeccion.esNegativo">
+            <ion-icon name="calendar-outline"></ion-icon>
+          </div>
+          <ion-label>
+            <h3>{{ proyeccion.nombreMes }}</h3>
+            <p>
+              @if (proyeccion.saldoRestante >= 0) {
+                Restante: {{ formatearMonto(proyeccion.saldoRestante) }}
+              } @else {
+                <span class="negativo">Restante: {{ formatearMonto(proyeccion.saldoRestante) }}</span>
+              }
+            </p>
+          </ion-label>
+          <ion-note slot="end" [class.saldo-positivo]="proyeccion.saldoRestante >= 0" [class.saldo-negativo]="proyeccion.saldoRestante < 0">
+            {{ formatearMonto(proyeccion.saldoRestante) }}
+          </ion-note>
+        </ion-item>
+
+        @if (mostrarDetalle && mesDetalle === proyeccion) {
+        <ion-item class="mes-detalle-item">
+          <ion-card class="detalle-card">
+            <ion-card-content>
+              <div class="detalle-row">
+                <span class="detalle-label">
+                  <ion-icon name="arrow-down-circle-outline"></ion-icon>
+                  Ingreso
+                </span>
+                <span class="detalle-value positivo">{{ formatearMonto(proyeccion.ingresoEstimado) }}</span>
+              </div>
+              <div class="detalle-row">
+                <span class="detalle-label">
+                  <ion-icon name="link-outline"></ion-icon>
+                  Gastos Fijos
+                </span>
+                <span class="detalle-value negativo">-{{ formatearMonto(proyeccion.totalGastosFijos) }}</span>
+              </div>
+              <div class="detalle-row">
+                <span class="detalle-label">
+                  <ion-icon name="time-outline"></ion-icon>
+                  Gastos Proyectados
+                </span>
+                <span class="detalle-value negativo">-{{ formatearMonto(proyeccion.totalGastosProyectados) }}</span>
+              </div>
+
+              @if (proyeccion.saldoRestante > 0) {
+              <div class="presupuesto-info">
+                <ion-icon name="wallet-outline"></ion-icon>
+                <span>Diario: <strong>{{ formatearMonto(proyeccion.presupuestoDiario) }}</strong>
+                  @if (proyeccion.diasRestantesMes > 0) {
+                    · {{ proyeccion.diasRestantesMes }} días
+                  }
+                </span>
+              </div>
+              }
+
+              @if (proyeccion.esNegativo) {
+              <div class="alerta-info">
+                <ion-icon name="warning-outline"></ion-icon>
+                <span>Saldo negativo</span>
+              </div>
+              }
+
+              @if (proyeccion.gastosFijosDelMes.length > 0 || proyeccion.gastosProyectadosDelMes.length > 0) {
+              <div class="gastos-detalle">
+                @if (proyeccion.gastosFijosDelMes.length > 0) {
+                <div class="gastos-subheader">
+                  <span>Fijos ({{ proyeccion.gastosFijosDelMes.length }})</span>
                 </div>
-
-                <div class="mes-resumen">
-                  <div class="resumen-row">
-                    <span>Ingreso:</span>
-                    <span class="monto-positivo">{{ formatearMonto(proyeccion.ingresoEstimado) }}</span>
-                  </div>
-                  <div class="resumen-row">
-                    <span>Gastos fijos:</span>
-                    <span class="monto-negativo">-{{ formatearMonto(proyeccion.totalGastosFijos) }}</span>
-                  </div>
-                  <div class="resumen-row">
-                    <span>Gastos proyectados:</span>
-                    <span class="monto-negativo">-{{ formatearMonto(proyeccion.totalGastosProyectados) }}</span>
-                  </div>
-                  <div class="resumen-row total">
-                    <span>Restante:</span>
-                    <span [class.monto-negativo]="proyeccion.saldoRestante < 0"
-                          [class.monto-positivo]="proyeccion.saldoRestante >= 0">
-                      {{ formatearMonto(proyeccion.saldoRestante) }}
-                    </span>
-                  </div>
+                @for (gasto of proyeccion.gastosFijosDelMes; track gasto.id) {
+                <div class="gasto-detalle-row" (click)="verInfoGasto(gasto); $event.stopPropagation()">
+                  <span>{{ gasto.nombre }}</span>
+                  <span>{{ formatearMonto(gasto.importe) }}</span>
                 </div>
-
-                @if (proyeccion.saldoRestante > 0) {
-                  <div class="presupuesto-diario">
-                    <ion-icon name="calendar-outline"></ion-icon>
-                    <span>Podés gastar <strong>{{ formatearMonto(proyeccion.presupuestoDiario) }}</strong> por día
-                      (@if (proyeccion.diasRestantesMes > 0) {
-                        {{ proyeccion.diasRestantesMes }} días restantes
-                      } @else {
-                        sin días restantes
-                      })
-                    </span>
-                  </div>
                 }
-
-                @if (proyeccion.esNegativo) {
-                  <div class="alerta-negativo">
-                    <ion-icon name="warning"></ion-icon>
-                    <span>¡Atención! Saldo negativo este mes</span>
-                  </div>
                 }
-
-                @if (mostrarDetalle && mesDetalle === proyeccion) {
-                  <div class="mes-detalle">
-                    <h4>Detalle de gastos</h4>
-                    @if (proyeccion.gastosFijosDelMes.length > 0) {
-                      <p class="subtitulo">Gastos fijos:</p>
-                      @for (gasto of proyeccion.gastosFijosDelMes; track gasto.id) {
-                        <div class="gasto-detalle">
-                          <span>{{ gasto.nombre }}</span>
-                          <span>{{ formatearMonto(gasto.importe) }}</span>
-                        </div>
-                      }
+                @if (proyeccion.gastosProyectadosDelMes.length > 0) {
+                <div class="gastos-subheader">
+                  <span>Proyectados ({{ proyeccion.gastosProyectadosDelMes.length }})</span>
+                </div>
+                @for (gasto of proyeccion.gastosProyectadosDelMes; track gasto.id) {
+                <div class="gasto-detalle-row" (click)="verInfoGasto(gasto); $event.stopPropagation()">
+                  <span>
+                    {{ gasto.nombre }}
+                    @if (tieneCuotas(gasto)) {
+                      <span class="cuota-tag">{{ getInfoCuota(gasto, proyeccion.mes) }}</span>
                     }
-                    @if (proyeccion.gastosProyectadosDelMes.length > 0) {
-                      <p class="subtitulo">Gastos proyectados:</p>
-                      @for (gasto of proyeccion.gastosProyectadosDelMes; track gasto.id) {
-                        <div class="gasto-detalle">
-                          <span>{{ gasto.nombre }}</span>
-                          <span>{{ formatearMonto(gasto.importe) }}</span>
-                        </div>
-                      }
-                    }
-                  </div>
+                  </span>
+                  <span>{{ formatearMonto(gasto.importe) }}</span>
+                </div>
+                }
                 }
               </div>
-            }
-          </ion-card-content>
-        </ion-card>
-      </div>
+              }
+            </ion-card-content>
+          </ion-card>
+        </ion-item>
+        }
+        }
+      </ion-list>
+    </div>
     }
 
   </div>

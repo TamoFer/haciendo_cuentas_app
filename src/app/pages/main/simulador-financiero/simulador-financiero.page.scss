@@ -1,162 +1,511 @@
 .simulador-container {
-  padding: 16px;
+  padding: 0;
+  background: var(--ion-color-light);
 }
 
 .input-section {
-  margin-bottom: 16px;
+  padding: 16px;
+  background: var(--ion-color-white);
+
+  .input-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--ion-color-light);
+
+    ion-icon {
+      font-size: 1.4rem;
+      color: var(--ion-color-primary);
+    }
+
+    span {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+    }
+  }
+
+  .input-card {
+    background: var(--ion-color-light);
+    border-radius: 12px;
+    padding: 16px;
+
+    .input-row {
+      &.split {
+        display: flex;
+        gap: 12px;
+        margin-top: 12px;
+
+        .input-item {
+          flex: 1;
+        }
+      }
+
+      &.full {
+        width: 100%;
+      }
+    }
+
+    ion-label[position="stacked"] {
+      font-size: 0.8rem;
+      color: var(--ion-color-medium);
+      margin-bottom: 4px;
+    }
+
+    ion-select, ion-input {
+      --background: var(--ion-color-white);
+      --padding-start: 12px;
+      --padding-end: 12px;
+      border-radius: 8px;
+      min-height: 44px;
+    }
+  }
 }
 
 .gastos-section {
-  margin-bottom: 16px;
+  padding: 0 0 100px 0;
 
-  ion-card-header {
+  .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 16px;
+    margin-bottom: 8px;
 
-    ion-card-title {
-      font-size: 1rem;
+    &.fijo {
+      background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-shade) 100%);
+
+      .section-title {
+        color: white;
+        ion-icon { color: white; }
+      }
+
+      ion-button {
+        --background: rgba(255,255,255,0.2);
+        --color: white;
+        font-weight: 600;
+      }
+    }
+
+    &.proy {
+      background: linear-gradient(135deg, var(--ion-color-warning) 0%, #f57c00 100%);
+
+      .section-title {
+        color: white;
+        ion-icon { color: white; }
+      }
+
+      ion-button {
+        --background: rgba(255,255,255,0.2);
+        --color: white;
+        font-weight: 600;
+      }
+    }
+
+    &.analytics {
+      background: var(--ion-color-dark);
+
+      .section-title {
+        color: white;
+        ion-icon { color: white; }
+      }
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      ion-icon {
+        font-size: 1.3rem;
+      }
+
+      span {
+        font-size: 1rem;
+        font-weight: 600;
+      }
     }
   }
-}
 
-.sin-gastos {
-  color: var(--ion-color-medium);
-  text-align: center;
-  padding: 16px;
-  font-style: italic;
-}
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: var(--ion-color-white);
+    margin: 0 16px;
+    border-radius: 12px;
 
-.total-gastos {
-  text-align: right;
-  padding: 8px 16px;
-  background: var(--ion-color-light);
-  border-radius: 8px;
-  margin-top: 8px;
-  font-size: 0.9rem;
+    ion-icon {
+      font-size: 2.5rem;
+      color: var(--ion-color-medium);
+      opacity: 0.5;
+      margin-bottom: 8px;
+    }
+
+    p {
+      margin: 0;
+      color: var(--ion-color-medium);
+      font-size: 0.9rem;
+    }
+  }
+
+  .gastos-list {
+    background: transparent;
+    padding: 0;
+    margin: 0 16px;
+
+    &.IOS {
+      ion-item {
+        --inner-padding-end: 0;
+      }
+    }
+  }
+
+  .gasto-item {
+    --background: var(--ion-color-white);
+    --padding-start: 0;
+    --padding-end: 0;
+    --inner-padding-end: 16px;
+    margin-bottom: 2px;
+    border-radius: 10px;
+    min-height: 60px;
+
+    .gasto-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+
+      ion-icon {
+        font-size: 1.2rem;
+        color: white;
+      }
+
+      &.fijo {
+        background: var(--ion-color-primary);
+      }
+
+      &.proy {
+        background: var(--ion-color-warning);
+      }
+    }
+
+    ion-label {
+      h3 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--ion-color-dark);
+        margin-bottom: 2px;
+      }
+
+      p {
+        font-size: 0.8rem;
+        color: var(--ion-color-medium);
+      }
+    }
+
+    .gasto-monto {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ion-color-danger);
+    }
+  }
+
+  .total-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    margin: 8px 16px 0 16px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+
+    &.fijo {
+      background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-shade) 100%);
+      color: white;
+    }
+
+    &.proy {
+      background: linear-gradient(135deg, var(--ion-color-warning) 0%, #f57c00 100%);
+      color: white;
+    }
+
+    .total-monto {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+  }
 }
 
 .proyecciones-section {
-  margin-bottom: 80px;
-}
+  padding-bottom: 100px;
 
-.mes-card {
-  background: var(--ion-color-light);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &.negativo {
-    background: rgba(var(--ion-color-danger-rgb), 0.1);
-    border-left: 4px solid var(--ion-color-danger);
-  }
-
-  &.expandido {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-}
-
-.mes-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-
-  h3 {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-  }
-
-  ion-icon {
-    font-size: 1.2rem;
-    color: var(--ion-color-medium);
-  }
-}
-
-.mes-resumen {
-  .resumen-row {
+  .section-header {
     display: flex;
     justify-content: space-between;
-    padding: 4px 0;
-    font-size: 0.9rem;
+    align-items: center;
+    padding: 16px;
+    margin-bottom: 8px;
 
-    &.total {
-      border-top: 1px solid var(--ion-color-medium);
-      margin-top: 8px;
-      padding-top: 8px;
-      font-weight: 600;
-      font-size: 1rem;
+    &.analytics {
+      background: var(--ion-color-dark);
+
+      .section-title {
+        color: white;
+        ion-icon { color: white; }
+      }
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      ion-icon {
+        font-size: 1.3rem;
+      }
+
+      span {
+        font-size: 1rem;
+        font-weight: 600;
+      }
     }
   }
 
-  .monto-positivo {
-    color: var(--ion-color-success);
+  .proyecciones-list {
+    background: transparent;
+    padding: 0;
+    margin: 0 16px;
   }
 
-  .monto-negativo {
-    color: var(--ion-color-danger);
+  .mes-card {
+    --background: var(--ion-color-white);
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    margin-bottom: 2px;
+    border-radius: 10px;
+    min-height: 64px;
+
+    &.negativo {
+      --background: rgba(var(--ion-color-danger-rgb), 0.05);
+    }
+
+    &.expandido {
+      --background: var(--ion-color-primary-tint);
+    }
+
+    .mes-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 0;
+      margin-right: 12px;
+      background: var(--ion-color-primary);
+      color: white;
+
+      &.negativo {
+        background: var(--ion-color-danger);
+      }
+    }
+
+    ion-label {
+      h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--ion-color-dark);
+        margin-bottom: 2px;
+      }
+
+      p {
+        font-size: 0.85rem;
+        color: var(--ion-color-medium);
+
+        .negativo {
+          color: var(--ion-color-danger);
+          font-weight: 600;
+        }
+      }
+    }
+
+    ion-note {
+      font-size: 1rem;
+      font-weight: 700;
+
+      &.saldo-positivo {
+        color: var(--ion-color-success);
+      }
+
+      &.saldo-negativo {
+        color: var(--ion-color-danger);
+      }
+    }
+  }
+
+  .mes-detalle-item {
+    --background: transparent;
+    --padding-start: 0;
+    --padding-end: 0;
+    --inner-padding-end: 0;
+    margin-bottom: 8px;
+
+    .detalle-card {
+      margin: 0;
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+      ion-card-content {
+        padding: 16px;
+      }
+
+      .detalle-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--ion-color-light);
+
+        &:last-of-type {
+          border-bottom: none;
+        }
+
+        .detalle-label {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.9rem;
+          color: var(--ion-color-dark);
+
+          ion-icon {
+            font-size: 1.1rem;
+            color: var(--ion-color-medium);
+          }
+        }
+
+        .detalle-value {
+          font-size: 0.95rem;
+          font-weight: 600;
+
+          &.positivo {
+            color: var(--ion-color-success);
+          }
+
+          &.negativo {
+            color: var(--ion-color-danger);
+          }
+        }
+      }
+
+      .presupuesto-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--ion-color-success);
+        color: white;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 12px;
+        font-size: 0.85rem;
+
+        ion-icon {
+          font-size: 1.1rem;
+        }
+
+        strong {
+          font-size: 1rem;
+        }
+      }
+
+      .alerta-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--ion-color-danger);
+        color: white;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 8px;
+        font-size: 0.85rem;
+
+        ion-icon {
+          font-size: 1.1rem;
+        }
+      }
+
+      .gastos-detalle {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--ion-color-light);
+
+        .gastos-subheader {
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: var(--ion-color-medium);
+          text-transform: uppercase;
+          margin: 8px 0 4px 0;
+        }
+
+        .gasto-detalle-row {
+          display: flex;
+          justify-content: space-between;
+          padding: 10px 12px;
+          background: var(--ion-color-light);
+          border-radius: 8px;
+          margin-bottom: 4px;
+          font-size: 0.85rem;
+          cursor: pointer;
+          transition: background 0.2s;
+
+          &:active {
+            background: var(--ion-color-primary-tint);
+          }
+
+          span:first-child {
+            color: var(--ion-color-dark);
+          }
+
+          span:last-child {
+            font-weight: 600;
+            color: var(--ion-color-danger);
+          }
+
+          .cuota-tag {
+            display: inline-block;
+            background: rgba(var(--ion-color-primary-rgb), 0.1);
+            color: var(--ion-color-primary);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            margin-left: 6px;
+            font-weight: 500;
+          }
+        }
+      }
+    }
   }
 }
 
-.presupuesto-diario {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--ion-color-success);
-  color: white;
-  padding: 10px 12px;
-  border-radius: 8px;
-  margin-top: 12px;
-  font-size: 0.85rem;
-
-  ion-icon {
-    font-size: 1.2rem;
-  }
-
-  strong {
-    font-size: 1.1rem;
-  }
+ion-list {
+  background: transparent;
 }
 
-.alerta-negativo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--ion-color-danger);
-  color: white;
-  padding: 10px 12px;
-  border-radius: 8px;
-  margin-top: 12px;
-  font-size: 0.85rem;
-
-  ion-icon {
-    font-size: 1.2rem;
-  }
+ion-item {
+  --border-color: transparent;
 }
 
-.mes-detalle {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--ion-color-medium);
-
-  h4 {
-    margin: 0 0 8px 0;
-    font-size: 0.95rem;
-  }
-
-  .subtitulo {
-    font-size: 0.8rem;
-    color: var(--ion-color-medium);
-    margin: 8px 0 4px 0;
-  }
-
-  .gasto-detalle {
-    display: flex;
-    justify-content: space-between;
-    padding: 4px 8px;
-    font-size: 0.85rem;
-  }
+ion-button {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  min-height: 36px;
 }

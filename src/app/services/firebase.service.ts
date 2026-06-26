@@ -86,4 +86,61 @@ export class FirebaseService {
     const ref = collection(this.firestore, path);
     return collectionData(query(ref, collectionQuery), { idField: 'id' });
   }
+
+  // 📊 Simulador Financiero - Gastos
+  async addGastoSimulador(uid: string, gasto: any) {
+    const path = `users/${uid}/gastosSimulador`;
+    gasto.id = this.crearId();
+    gasto.fechaCreacion = new Date();
+    gasto.fechaFin = gasto.fechaFin || null;
+    gasto.cantidadCuotas = gasto.cantidadCuotas || null;
+    gasto.detalles = gasto.detalles || null;
+    console.log('FirebaseService addGastoSimulador - path:', path, 'gasto:', gasto);
+    try {
+      const result = await this.addDocument(path, gasto);
+      console.log('Gasto added successfully, result:', result);
+      return result;
+    } catch (error) {
+      console.error('Error adding gasto:', error);
+      throw error;
+    }
+  }
+
+  async getGastosSimulador(uid: string) {
+    const path = `users/${uid}/gastosSimulador`;
+    console.log('FirebaseService getGastosSimulador - path:', path);
+    return new Promise((resolve) => {
+      this.getCollectionData(path).subscribe({
+        next: (data) => {
+          console.log('getGastosSimulador data:', data);
+          resolve(data);
+        },
+        error: (err) => {
+          console.error('Error getting gastos:', err);
+          resolve([]);
+        }
+      });
+    });
+  }
+
+  async updateGastoSimulador(uid: string, gastoId: string, data: any) {
+    const path = `users/${uid}/gastosSimulador/${gastoId}`;
+    data.fechaFin = data.fechaFin || null;
+    data.cantidadCuotas = data.cantidadCuotas || null;
+    data.detalles = data.detalles || null;
+    data.nombre = data.nombre || '';
+    data.categoria = data.categoria || 'Otros';
+    data.importe = Number(data.importe) || 0;
+    console.log('FirebaseService updateGastoSimulador - path:', path, 'data:', data);
+    return this.updateDocument(path, data);
+  }
+
+  async deleteGastoSimulador(uid: string, gastoId: string) {
+    const path = `users/${uid}/gastosSimulador/${gastoId}`;
+    return this.deleteDocument(path);
+  }
+
+  crearId(): string {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  }
 }
