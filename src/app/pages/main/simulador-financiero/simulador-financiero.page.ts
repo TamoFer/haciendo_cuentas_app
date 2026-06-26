@@ -18,7 +18,7 @@ import { MaskitoElementPredicate } from '@maskito/core';
   selector: 'app-simulador-financiero',
   templateUrl: './simulador-financiero.page.html',
   styleUrls: ['./simulador-financiero.page.scss'],
-  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, HeaderComponent, FooterComponent, IngresoDatosComponent, MaskitoDirective, VerGastoComponent]
+  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, HeaderComponent, FooterComponent, IngresoDatosComponent, MaskitoDirective]
 })
 export class SimuladorFinancieroPage implements OnInit {
 
@@ -189,7 +189,7 @@ export class SimuladorFinancieroPage implements OnInit {
     if (!fechaInicio) return null;
 
     const mesesDiff = (fechaMes.getFullYear() - fechaInicio.getFullYear()) * 12 +
-                       (fechaMes.getMonth() - fechaInicio.getMonth());
+      (fechaMes.getMonth() - fechaInicio.getMonth());
 
     if (mesesDiff < 0) return null;
 
@@ -212,7 +212,7 @@ export class SimuladorFinancieroPage implements OnInit {
     if (!fechaInicio) return null;
 
     const mesesDiff = (fechaMes.getFullYear() - fechaInicio.getFullYear()) * 12 +
-                       (fechaMes.getMonth() - fechaInicio.getMonth());
+      (fechaMes.getMonth() - fechaInicio.getMonth());
 
     if (mesesDiff < 0) return null;
 
