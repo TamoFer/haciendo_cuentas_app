@@ -128,6 +128,16 @@ export class FirebaseService {
     return this.deleteDocument(path);
   }
 
+  async getUserData(uid: string) {
+    const path = `users/${uid}`;
+    return this.getDocument(path);
+  }
+
+  async updateUserData(uid: string, data: any) {
+    const path = `users/${uid}`;
+    return this.updateDocument(path, data);
+  }
+
   crearId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }

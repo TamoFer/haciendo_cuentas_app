@@ -53,12 +53,12 @@ export class SimuladorFinancieroPage implements OnInit {
   readonly maskPredicate: MaskitoElementPredicate = async (el) => ((el as unknown) as HTMLIonInputElement).getInputElement();
 
   async ngOnInit() {
-    this.cargarConfig();
+    await this.cargarConfig();
     await this.cargarGastos();
   }
 
-  cargarConfig() {
-    const config = this.simuladorSvc.obtenerConfig();
+  async cargarConfig() {
+    const config = await this.simuladorSvc.obtenerConfig();
     if (config) {
       this.ingresoMensualControl.setValue(config.ingresoMensual.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
       this.mesesProyeccion = config.mesesProyeccion;
@@ -68,7 +68,7 @@ export class SimuladorFinancieroPage implements OnInit {
     }
   }
 
-  guardarConfig() {
+  async guardarConfig() {
     const ingresoValor = this.ingresoMensualControl.value ? Number(this.ingresoMensualControl.value.replace(/\./g, '').replace(',', '.')) : 0;
     if (ingresoValor <= 0) {
       this.utilsSvc.presentToast({
@@ -89,7 +89,7 @@ export class SimuladorFinancieroPage implements OnInit {
       fechaActualizacion: new Date()
     };
 
-    this.simuladorSvc.guardarConfig(config);
+    await this.simuladorSvc.guardarConfig(config);
     this.utilsSvc.presentToast({
       message: 'Configuración guardada',
       duration: 2000,
@@ -100,8 +100,8 @@ export class SimuladorFinancieroPage implements OnInit {
     this.calcularProyeccion();
   }
 
-  actualizarConfig() {
-    const config = this.simuladorSvc.obtenerConfig();
+  async actualizarConfig() {
+    const config = await this.simuladorSvc.obtenerConfig();
     if (!config) {
       this.guardarConfig();
       return;
@@ -117,7 +117,7 @@ export class SimuladorFinancieroPage implements OnInit {
       fechaActualizacion: new Date()
     };
 
-    this.simuladorSvc.guardarConfig(configActualizada);
+    await this.simuladorSvc.guardarConfig(configActualizada);
     this.utilsSvc.presentToast({
       message: 'Configuración actualizada',
       duration: 2000,
@@ -128,8 +128,8 @@ export class SimuladorFinancieroPage implements OnInit {
     this.calcularProyeccion();
   }
 
-  borrarConfig() {
-    this.simuladorSvc.eliminarConfig();
+  async borrarConfig() {
+    await this.simuladorSvc.eliminarConfig();
     this.ingresoMensualControl.setValue(null);
     this.fechaCierreControl.setValue(null);
     this.mesesProyeccion = 6;
@@ -280,6 +280,35 @@ export class SimuladorFinancieroPage implements OnInit {
     await alert.present();
   }
 
+  async confirmarEliminarGasto(gasto: GastoSimulador, tipo: 'fijo' | 'temporal') {
+    const alert = await this.utilsSvc.alertasCtrl.create({
+      header: 'Eliminar gasto',
+      message: `¿Estás seguro que deseas eliminar "${gasto.nombre}"?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: async () => {
+            await this.simuladorSvc.eliminarGasto(gasto.id);
+            await this.cargarGastos(true);
+            this.utilsSvc.presentToast({
+              message: 'Gasto eliminado',
+              duration: 2000,
+              color: 'success',
+              position: 'middle',
+              icon: 'checkmark-circle-outline'
+            });
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
   async eliminarTodosFijos() {
     for (const gasto of this.gastosFijos) {
       await this.simuladorSvc.eliminarGasto(gasto.id);
@@ -330,10 +359,12 @@ export class SimuladorFinancieroPage implements OnInit {
   }
 
   async verInfoGasto(gasto: GastoSimulador) {
+    const fechaCierre = this.fechaCierreControl.value ? Number(this.fechaCierreControl.value) : null;
     const modal = await this.utilsSvc.modalsCtrl.create({
       component: VerGastoComponent,
       componentProps: {
         gasto,
+        fechaCierre,
         cerrar: () => this.utilsSvc.dismissModal()
       }
     });
@@ -366,6 +397,19 @@ export class SimuladorFinancieroPage implements OnInit {
     }
   }
 
+  getMesInicioEfectivo(fechaInicio: Date, fechaCierre: number | null): Date {
+    if (!fechaCierre || fechaCierre <= 0) {
+      return new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), 1);
+    }
+
+    const diaCreacion = fechaInicio.getDate();
+    if (diaCreacion <= fechaCierre) {
+      return new Date(fechaInicio.getFullYear(), fechaInicio.getMonth() + 1, 1);
+    } else {
+      return new Date(fechaInicio.getFullYear(), fechaInicio.getMonth() + 2, 1);
+    }
+  }
+
   getInfoCuota(gasto: GastoSimulador, fechaMes: Date): string | null {
     if (!gasto.cantidadCuotas || gasto.cantidadCuotas <= 0) {
       return null;
@@ -374,12 +418,12 @@ export class SimuladorFinancieroPage implements OnInit {
     const fechaInicio = this.simuladorSvc.safeParseDate(gasto.fechaInicio);
     if (!fechaInicio) return null;
 
-    const offsetMeses = this.simuladorSvc.getOffsetMeses();
-    const fechaBase = new Date();
-    fechaBase.setMonth(fechaBase.getMonth() + offsetMeses);
+    const fechaCierre = this.fechaCierreControl.value ? Number(this.fechaCierreControl.value) : null;
+    const mesInicioEfectivo = this.getMesInicioEfectivo(fechaInicio, fechaCierre);
+    const mesProyeccion = new Date(fechaMes.getFullYear(), fechaMes.getMonth(), 1);
 
-    const mesesDiff = (fechaMes.getFullYear() - fechaInicio.getFullYear()) * 12 +
-      (fechaMes.getMonth() - fechaInicio.getMonth());
+    const mesesDiff = (mesProyeccion.getFullYear() - mesInicioEfectivo.getFullYear()) * 12 +
+      (mesProyeccion.getMonth() - mesInicioEfectivo.getMonth());
 
     if (mesesDiff < 0) return null;
 
@@ -401,8 +445,12 @@ export class SimuladorFinancieroPage implements OnInit {
     const fechaInicio = this.simuladorSvc.safeParseDate(gasto.fechaInicio);
     if (!fechaInicio) return null;
 
-    const mesesDiff = (fechaMes.getFullYear() - fechaInicio.getFullYear()) * 12 +
-      (fechaMes.getMonth() - fechaInicio.getMonth());
+    const fechaCierre = this.fechaCierreControl.value ? Number(this.fechaCierreControl.value) : null;
+    const mesInicioEfectivo = this.getMesInicioEfectivo(fechaInicio, fechaCierre);
+    const mesProyeccion = new Date(fechaMes.getFullYear(), fechaMes.getMonth(), 1);
+
+    const mesesDiff = (mesProyeccion.getFullYear() - mesInicioEfectivo.getFullYear()) * 12 +
+      (mesProyeccion.getMonth() - mesInicioEfectivo.getMonth());
 
     if (mesesDiff < 0) return null;
 
@@ -415,5 +463,20 @@ export class SimuladorFinancieroPage implements OnInit {
 
   tieneCuotas(gasto: GastoSimulador): boolean {
     return gasto.cantidadCuotas !== null && gasto.cantidadCuotas !== undefined && gasto.cantidadCuotas > 0;
+  }
+
+  getIconoPorCategoria(categoria: string): string {
+    const cat = categoria.toLowerCase();
+    if (cat === 'alquiler') return 'home-outline';
+    if (cat === 'servicios') return 'flash-outline';
+    if (cat === 'supermercado') return 'cart-outline';
+    if (cat === 'transporte') return 'car-outline';
+    if (cat === 'seguros') return 'shield-checkmark-outline';
+    if (cat === 'suscripciones') return 'repeat-outline';
+    if (cat === 'prestamo') return 'cash-outline';
+    if (cat === 'cuota') return 'layers-outline';
+    if (cat === 'compra') return 'bag-outline';
+    if (cat === 'deuda') return 'card-outline';
+    return 'pricetag-outline';
   }
 }

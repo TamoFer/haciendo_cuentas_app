@@ -13,21 +13,58 @@ export class SimuladorService {
   firebaseSvc = inject(FirebaseService);
   utilsSvc = inject(UtilsService);
 
-  guardarConfig(config: ProyeccionConfig): void {
+  async guardarConfig(config: ProyeccionConfig): Promise<void> {
+    const user = this.utilsSvc.obtenerDatosLS('user');
+    if (!user?.uid) return;
+
+    const data = {
+      simuladorIngresoMensual: config.ingresoMensual,
+      simuladorMesesProyeccion: config.mesesProyeccion,
+      simuladorFechaCierreTarjeta: config.fechaCierre
+    };
+
+    await this.firebaseSvc.updateUserData(user.uid, data);
     localStorage.setItem(PROYECCION_CONFIG_KEY, JSON.stringify(config));
   }
 
-  obtenerConfig(): ProyeccionConfig | null {
+  async obtenerConfig(): Promise<ProyeccionConfig | null> {
     const data = localStorage.getItem(PROYECCION_CONFIG_KEY);
-    if (!data) return null;
-    try {
-      return JSON.parse(data);
-    } catch {
-      return null;
+    if (data) {
+      try {
+        return JSON.parse(data);
+      } catch {
+        return null;
+      }
     }
+
+    const user = this.utilsSvc.obtenerDatosLS('user');
+    if (!user?.uid) return null;
+
+    const userData = await this.firebaseSvc.getUserData(user.uid) as any;
+    if (userData && (userData.simuladorIngresoMensual || userData.simuladorMesesProyeccion)) {
+      const config: ProyeccionConfig = {
+        id: 'config_principal',
+        ingresoMensual: userData.simuladorIngresoMensual || 0,
+        mesesProyeccion: userData.simuladorMesesProyeccion || 6,
+        fechaCierre: userData.simuladorFechaCierreTarjeta || null,
+        fechaActualizacion: new Date()
+      };
+      localStorage.setItem(PROYECCION_CONFIG_KEY, JSON.stringify(config));
+      return config;
+    }
+
+    return null;
   }
 
-  eliminarConfig(): void {
+  async eliminarConfig(): Promise<void> {
+    const user = this.utilsSvc.obtenerDatosLS('user');
+    if (user?.uid) {
+      await this.firebaseSvc.updateUserData(user.uid, {
+        simuladorIngresoMensual: null,
+        simuladorMesesProyeccion: null,
+        simuladorFechaCierreTarjeta: null
+      });
+    }
     localStorage.removeItem(PROYECCION_CONFIG_KEY);
   }
 
@@ -102,7 +139,7 @@ export class SimuladorService {
       try {
         const tempGastos = gastosTemporales.filter(g => this.esGastoValidoParaMes(g, fechaMes, fechaCierreDia));
         gastosTemporalesMes = tempGastos.map(gasto => {
-          const cuotaInfo = this.calcularInfoCuota(gasto, fechaMes, i);
+          const cuotaInfo = this.calcularInfoCuota(gasto, fechaMes, i, fechaCierreDia);
           return { ...gasto, ...cuotaInfo };
         });
       } catch (e) {
@@ -233,7 +270,7 @@ export class SimuladorService {
     return `${meses[fecha.getMonth()]} ${fecha.getFullYear()}`;
   }
 
-  private calcularInfoCuota(gasto: GastoSimulador, fechaMes: Date, indiceMes: number): Partial<GastoConCuota> {
+  private calcularInfoCuota(gasto: GastoSimulador, fechaMes: Date, indiceMes: number, fechaCierreDia: number | null): Partial<GastoConCuota> {
     if (!gasto.cantidadCuotas || gasto.cantidadCuotas <= 0) {
       return {};
     }
@@ -241,7 +278,17 @@ export class SimuladorService {
     const fechaInicio = this.safeParseDate(gasto.fechaInicio);
     if (!fechaInicio) return {};
 
-    const mesAnioGasto = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), 1);
+    let mesAnioGasto: Date;
+    if (fechaCierreDia && fechaCierreDia > 0) {
+      if (fechaInicio.getDate() <= fechaCierreDia) {
+        mesAnioGasto = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth() + 1, 1);
+      } else {
+        mesAnioGasto = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth() + 2, 1);
+      }
+    } else {
+      mesAnioGasto = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), 1);
+    }
+
     const mesAnioProyeccion = new Date(fechaMes.getFullYear(), fechaMes.getMonth(), 1);
 
     const mesesDesdeInicio = (mesAnioProyeccion.getFullYear() - mesAnioGasto.getFullYear()) * 12 +

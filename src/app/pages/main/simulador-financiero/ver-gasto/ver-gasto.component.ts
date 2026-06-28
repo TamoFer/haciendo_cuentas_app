@@ -62,7 +62,15 @@ import { GastoSimulador } from 'src/app/models/gasto-simulador.model';
             <div class="info-value">{{ formatDate(gasto.fechaInicio) }}</div>
           </div>
 
-          @if (gasto.fechaFin) {
+          @if (gasto.tipo === 'temporal' && gasto.cantidadCuotas) {
+            <div class="info-row">
+              <div class="info-label">
+                <ion-icon name="calendar-outline"></ion-icon>
+                Fecha fin
+              </div>
+              <div class="info-value">{{ getFechaFin() }}</div>
+            </div>
+          } @else if (gasto.fechaFin) {
             <div class="info-row">
               <div class="info-label">
                 <ion-icon name="calendar-outline"></ion-icon>
@@ -76,9 +84,23 @@ import { GastoSimulador } from 'src/app/models/gasto-simulador.model';
             <div class="info-row">
               <div class="info-label">
                 <ion-icon name="layers-outline"></ion-icon>
-                Cuotas
+                Cuota
+              </div>
+              <div class="info-value">{{ getCuotaActual() }}/{{ gasto.cantidadCuotas }}</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">
+                <ion-icon name="time-outline"></ion-icon>
+                Duración
               </div>
               <div class="info-value">{{ gasto.cantidadCuotas }} meses</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">
+                <ion-icon name="hourglass-outline"></ion-icon>
+                Restantes
+              </div>
+              <div class="info-value">{{ getCuotasRestantes() }}</div>
             </div>
           }
 
@@ -189,6 +211,10 @@ import { GastoSimulador } from 'src/app/models/gasto-simulador.model';
 export class VerGastoComponent implements OnInit {
   @Input() gasto!: GastoSimulador;
   @Input() cerrar!: () => void;
+  @Input() fechaCierre: number | null = null;
+
+  private mesesNombres = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
   ngOnInit() {}
 
@@ -196,8 +222,96 @@ export class VerGastoComponent implements OnInit {
     return '$' + monto.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
-  formatDate(date: Date | string): string {
-    const d = date instanceof Date ? date : new Date(date);
+  safeParseDate(dateValue: any): Date | null {
+    if (!dateValue) return null;
+    try {
+      if (dateValue instanceof Date) return dateValue;
+      if (typeof dateValue === 'string') {
+        const d = new Date(dateValue);
+        return isNaN(d.getTime()) ? null : d;
+      }
+      if (typeof dateValue === 'number') {
+        const d = new Date(dateValue);
+        return isNaN(d.getTime()) ? null : d;
+      }
+      if (dateValue && typeof dateValue === 'object' && dateValue.seconds) {
+        return new Date(dateValue.seconds * 1000);
+      }
+      const d = new Date(dateValue);
+      return isNaN(d.getTime()) ? null : d;
+    } catch {
+      return null;
+    }
+  }
+
+  formatDate(date: Date | string | any): string {
+    const d = this.safeParseDate(date);
+    if (!d) return 'Fecha inválida';
     return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  getFechaFin(): string {
+    if (!this.gasto.cantidadCuotas || this.gasto.cantidadCuotas <= 0) {
+      return 'N/A';
+    }
+
+    const fechaInicio = this.safeParseDate(this.gasto.fechaInicio);
+    if (!fechaInicio) return 'Fecha inválida';
+
+    const cuotas = this.gasto.cantidadCuotas;
+    const diaCreacion = fechaInicio.getDate();
+    let mesesOffset: number;
+
+    if (this.fechaCierre && this.fechaCierre > 0) {
+      if (diaCreacion <= this.fechaCierre) {
+        mesesOffset = cuotas;
+      } else {
+        mesesOffset = cuotas + 1;
+      }
+    } else {
+      mesesOffset = cuotas;
+    }
+
+    const mesInicio = fechaInicio.getMonth();
+    const anioInicio = fechaInicio.getFullYear();
+
+    const mesFin = mesInicio + mesesOffset;
+    const anioFin = anioInicio + Math.floor(mesFin / 12);
+    const mesAjustado = ((mesFin % 12) + 12) % 12;
+
+    return `${this.mesesNombres[mesAjustado]} ${anioFin}`;
+  }
+
+  getMesInicioEfectivo(fechaInicio: Date): Date {
+    if (!this.fechaCierre || this.fechaCierre <= 0) {
+      return new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), 1);
+    }
+    if (fechaInicio.getDate() <= this.fechaCierre) {
+      return new Date(fechaInicio.getFullYear(), fechaInicio.getMonth() + 1, 1);
+    } else {
+      return new Date(fechaInicio.getFullYear(), fechaInicio.getMonth() + 2, 1);
+    }
+  }
+
+  getCuotaActual(): number {
+    if (!this.gasto.cantidadCuotas || this.gasto.cantidadCuotas <= 0) {
+      return 0;
+    }
+    const fechaInicio = this.safeParseDate(this.gasto.fechaInicio);
+    if (!fechaInicio) return 0;
+    const mesInicioEfectivo = this.getMesInicioEfectivo(fechaInicio);
+    const hoy = new Date();
+    const mesProyeccion = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    const mesesDiff = (mesProyeccion.getFullYear() - mesInicioEfectivo.getFullYear()) * 12 +
+      (mesProyeccion.getMonth() - mesInicioEfectivo.getMonth());
+    if (mesesDiff < 0) return 1;
+    return Math.min(mesesDiff + 1, this.gasto.cantidadCuotas);
+  }
+
+  getCuotasRestantes(): number {
+    if (!this.gasto.cantidadCuotas || this.gasto.cantidadCuotas <= 0) {
+      return 0;
+    }
+    return this.gasto.cantidadCuotas - this.getCuotaActual();
   }
 }

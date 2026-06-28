@@ -11,5 +11,8 @@ export interface User {
     movimientos: Movimiento[];
     censurar_montos: boolean;
     tarjetas: Tarjeta[];
+    simuladorIngresoMensual?: number;
+    simuladorMesesProyeccion?: number;
+    simuladorFechaCierreTarjeta?: number;
 }
 
