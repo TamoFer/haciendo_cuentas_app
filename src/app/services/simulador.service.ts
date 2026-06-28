@@ -1,7 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { GastoSimulador, ProyeccionMes } from '../models/gasto-simulador.model';
+import { GastoSimulador, GastoConCuota, ProyeccionMes, ProyeccionConfig } from '../models/gasto-simulador.model';
 import { FirebaseService } from './firebase.service';
 import { UtilsService } from './utils.service';
+
+const PROYECCION_CONFIG_KEY = 'proyeccionConfig';
 
 @Injectable({
   providedIn: 'root'
@@ -11,26 +13,38 @@ export class SimuladorService {
   firebaseSvc = inject(FirebaseService);
   utilsSvc = inject(UtilsService);
 
+  guardarConfig(config: ProyeccionConfig): void {
+    localStorage.setItem(PROYECCION_CONFIG_KEY, JSON.stringify(config));
+  }
+
+  obtenerConfig(): ProyeccionConfig | null {
+    const data = localStorage.getItem(PROYECCION_CONFIG_KEY);
+    if (!data) return null;
+    try {
+      return JSON.parse(data);
+    } catch {
+      return null;
+    }
+  }
+
+  eliminarConfig(): void {
+    localStorage.removeItem(PROYECCION_CONFIG_KEY);
+  }
+
   async guardarGasto(gasto: GastoSimulador): Promise<void> {
     const user = this.utilsSvc.obtenerDatosLS('user');
-    console.log('guardarGasto - user:', user);
     if (!user?.uid) {
-      console.error('No user.uid found');
       return;
     }
 
-    console.log('Saving gasto to path:', `users/${user.uid}/gastosSimulador`, gasto);
     await this.firebaseSvc.addGastoSimulador(user.uid, gasto);
-    console.log('Gasto saved successfully');
   }
 
   async obtenerGastos(): Promise<GastoSimulador[]> {
     const user = this.utilsSvc.obtenerDatosLS('user');
-    console.log('obtenerGastos - user:', user);
     if (!user?.uid) return [];
 
     const gastos = await this.firebaseSvc.getGastosSimulador(user.uid) as GastoSimulador[];
-    console.log('Gastos loaded:', gastos);
     return gastos;
   }
 
@@ -67,22 +81,17 @@ export class SimuladorService {
     meses: number,
     gastosFijos: GastoSimulador[],
     gastosTemporales: GastoSimulador[],
-    fechaCierreDia: number | null = null
+    fechaCierreDia: number | null = null,
+    offsetMeses: number = 0
   ): ProyeccionMes[] {
     const proyecciones: ProyeccionMes[] = [];
     const fechaActual = new Date();
 
-    console.log(`=== calcularProyeccion ===`);
-    console.log(`fechaActual=${fechaActual.toISOString()}, meses=${meses}, fechaCierreDia=${fechaCierreDia}`);
-    console.log(`gastosFijos count: ${gastosFijos.length}`);
-    console.log(`gastosTemporales count: ${gastosTemporales.length}`);
-
-    for (let i = 0; i < meses; i++) {
+    for (let i = offsetMeses; i < meses + offsetMeses; i++) {
       const fechaMes = this.sumarMeses(fechaActual, i);
-      console.log(`\n--- Mes ${i}: ${fechaMes.toISOString()} ---`);
 
       let gastosFijosMes: GastoSimulador[] = [];
-      let gastosTemporalesMes: GastoSimulador[] = [];
+      let gastosTemporalesMes: GastoConCuota[] = [];
 
       try {
         gastosFijosMes = gastosFijos.filter(g => this.esGastoValidoParaMes(g, fechaMes, null));
@@ -91,13 +100,14 @@ export class SimuladorService {
       }
 
       try {
-        gastosTemporalesMes = gastosTemporales.filter(g => this.esGastoValidoParaMes(g, fechaMes, fechaCierreDia));
+        const tempGastos = gastosTemporales.filter(g => this.esGastoValidoParaMes(g, fechaMes, fechaCierreDia));
+        gastosTemporalesMes = tempGastos.map(gasto => {
+          const cuotaInfo = this.calcularInfoCuota(gasto, fechaMes, i);
+          return { ...gasto, ...cuotaInfo };
+        });
       } catch (e) {
         console.error(`Error filtrando gastos temporales:`, e);
       }
-
-      console.log(`gastosFijosMes count: ${gastosFijosMes.length}`);
-      console.log(`gastosTemporalesMes count: ${gastosTemporalesMes.length}`);
 
       const totalFijos = this.sumarImportes(gastosFijosMes);
       const totalTemporales = this.sumarImportes(gastosTemporalesMes);
@@ -106,7 +116,7 @@ export class SimuladorService {
 
       const diasTotalesMes = this.getDiasTotalesMes(fechaMes);
       const diaActual = fechaActual.getDate();
-      const esMesActual = i === 0;
+      const esMesActual = i === offsetMeses;
       const diasRestantes = esMesActual ? diasTotalesMes - diaActual : diasTotalesMes;
       const presupuestoDiario = diasRestantes > 0 ? Math.floor(saldoRestante / diasRestantes) : 0;
       const gastoDiarioPromedio = diasTotalesMes > 0 ? Math.floor(totalGastos / diasTotalesMes) : 0;
@@ -162,12 +172,8 @@ export class SimuladorService {
       const fechaFin = gasto.fechaFin ? this.safeParseDate(gasto.fechaFin) : null;
 
       if (!fechaInicio) {
-        console.log(`  esGastoValidoParaMes: fechaInicio inválida para gasto ${gasto.nombre}`);
         return false;
       }
-
-      console.log(`  esGastoValidoParaMes: gasto=${gasto.nombre}, tipo=${gasto.tipo}, fechaInicio=${fechaInicio.toISOString()}, fechaFin=${fechaFin?.toISOString()}`);
-      console.log(`    fechaMes=${fechaMes.toISOString()}, fechaCierreDia=${fechaCierreDia}`);
 
       let mesAnioGasto: Date;
       let mesAnioFin: Date | null = null;
@@ -194,21 +200,15 @@ export class SimuladorService {
 
       const mesAnioProyeccion = new Date(fechaMes.getFullYear(), fechaMes.getMonth(), 1);
 
-      console.log(`    mesAnioGasto=${mesAnioGasto.toISOString()}, mesAnioFin=${mesAnioFin?.toISOString()}, mesAnioProyeccion=${mesAnioProyeccion.toISOString()}`);
-
       if (mesAnioProyeccion < mesAnioGasto) {
-        console.log(`    Result: false (proyeccion < gasto)`);
         return false;
       }
       if (mesAnioFin && mesAnioProyeccion > mesAnioFin) {
-        console.log(`    Result: false (proyeccion > fin)`);
         return false;
       }
 
-      console.log(`    Result: true`);
       return true;
     } catch (e) {
-      console.error(`  Error en esGastoValidoParaMes para gasto ${gasto.nombre}:`, e);
       return false;
     }
   }
@@ -233,6 +233,33 @@ export class SimuladorService {
     return `${meses[fecha.getMonth()]} ${fecha.getFullYear()}`;
   }
 
+  private calcularInfoCuota(gasto: GastoSimulador, fechaMes: Date, indiceMes: number): Partial<GastoConCuota> {
+    if (!gasto.cantidadCuotas || gasto.cantidadCuotas <= 0) {
+      return {};
+    }
+
+    const fechaInicio = this.safeParseDate(gasto.fechaInicio);
+    if (!fechaInicio) return {};
+
+    const mesAnioGasto = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), 1);
+    const mesAnioProyeccion = new Date(fechaMes.getFullYear(), fechaMes.getMonth(), 1);
+
+    const mesesDesdeInicio = (mesAnioProyeccion.getFullYear() - mesAnioGasto.getFullYear()) * 12 +
+      (mesAnioProyeccion.getMonth() - mesAnioGasto.getMonth());
+
+    if (mesesDesdeInicio < 0) return {};
+
+    const numeroCuota = Math.min(mesesDesdeInicio + 1, gasto.cantidadCuotas);
+    const cuotasRestantes = gasto.cantidadCuotas - numeroCuota;
+
+    return {
+      numeroCuota,
+      totalCuotas: gasto.cantidadCuotas,
+      cuotasRestantes,
+      esUltimaCuota: cuotasRestantes === 0
+    };
+  }
+
   formatearNumero(numero: number): string {
     return numero.toLocaleString('es-AR');
   }
@@ -243,5 +270,14 @@ export class SimuladorService {
 
   crearId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  }
+
+  debeOcultarMesActual(): boolean {
+    const hoy = new Date();
+    return hoy.getDate() > 10;
+  }
+
+  getOffsetMeses(): number {
+    return this.debeOcultarMesActual() ? 1 : 0;
   }
 }

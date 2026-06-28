@@ -11,6 +11,13 @@ export interface GastoSimulador {
   fechaCreacion: Date;
 }
 
+export interface GastoConCuota extends GastoSimulador {
+  numeroCuota?: number;
+  totalCuotas?: number;
+  cuotasRestantes?: number;
+  esUltimaCuota?: boolean;
+}
+
 export interface ProyeccionMes {
   mes: Date;
   nombreMes: string;
@@ -26,6 +33,14 @@ export interface ProyeccionMes {
   diasTotalesMes: number;
   gastoDiarioPromedio: number;
   gastosFijosDelMes: GastoSimulador[];
-  gastosProyectadosDelMes: GastoSimulador[];
+  gastosProyectadosDelMes: GastoConCuota[];
   esNegativo: boolean;
+}
+
+export interface ProyeccionConfig {
+  id: string;
+  ingresoMensual: number;
+  mesesProyeccion: number;
+  fechaCierre: number | null;
+  fechaActualizacion: Date;
 }

@@ -32,21 +32,50 @@
             <ion-input type="date" [(ngModel)]="fechaCierre" (ionChange)="onFechaCierreChange($event)"></ion-input>
           </div>
         </div>
+
+        <div class="botones-config">
+          <ion-button size="small" fill="outline" (click)="guardarConfig()">
+            <ion-icon slot="start" name="save-outline"></ion-icon>
+            Guardar
+          </ion-button>
+          <ion-button size="small" fill="outline" (click)="actualizarConfig()">
+            <ion-icon slot="start" name="refresh-outline"></ion-icon>
+            Actualizar
+          </ion-button>
+          <ion-button size="small" fill="outline" color="danger" (click)="borrarConfig()">
+            <ion-icon slot="start" name="trash-outline"></ion-icon>
+            Borrar
+          </ion-button>
+        </div>
       </div>
     </div>
 
     <div class="gastos-section">
-      <div class="section-header fijo">
+      <div class="section-header fijo" (click)="toggleFijos()">
         <div class="section-title">
-          <ion-icon name="link-outline"></ion-icon>
-          <span>Gastos Fijos</span>
+          <ion-icon [name]="expandirFijos ? 'chevron-down' : 'chevron-forward'"></ion-icon>
+          <ion-icon name="receipt-outline"></ion-icon>
+          <span>Fijos</span>
+          @if (gastosFijos.length > 0 && expandirFijos) {
+          <span class="total-titulo">{{ formatearMonto(getTotalGastosFijos()) }}</span>
+          }
         </div>
-        <ion-button size="small" (click)="abrirModalGasto('fijo')">
-          <ion-icon slot="start" name="add-outline"></ion-icon>
-          Agregar
-        </ion-button>
+        <div class="header-actions" (click)="$event.stopPropagation()">
+          @if (gastosFijos.length > 0 && !expandirFijos) {
+          <span class="total-inline">{{ formatearMonto(getTotalGastosFijos()) }}</span>
+          }
+          @if (gastosFijos.length > 0) {
+          <ion-button size="small" fill="clear" (click)="confirmarEliminarTodosFijos()">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-button>
+          }
+          <ion-button size="small" (click)="abrirModalGasto('fijo')">
+            <ion-icon name="add-outline"></ion-icon>
+          </ion-button>
+        </div>
       </div>
 
+      @if (expandirFijos) {
       @if (gastosFijos.length === 0) {
       <div class="empty-state">
         <ion-icon name="link-outline"></ion-icon>
@@ -72,18 +101,33 @@
         <span class="total-monto">{{ formatearMonto(getTotalGastosFijos()) }}</span>
       </div>
       }
+      }
 
-      <div class="section-header proy">
+      <div class="section-header proy" (click)="toggleTemporales()">
         <div class="section-title">
-          <ion-icon name="time-outline"></ion-icon>
-          <span>Gastos Proyectados</span>
+          <ion-icon [name]="expandirTemporales ? 'chevron-down' : 'chevron-forward'"></ion-icon>
+          <ion-icon name="receipt-outline"></ion-icon>
+          <span>Futuros</span>
+          @if (gastosTemporales.length > 0 && expandirTemporales) {
+          <span class="total-titulo">{{ formatearMonto(getTotalGastosTemporales()) }}</span>
+          }
         </div>
-        <ion-button size="small" (click)="abrirModalGasto('temporal')">
-          <ion-icon slot="start" name="add-outline"></ion-icon>
-          Agregar
-        </ion-button>
+        <div class="header-actions" (click)="$event.stopPropagation()">
+          @if (gastosTemporales.length > 0 && !expandirTemporales) {
+          <span class="total-inline">{{ formatearMonto(getTotalGastosTemporales()) }}</span>
+          }
+          @if (gastosTemporales.length > 0) {
+          <ion-button size="small" fill="clear" (click)="confirmarEliminarTodosTemporales()">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-button>
+          }
+          <ion-button size="small" (click)="abrirModalGasto('temporal')">
+            <ion-icon name="add-outline"></ion-icon>
+          </ion-button>
+        </div>
       </div>
 
+      @if (expandirTemporales) {
       @if (gastosTemporales.length === 0) {
       <div class="empty-state">
         <ion-icon name="time-outline"></ion-icon>
@@ -101,7 +145,7 @@
             <p>
               {{ gasto.categoria }}
               @if (gasto.cantidadCuotas) {
-                · {{ gasto.cantidadCuotas }} cuotas
+              · {{ gasto.cantidadCuotas }} cuotas
               }
             </p>
           </ion-label>
@@ -113,6 +157,7 @@
         <span>Total Proyectados</span>
         <span class="total-monto">{{ formatearMonto(getTotalGastosTemporales()) }}</span>
       </div>
+      }
       }
     </div>
 
@@ -127,8 +172,8 @@
 
       <ion-list class="proyecciones-list">
         @for (proyeccion of proyecciones; track proyeccion.mes.toString()) {
-        <ion-item class="mes-card" [class.negativo]="proyeccion.esNegativo" [class.expandido]="mesDetalle === proyeccion"
-          (click)="toggleDetalle(proyeccion)" detail>
+        <ion-item class="mes-card" [class.negativo]="proyeccion.esNegativo"
+          [class.expandido]="mesDetalle === proyeccion" (click)="toggleDetalle(proyeccion)" detail>
           <div slot="start" class="mes-icon" [class.negativo]="proyeccion.esNegativo">
             <ion-icon name="calendar-outline"></ion-icon>
           </div>
@@ -136,13 +181,14 @@
             <h3>{{ proyeccion.nombreMes }}</h3>
             <p>
               @if (proyeccion.saldoRestante >= 0) {
-                Restante: {{ formatearMonto(proyeccion.saldoRestante) }}
+              Restante: {{ formatearMonto(proyeccion.saldoRestante) }}
               } @else {
-                <span class="negativo">Restante: {{ formatearMonto(proyeccion.saldoRestante) }}</span>
+              <span class="negativo">Restante: {{ formatearMonto(proyeccion.saldoRestante) }}</span>
               }
             </p>
           </ion-label>
-          <ion-note slot="end" [class.saldo-positivo]="proyeccion.saldoRestante >= 0" [class.saldo-negativo]="proyeccion.saldoRestante < 0">
+          <ion-note slot="end" [class.saldo-positivo]="proyeccion.saldoRestante >= 0"
+            [class.saldo-negativo]="proyeccion.saldoRestante < 0">
             {{ formatearMonto(proyeccion.saldoRestante) }}
           </ion-note>
         </ion-item>
@@ -178,7 +224,7 @@
                 <ion-icon name="wallet-outline"></ion-icon>
                 <span>Diario: <strong>{{ formatearMonto(proyeccion.presupuestoDiario) }}</strong>
                   @if (proyeccion.diasRestantesMes > 0) {
-                    · {{ proyeccion.diasRestantesMes }} días
+                  · {{ proyeccion.diasRestantesMes }} días
                   }
                 </span>
               </div>
@@ -212,8 +258,13 @@
                 <div class="gasto-detalle-row" (click)="verInfoGasto(gasto); $event.stopPropagation()">
                   <span>
                     {{ gasto.nombre }}
-                    @if (tieneCuotas(gasto)) {
-                      <span class="cuota-tag">{{ getInfoCuota(gasto, proyeccion.mes) }}</span>
+                    @if (gasto.numeroCuota && gasto.totalCuotas) {
+                    @if (gasto.esUltimaCuota) {
+                    <span class="cuota-tag">Última cuota</span>
+                    } @else {
+                    <span class="cuota-tag">{{ gasto.numeroCuota }}/{{ gasto.totalCuotas }} ({{ gasto.cuotasRestantes }}
+                      restantes)</span>
+                    }
                     }
                   </span>
                   <span>{{ formatearMonto(gasto.importe) }}</span>

@@ -22,8 +22,19 @@
     padding: 16px;
 
     .input-row {
-      &.split { display: flex; gap: 12px; margin-top: 12px; .input-item { flex: 1; } }
+      &.split { display: flex; gap: 12px; .input-item { flex: 1; } }
       &.full { width: 100%; }
+    }
+
+    .botones-config {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+
+      ion-button {
+        flex: 1;
+        --border-radius: 8px;
+      }
     }
 
     ion-label[position="stacked"] { font-size: 0.8rem; color: var(--ion-color-medium); margin-bottom: 4px; }
@@ -39,14 +50,45 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px;
-    margin-bottom: 8px;
+    cursor: pointer;
 
     &.fijo { background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-shade) 100%); }
-    &.proy { background: linear-gradient(135deg, var(--ion-color-warning) 0%, #f57c00 100%); }
+    &.proy { background: linear-gradient(135deg, var(--ion-color-warning) 0%, #f57c00 100%); margin-top: 16px; }
     &.analytics { background: var(--ion-color-dark); }
 
-    .section-title { display: flex; align-items: center; gap: 10px; color: white; ion-icon { color: white; } span { font-size: 1rem; font-weight: 600; } }
-    ion-button { --background: rgba(255,255,255,0.2); --color: white; font-weight: 600; }
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: white;
+      flex-wrap: wrap;
+      ion-icon { color: white; }
+      span { font-size: 1rem; font-weight: 600; }
+      .total-titulo {
+        width: 100%;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-left: 26px;
+        opacity: 0.9;
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .total-inline {
+        color: white;
+        font-size: 0.9rem;
+        font-weight: 600;
+        background: rgba(255,255,255,0.2);
+        padding: 4px 10px;
+        border-radius: 12px;
+      }
+
+      ion-button { --background: rgba(255,255,255,0.2); --color: white; font-weight: 600; }
+    }
   }
 
   .empty-state {

@@ -95,28 +95,17 @@ export class FirebaseService {
     gasto.fechaFin = gasto.fechaFin || null;
     gasto.cantidadCuotas = gasto.cantidadCuotas || null;
     gasto.detalles = gasto.detalles || null;
-    console.log('FirebaseService addGastoSimulador - path:', path, 'gasto:', gasto);
-    try {
-      const result = await this.addDocument(path, gasto);
-      console.log('Gasto added successfully, result:', result);
-      return result;
-    } catch (error) {
-      console.error('Error adding gasto:', error);
-      throw error;
-    }
+    return this.addDocument(path, gasto);
   }
 
   async getGastosSimulador(uid: string) {
     const path = `users/${uid}/gastosSimulador`;
-    console.log('FirebaseService getGastosSimulador - path:', path);
     return new Promise((resolve) => {
       this.getCollectionData(path).subscribe({
         next: (data) => {
-          console.log('getGastosSimulador data:', data);
           resolve(data);
         },
-        error: (err) => {
-          console.error('Error getting gastos:', err);
+        error: () => {
           resolve([]);
         }
       });
@@ -131,7 +120,6 @@ export class FirebaseService {
     data.nombre = data.nombre || '';
     data.categoria = data.categoria || 'Otros';
     data.importe = Number(data.importe) || 0;
-    console.log('FirebaseService updateGastoSimulador - path:', path, 'data:', data);
     return this.updateDocument(path, data);
   }
 

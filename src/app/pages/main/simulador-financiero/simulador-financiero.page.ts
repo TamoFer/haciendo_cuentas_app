@@ -6,7 +6,7 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/ingreso-datos.component';
 import { SimuladorService } from 'src/app/services/simulador.service';
-import { GastoSimulador, ProyeccionMes } from 'src/app/models/gasto-simulador.model';
+import { GastoSimulador, GastoConCuota, ProyeccionMes, ProyeccionConfig } from 'src/app/models/gasto-simulador.model';
 import { AgregarGastoComponent } from './agregar-gasto/agregar-gasto.component';
 import { VerGastoComponent } from './ver-gasto/ver-gasto.component';
 import { UtilsService } from 'src/app/services/utils.service';
@@ -31,12 +31,15 @@ export class SimuladorFinancieroPage implements OnInit {
   fechaCierre: string = '';
   mesesProyeccion: number = 6;
   proyecciones: ProyeccionMes[] = [];
+  configId: string = 'config_principal';
 
   gastosFijos: GastoSimulador[] = [];
   gastosTemporales: GastoSimulador[] = [];
 
   mostrarDetalle: boolean = false;
   mesDetalle?: ProyeccionMes;
+  expandirFijos: boolean = true;
+  expandirTemporales: boolean = true;
 
   categoriasFijas: string[] = ['Servicios', 'Alquiler', 'Supermercado', 'Transporte', 'Seguros', 'Suscripciones', 'Otros'];
   categoriasTemporales: string[] = ['Prestamo', 'Cuota', 'Compra', 'Deuda', 'Otro'];
@@ -50,19 +53,100 @@ export class SimuladorFinancieroPage implements OnInit {
   readonly maskPredicate: MaskitoElementPredicate = async (el) => ((el as unknown) as HTMLIonInputElement).getInputElement();
 
   async ngOnInit() {
-    console.log('SimuladorFinancieroPage ngOnInit');
-    const user = this.utilsSvc.obtenerDatosLS('user');
-    console.log('User from localStorage:', user);
+    this.cargarConfig();
     await this.cargarGastos();
   }
 
+  cargarConfig() {
+    const config = this.simuladorSvc.obtenerConfig();
+    if (config) {
+      this.ingresoMensualControl.setValue(config.ingresoMensual.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+      this.mesesProyeccion = config.mesesProyeccion;
+      if (config.fechaCierre) {
+        this.fechaCierreControl.setValue(config.fechaCierre);
+      }
+    }
+  }
+
+  guardarConfig() {
+    const ingresoValor = this.ingresoMensualControl.value ? Number(this.ingresoMensualControl.value.replace(/\./g, '').replace(',', '.')) : 0;
+    if (ingresoValor <= 0) {
+      this.utilsSvc.presentToast({
+        message: 'Ingresá un monto para guardar',
+        duration: 2000,
+        color: 'warning',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      });
+      return;
+    }
+
+    const config: ProyeccionConfig = {
+      id: this.configId,
+      ingresoMensual: ingresoValor,
+      mesesProyeccion: this.mesesProyeccion,
+      fechaCierre: this.fechaCierreControl.value ? Number(this.fechaCierreControl.value) : null,
+      fechaActualizacion: new Date()
+    };
+
+    this.simuladorSvc.guardarConfig(config);
+    this.utilsSvc.presentToast({
+      message: 'Configuración guardada',
+      duration: 2000,
+      color: 'success',
+      position: 'middle',
+      icon: 'checkmark-circle-outline'
+    });
+    this.calcularProyeccion();
+  }
+
+  actualizarConfig() {
+    const config = this.simuladorSvc.obtenerConfig();
+    if (!config) {
+      this.guardarConfig();
+      return;
+    }
+
+    const ingresoValor = this.ingresoMensualControl.value ? Number(this.ingresoMensualControl.value.replace(/\./g, '').replace(',', '.')) : 0;
+
+    const configActualizada: ProyeccionConfig = {
+      ...config,
+      ingresoMensual: ingresoValor,
+      mesesProyeccion: this.mesesProyeccion,
+      fechaCierre: this.fechaCierreControl.value ? Number(this.fechaCierreControl.value) : null,
+      fechaActualizacion: new Date()
+    };
+
+    this.simuladorSvc.guardarConfig(configActualizada);
+    this.utilsSvc.presentToast({
+      message: 'Configuración actualizada',
+      duration: 2000,
+      color: 'success',
+      position: 'middle',
+      icon: 'checkmark-circle-outline'
+    });
+    this.calcularProyeccion();
+  }
+
+  borrarConfig() {
+    this.simuladorSvc.eliminarConfig();
+    this.ingresoMensualControl.setValue(null);
+    this.fechaCierreControl.setValue(null);
+    this.mesesProyeccion = 6;
+    this.proyecciones = [];
+    this.utilsSvc.presentToast({
+      message: 'Configuración eliminada',
+      duration: 2000,
+      color: 'medium',
+      position: 'middle',
+      icon: 'trash-outline'
+    });
+  }
+
   async cargarGastos(forceRecalculate: boolean = false) {
-    console.log('Eliminando gastos vencidos...');
     await this.simuladorSvc.eliminarGastosVencidos();
 
-    console.log('Obteniendo gastos de Firebase...');
     const gastos = await this.simuladorSvc.obtenerGastos();
-    console.log('Gastos recibidos:', gastos);
     this.gastosFijos = gastos.filter(g => g.tipo === 'fijo').sort((a, b) => a.nombre.localeCompare(b.nombre));
     this.gastosTemporales = gastos.filter(g => g.tipo === 'temporal').sort((a, b) => a.nombre.localeCompare(b.nombre));
 
@@ -80,12 +164,14 @@ export class SimuladorFinancieroPage implements OnInit {
       return;
     }
 
+    const offsetMeses = this.simuladorSvc.getOffsetMeses();
     this.proyecciones = this.simuladorSvc.calcularProyeccion(
       ingresoValor,
       this.mesesProyeccion,
       this.gastosFijos,
       this.gastosTemporales,
-      fechaCierre
+      fechaCierre,
+      offsetMeses
     );
   }
 
@@ -115,7 +201,6 @@ export class SimuladorFinancieroPage implements OnInit {
 
     await modal.present();
     const { data } = await modal.onWillDismiss();
-    console.log('Modal dismissed with data:', data);
 
     if (data) {
       if (data.eliminar) {
@@ -128,12 +213,9 @@ export class SimuladorFinancieroPage implements OnInit {
         await this.simuladorSvc.actualizarGasto(data.id, data);
         await this.cargarGastos(true);
       } else {
-        console.log('Calling guardarGasto with:', data);
         await this.simuladorSvc.guardarGasto(data);
         await this.cargarGastos(true);
       }
-    } else {
-      console.log('No data received from modal');
     }
   }
 
@@ -145,6 +227,14 @@ export class SimuladorFinancieroPage implements OnInit {
   async eliminarGastoTemporal(id: string) {
     await this.simuladorSvc.eliminarGasto(id);
     await this.cargarGastos();
+  }
+
+  toggleFijos() {
+    this.expandirFijos = !this.expandirFijos;
+  }
+
+  toggleTemporales() {
+    this.expandirTemporales = !this.expandirTemporales;
   }
 
   toggleDetalle(proyeccion: ProyeccionMes) {
@@ -169,6 +259,76 @@ export class SimuladorFinancieroPage implements OnInit {
     return this.gastosTemporales.reduce((sum, g) => sum + g.importe, 0);
   }
 
+  async confirmarEliminarTodosFijos() {
+    if (this.gastosFijos.length === 0) return;
+
+    const alert = await this.utilsSvc.alertasCtrl.create({
+      header: 'Eliminar todos los gastos fijos',
+      message: `¿Estás seguro que deseas eliminar los ${this.gastosFijos.length} gastos fijos?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: () => this.eliminarTodosFijos()
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  async eliminarTodosFijos() {
+    for (const gasto of this.gastosFijos) {
+      await this.simuladorSvc.eliminarGasto(gasto.id);
+    }
+    await this.cargarGastos(true);
+    this.utilsSvc.presentToast({
+      message: 'Gastos fijos eliminados',
+      duration: 2000,
+      color: 'success',
+      position: 'middle',
+      icon: 'checkmark-circle-outline'
+    });
+  }
+
+  async confirmarEliminarTodosTemporales() {
+    if (this.gastosTemporales.length === 0) return;
+
+    const alert = await this.utilsSvc.alertasCtrl.create({
+      header: 'Eliminar todos los gastos proyectados',
+      message: `¿Estás seguro que deseas eliminar los ${this.gastosTemporales.length} gastos proyectados?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: () => this.eliminarTodosTemporales()
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  async eliminarTodosTemporales() {
+    for (const gasto of this.gastosTemporales) {
+      await this.simuladorSvc.eliminarGasto(gasto.id);
+    }
+    await this.cargarGastos(true);
+    this.utilsSvc.presentToast({
+      message: 'Gastos proyectados eliminados',
+      duration: 2000,
+      color: 'success',
+      position: 'middle',
+      icon: 'checkmark-circle-outline'
+    });
+  }
+
   async verInfoGasto(gasto: GastoSimulador) {
     const modal = await this.utilsSvc.modalsCtrl.create({
       component: VerGastoComponent,
@@ -177,7 +337,33 @@ export class SimuladorFinancieroPage implements OnInit {
         cerrar: () => this.utilsSvc.dismissModal()
       }
     });
+
     await modal.present();
+    const { data } = await modal.onWillDismiss();
+
+    if (data) {
+      if (data.eliminar) {
+        await this.simuladorSvc.eliminarGasto(data.id);
+        await this.cargarGastos(true);
+        this.utilsSvc.presentToast({
+          message: 'Gasto eliminado',
+          duration: 2000,
+          color: 'success',
+          position: 'middle',
+          icon: 'checkmark-circle-outline'
+        });
+      } else if (data.id && data.existente) {
+        await this.simuladorSvc.actualizarGasto(data.id, data);
+        await this.cargarGastos(true);
+        this.utilsSvc.presentToast({
+          message: 'Gasto actualizado',
+          duration: 2000,
+          color: 'success',
+          position: 'middle',
+          icon: 'checkmark-circle-outline'
+        });
+      }
+    }
   }
 
   getInfoCuota(gasto: GastoSimulador, fechaMes: Date): string | null {
@@ -187,6 +373,10 @@ export class SimuladorFinancieroPage implements OnInit {
 
     const fechaInicio = this.simuladorSvc.safeParseDate(gasto.fechaInicio);
     if (!fechaInicio) return null;
+
+    const offsetMeses = this.simuladorSvc.getOffsetMeses();
+    const fechaBase = new Date();
+    fechaBase.setMonth(fechaBase.getMonth() + offsetMeses);
 
     const mesesDiff = (fechaMes.getFullYear() - fechaInicio.getFullYear()) * 12 +
       (fechaMes.getMonth() - fechaInicio.getMonth());
