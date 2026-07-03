@@ -1,6 +1,10 @@
 <app-header [title]="'Simulador Financiero'"></app-header>
 
 <ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
   <div class="simulador-container">
 
     <div class="input-section">
@@ -10,10 +14,17 @@
       </div>
 
       <div class="input-card">
-        <div class="input-row full">
-          <app-ingreso-datos icon="wallet-outline" autocomplete="detail" label="Ingreso mensual"
-            [control]="ingresoMensualControl" [maskito]="mascara" [maskitoElement]="maskPredicate" inputmode="decimal"
-            type='text' (ionInput)="calcularProyeccion()"></app-ingreso-datos>
+        <div class="income-group">
+          <div class="income-label">
+            <ion-icon name="wallet-outline"></ion-icon>
+            <span>Ingreso mensual</span>
+          </div>
+          <div class="income-input-wrap">
+            <span class="income-symbol">$</span>
+            <ion-input [formControl]="ingresoMensualControl" [maskito]="mascara"
+              [maskitoElement]="maskPredicate" inputmode="decimal" type="text" placeholder="0,00"
+              (ionInput)="calcularProyeccion()"></ion-input>
+          </div>
         </div>
 
         <div class="input-row split">
@@ -50,6 +61,39 @@
       </div>
     </div>
 
+    @if (ingresoMensualControl.value) {
+    <div class="summary-section">
+      <div class="summary-card">
+        <div class="summary-row main">
+          <div class="summary-icon" [class.negativo]="getSaldoDisponible() < 0">
+            @if (getSaldoDisponible() < 0) {
+            <ion-icon name="warning-outline"></ion-icon>
+            } @else {
+            <ion-icon name="wallet-outline"></ion-icon>
+            }
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Disponible</span>
+            <span class="summary-value" [class.negativo]="getSaldoDisponible() < 0">{{ formatearMonto(getSaldoDisponible()) }}</span>
+          </div>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-row secondary">
+          <div class="summary-item">
+            <span class="summary-dot fijo"></span>
+            <span class="summary-item-label">Fijos</span>
+            <span class="summary-item-value">{{ formatearMonto(getTotalGastosFijos()) }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-dot proy"></span>
+            <span class="summary-item-label">Proy.</span>
+            <span class="summary-item-value">{{ formatearMonto(getTotalGastosTemporales()) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+
     <div class="gastos-section">
       <div class="section-header fijo" (click)="toggleFijos()">
         <div class="section-title">
@@ -85,7 +129,7 @@
       <ion-list class="gastos-list">
         @for (gasto of gastosFijos; track gasto.id) {
         <ion-item-sliding>
-          <ion-item class="gasto-item" detail (click)="verInfoGasto(gasto)">
+          <ion-item class="gasto-item" (click)="verInfoGasto(gasto)">
             <div slot="start" class="gasto-icon fijo">
               <ion-icon [name]="getIconoPorCategoria(gasto.categoria)"></ion-icon>
             </div>
@@ -147,7 +191,7 @@
       <ion-list class="gastos-list">
         @for (gasto of gastosTemporales; track gasto.id) {
         <ion-item-sliding>
-          <ion-item class="gasto-item" detail (click)="verInfoGasto(gasto)">
+          <ion-item class="gasto-item" (click)="verInfoGasto(gasto)">
             <div slot="start" class="gasto-icon proy">
               <ion-icon [name]="getIconoPorCategoria(gasto.categoria)"></ion-icon>
             </div>
@@ -156,7 +200,7 @@
               <p>
                 {{ gasto.categoria }}
                 @if (gasto.cantidadCuotas) {
-                · {{ gasto.cantidadCuotas }} cuotas
+                <span class="cuota-badge">{{ gasto.cantidadCuotas }} cuotas</span>
                 }
               </p>
             </ion-label>
@@ -193,7 +237,7 @@
       <ion-list class="proyecciones-list">
         @for (proyeccion of proyecciones; track proyeccion.mes.toString()) {
         <ion-item class="mes-card" [class.negativo]="proyeccion.esNegativo"
-          [class.expandido]="mesDetalle === proyeccion" (click)="toggleDetalle(proyeccion)" detail>
+          [class.expandido]="mesDetalle === proyeccion" (click)="toggleDetalle(proyeccion)">
           <div slot="start" class="mes-icon" [class.negativo]="proyeccion.esNegativo">
             <ion-icon name="calendar-outline"></ion-icon>
           </div>
@@ -209,6 +253,9 @@
           </ion-label>
           <ion-note slot="end" [class.saldo-positivo]="proyeccion.saldoRestante >= 0"
             [class.saldo-negativo]="proyeccion.saldoRestante < 0">
+            @if (proyeccion.esNegativo) {
+            <ion-icon name="warning-outline" class="warning-icon"></ion-icon>
+            }
             {{ formatearMonto(proyeccion.saldoRestante) }}
           </ion-note>
         </ion-item>

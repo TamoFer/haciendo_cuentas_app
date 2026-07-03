@@ -21,6 +21,56 @@
     border-radius: 12px;
     padding: 16px;
 
+    .income-group {
+      margin-bottom: 16px;
+
+      .income-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 8px;
+
+        ion-icon { font-size: 1.1rem; color: var(--ion-color-primary); }
+        span { font-size: 0.8rem; font-weight: 600; color: var(--ion-color-medium); text-transform: uppercase; letter-spacing: 0.5px; }
+      }
+
+      .income-input-wrap {
+        display: flex;
+        align-items: center;
+        background: var(--ion-color-white);
+        border: 2px solid var(--ion-color-light);
+        border-radius: 14px;
+        padding: 2px 2px 2px 18px;
+        transition: border-color 0.2s ease;
+
+        &:focus-within { border-color: var(--ion-color-primary); }
+
+        .income-symbol {
+          font-size: 1.6rem;
+          font-weight: 300;
+          color: var(--ion-color-medium);
+          margin-right: 6px;
+        }
+
+        ion-input {
+          flex: 1;
+          --padding-start: 0;
+          --padding-end: 12px;
+          --padding-top: 14px;
+          --padding-bottom: 14px;
+          --background: transparent;
+          --border-color: transparent;
+          --highlight-height: 0;
+          --box-shadow: none;
+          font-size: 1.6rem;
+          font-weight: 700;
+          color: var(--ion-color-dark);
+
+          input { caret-color: var(--ion-color-primary); }
+        }
+      }
+    }
+
     .input-row {
       &.split { display: flex; gap: 12px; .input-item { flex: 1; } }
       &.full { width: 100%; }
@@ -39,6 +89,100 @@
 
     ion-label[position="stacked"] { font-size: 0.8rem; color: var(--ion-color-medium); margin-bottom: 4px; }
     ion-select, ion-input { --background: var(--ion-color-white); --padding-start: 12px; --padding-end: 12px; border-radius: 8px; min-height: 44px; }
+  }
+}
+
+.summary-section {
+  padding: 0 16px 16px 16px;
+
+  .summary-card {
+    background: var(--ion-color-white);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+
+    .summary-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      &.main {
+        margin-bottom: 12px;
+
+        .summary-icon {
+          width: 48px;
+          height: 48px;
+          border-radius: 12px;
+          background: var(--ion-color-primary);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          ion-icon { font-size: 1.4rem; color: white; }
+
+          &.negativo {
+            background: var(--ion-color-danger);
+          }
+        }
+
+        .summary-content {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+
+          .summary-label {
+            font-size: 0.85rem;
+            color: var(--ion-color-medium);
+          }
+
+          .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ion-color-success);
+
+            &.negativo { color: var(--ion-color-danger); }
+          }
+        }
+      }
+
+      &.secondary {
+        display: flex;
+        gap: 16px;
+
+        .summary-item {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          .summary-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+
+            &.fijo { background: var(--ion-color-primary); }
+            &.proy { background: var(--ion-color-warning); }
+          }
+
+          .summary-item-label {
+            font-size: 0.85rem;
+            color: var(--ion-color-medium);
+          }
+
+          .summary-item-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--ion-color-dark);
+          }
+        }
+      }
+    }
+
+    .summary-divider {
+      height: 1px;
+      background: var(--ion-color-light);
+      margin: 12px 0;
+    }
   }
 }
 
@@ -132,10 +276,20 @@
 
     ion-label {
       h3 { font-size: 0.95rem; font-weight: 600; color: var(--ion-color-dark); margin-bottom: 2px; }
-      p { font-size: 0.8rem; color: var(--ion-color-medium); }
+      p { font-size: 0.8rem; color: var(--ion-color-medium); display: flex; align-items: center; gap: 6px; }
     }
 
     .gasto-monto { font-size: 1rem; font-weight: 700; color: var(--ion-color-danger); }
+
+    .cuota-badge {
+      background: var(--ion-color-warning);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: none;
+    }
   }
 
   .total-bar {
@@ -201,7 +355,7 @@
       p { font-size: 0.85rem; color: var(--ion-color-medium); .negativo { color: var(--ion-color-danger); font-weight: 600; } }
     }
 
-    ion-note { font-size: 1rem; font-weight: 700; &.saldo-positivo { color: var(--ion-color-success); } &.saldo-negativo { color: var(--ion-color-danger); } }
+    ion-note { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 4px; &.saldo-positivo { color: var(--ion-color-success); } &.saldo-negativo { color: var(--ion-color-danger); } .warning-icon { font-size: 1.1rem; color: var(--ion-color-danger); } }
   }
 
   .mes-detalle-item {

@@ -34,3 +34,39 @@ ion-app {
   background-color: black;
   /* mismo color que el modal */
 }
+
+// SweetAlert2 custom styles
+.swal-popup {
+  border-radius: 16px !important;
+  font-family: var(--ion-font-family, inherit) !important;
+}
+
+.swal2-title {
+  font-size: 1.3rem !important;
+  font-weight: 600 !important;
+  color: var(--ion-color-dark) !important;
+}
+
+.swal2-html-container {
+  font-size: 1rem !important;
+  color: var(--ion-color-medium) !important;
+}
+
+.swal-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+
+  ion-spinner {
+    width: 48px;
+    height: 48px;
+    color: var(--ion-color-primary);
+  }
+}
+
+// Bottom safe area for Android navigation bar (home, back, multitask)
+ion-content {
+  --padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+

@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
-import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/ingreso-datos.component';
 import { SimuladorService } from 'src/app/services/simulador.service';
 import { GastoSimulador, GastoConCuota, ProyeccionMes, ProyeccionConfig } from 'src/app/models/gasto-simulador.model';
 import { AgregarGastoComponent } from './agregar-gasto/agregar-gasto.component';
@@ -13,12 +12,11 @@ import { UtilsService } from 'src/app/services/utils.service';
 import { MaskitoDirective } from '@maskito/angular';
 import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import { MaskitoElementPredicate } from '@maskito/core';
-
 @Component({
   selector: 'app-simulador-financiero',
   templateUrl: './simulador-financiero.page.html',
   styleUrls: ['./simulador-financiero.page.scss'],
-  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, HeaderComponent, FooterComponent, IngresoDatosComponent, MaskitoDirective]
+  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, HeaderComponent, FooterComponent, MaskitoDirective]
 })
 export class SimuladorFinancieroPage implements OnInit {
 
@@ -53,8 +51,36 @@ export class SimuladorFinancieroPage implements OnInit {
   readonly maskPredicate: MaskitoElementPredicate = async (el) => ((el as unknown) as HTMLIonInputElement).getInputElement();
 
   async ngOnInit() {
+    this.cargarEstadoSecciones();
     await this.cargarConfig();
     await this.cargarGastos();
+  }
+
+  cargarEstadoSecciones() {
+    const estado = localStorage.getItem('simuladorEstadoSecciones');
+    if (estado) {
+      try {
+        const parsed = JSON.parse(estado);
+        this.expandirFijos = parsed.expandirFijos ?? true;
+        this.expandirTemporales = parsed.expandirTemporales ?? true;
+      } catch {
+        this.expandirFijos = true;
+        this.expandirTemporales = true;
+      }
+    }
+  }
+
+  guardarEstadoSecciones() {
+    localStorage.setItem('simuladorEstadoSecciones', JSON.stringify({
+      expandirFijos: this.expandirFijos,
+      expandirTemporales: this.expandirTemporales
+    }));
+  }
+
+  async handleRefresh(event: any) {
+    await this.cargarConfig();
+    await this.cargarGastos(true);
+    event.target.complete();
   }
 
   async cargarConfig() {
@@ -64,6 +90,13 @@ export class SimuladorFinancieroPage implements OnInit {
       this.mesesProyeccion = config.mesesProyeccion;
       if (config.fechaCierre) {
         this.fechaCierreControl.setValue(config.fechaCierre);
+        const now = new Date();
+        const ultimoDia = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        const dia = Math.min(config.fechaCierre, ultimoDia);
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const dayStr = String(dia).padStart(2, '0');
+        this.fechaCierre = `${year}-${month}-${dayStr}`;
       }
     }
   }
@@ -132,6 +165,7 @@ export class SimuladorFinancieroPage implements OnInit {
     await this.simuladorSvc.eliminarConfig();
     this.ingresoMensualControl.setValue(null);
     this.fechaCierreControl.setValue(null);
+    this.fechaCierre = '';
     this.mesesProyeccion = 6;
     this.proyecciones = [];
     this.utilsSvc.presentToast({
@@ -231,10 +265,12 @@ export class SimuladorFinancieroPage implements OnInit {
 
   toggleFijos() {
     this.expandirFijos = !this.expandirFijos;
+    this.guardarEstadoSecciones();
   }
 
   toggleTemporales() {
     this.expandirTemporales = !this.expandirTemporales;
+    this.guardarEstadoSecciones();
   }
 
   toggleDetalle(proyeccion: ProyeccionMes) {
@@ -257,6 +293,13 @@ export class SimuladorFinancieroPage implements OnInit {
 
   getTotalGastosTemporales(): number {
     return this.gastosTemporales.reduce((sum, g) => sum + g.importe, 0);
+  }
+
+  getSaldoDisponible(): number {
+    const ingresoValor = this.ingresoMensualControl.value
+      ? Number(this.ingresoMensualControl.value.replace(/\./g, '').replace(',', '.'))
+      : 0;
+    return ingresoValor - this.getTotalGastosFijos() - this.getTotalGastosTemporales();
   }
 
   async confirmarEliminarTodosFijos() {
