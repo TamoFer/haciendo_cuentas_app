@@ -6,45 +6,43 @@ import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
-import { AddUpdtDeleteGastoComponent } from '../gastos/add-updt-delete-gasto/add-updt-delete-gasto.component';
-import { AddUpdtDeleteIngresosComponent } from '../ingresos/add-updt-delete-ingresos/add-updt-delete-ingresos.component';
 import { User } from 'src/app/models/user.model';
 import { Subscription } from 'rxjs';
 import { IdleTimeoutService } from 'src/app/services/idle-timeout.service';
 import { Cambio } from 'src/app/models/cambio';
+
+interface MovimientoItem {
+  tipoMov: 'gasto' | 'ingreso' | 'cambio';
+  concepto: string;
+  importe: string;
+  fecha: string;
+  icono: string;
+  rawFecha: Date;
+}
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
   imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor, CommonModule]
-
 })
 export class HomePage implements OnInit, OnDestroy {
 
-
-  //importo servicios
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
 
-
-  //defino variables que uso en html
   nombreUser: string = '';
-  saldo_bco: number;
-  saldo_efe: number;
-  saldo_total: number;
+  saldo_bco: number = 0;
+  saldo_efe: number = 0;
+  saldo_total: number = 0;
   hora: Date = new Date();
 
-
-
-  // condicionales para mostrar info
   usuarioLogeado: boolean = false;
-  mostrarDetalle: boolean = false;
+  mostrarSaldos: boolean = false;
   movimientosCuenta: Movimiento[] = [];
   movimientosCambios: Cambio[] = [];
-  user: User;
-  subscripcionUser: Subscription;
-  mostrarSaldos: boolean = false;
+  user!: User;
+  subscripcionUser!: Subscription;
 
   private opciones: Intl.DateTimeFormatOptions = {
     day: '2-digit',
@@ -80,15 +78,45 @@ export class HomePage implements OnInit, OnDestroy {
       );
     });
 
-
-    // Cargar movimientos una vez (al iniciar)
     this.obtenerMovimientosCuenta();
-
     this.obtenerMovimientosCambios();
   }
 
-  obtenerDatosUsuario(user: User) {
+  get ultimosMovimientos(): MovimientoItem[] {
+    const items: MovimientoItem[] = [];
 
+    for (const m of this.movimientosCuenta) {
+      const fecha = new Date(m.fecha);
+      items.push({
+        tipoMov: m.genero === 'gasto' ? 'gasto' : 'ingreso',
+        concepto: m.rubro || m.detalle || '',
+        importe: m.genero === 'gasto'
+          ? `- $${Number(m.importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`
+          : `+ $${Number(m.importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
+        fecha: fecha.toLocaleDateString('es-AR', { day: '2-digit', month: 'short' }),
+        icono: m.tipo === 'Efectivo' ? 'cash-outline' : 'card-outline',
+        rawFecha: fecha
+      });
+    }
+
+    for (const c of this.movimientosCambios) {
+      const fecha = new Date(c.fecha);
+      items.push({
+        tipoMov: 'cambio',
+        concepto: c.desde === 'efectivo' ? 'Depósito a banco' : 'Retiro de efectivo',
+        importe: `$${c.importe.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
+        fecha: fecha.toLocaleDateString('es-AR', { day: '2-digit', month: 'short' }),
+        icono: 'swap-horizontal-outline',
+        rawFecha: fecha
+      });
+    }
+
+    return items
+      .sort((a, b) => b.rawFecha.getTime() - a.rawFecha.getTime())
+      .slice(0, 6);
+  }
+
+  obtenerDatosUsuario(user: User) {
     this.nombreUser = user.name;
     this.saldo_bco = user?.saldo_banco || 0;
     this.saldo_efe = user?.saldo_efectivo || 0;
@@ -99,248 +127,23 @@ export class HomePage implements OnInit, OnDestroy {
     this.obtenerMovimientosCambios();
   }
 
-
   obtenerMovimientosCuenta() {
     const path = `users/${this.user.uid}/movimientos`;
-
     this.firebaseSVC.getCollectionData(path).subscribe({
-      next: (res: Movimiento[]) => {
-        this.utilsSVC.setMovimientos(res);
-      },
-      error: err => {
-        console.error('Error obteniendo movimientos', err);
-      }
+      next: (res: Movimiento[]) => this.utilsSVC.setMovimientos(res),
+      error: err => console.error('Error obteniendo movimientos', err)
     });
   }
 
   obtenerMovimientosCambios() {
     const path = `users/${this.user.uid}/cambios`;
-
     this.firebaseSVC.getCollectionData(path).subscribe({
-      next: (res: Cambio[]) => {
-        this.utilsSVC.setCambios(res);
-      },
-      error: err => {
-        console.error('Error obteniendo cambios', err);
-      }
+      next: (res: Cambio[]) => this.utilsSVC.setCambios(res),
+      error: err => console.error('Error obteniendo cambios', err)
     });
-  }
-
-
-  async confirmarSignOut() {
-    const alert = await this.utilsSVC.alertasCtrl.create({
-      header: 'Cerrar sesión',
-      message: '¿Estás seguro que deseas desloguearte?',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          handler: () => {
-          }
-        },
-        {
-          text: 'Salir',
-          role: 'destructive',
-          handler: () => {
-            this.signOut();
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  signOut() {
-    const path = `users/${this.user.uid}`;
-    const data = {
-      ... this.user,
-      saldo_banco: this.saldo_bco,
-      saldo_efectivo: this.saldo_efe,
-      censurar_montos: this.mostrarSaldos
-    };
-
-    this.firebaseSVC.setDocument(path, data).then(() => {
-      this.movimientosCuenta = [];
-      this.firebaseSVC.signOut();
-    })
-
-
-  }
-
-  //agregar gastos o actualizar
-  async agregarGastos(movimiento?: Movimiento) {
-    const modal = await this.utilsSVC.modalsCtrl.create({
-      component: AddUpdtDeleteGastoComponent,
-      componentProps: {
-        gasto: movimiento // ✅ PASA el movimiento si existe
-      }
-    });
-
-    await modal.present();
-  }
-
-  //agregar ingresos o actualizar
-  async agregarIngresos(movimiento?: Movimiento) {
-    const modal = await this.utilsSVC.modalsCtrl.create({
-      component: AddUpdtDeleteIngresosComponent,
-      componentProps: {
-        ingreso: movimiento // Aunque sea ingreso, lo tratás como Movimiento
-      }
-    });
-
-    await modal.present();
-  }
-
-  //alerta notificacion
-  async infoMovimiento(movimiento) {
-    if (movimiento.genero == 'gasto') {
-      const alert = await this.utilsSVC.alertasCtrl.create({
-
-        header: movimiento.rubro,
-        subHeader: 'Costo $ ' + movimiento.importe,
-        message: movimiento.detalle,
-        buttons: ['OK']
-      })
-      await alert.present();
-    } else {
-      const alert = await this.utilsSVC.alertasCtrl.create({
-
-        header: movimiento.detalle,
-        subHeader: movimiento.tipo,
-        message: 'Ganancia: $' + movimiento.importe,
-        buttons: ['OK'],
-      })
-      await alert.present();
-    }
-  }
-
-  async infoCambio(cambio) {
-    const importeARS = new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS'
-    }).format(cambio.importe);
-
-
-    if (cambio.desde === 'efectivo') {
-      const alert = await this.utilsSVC.alertasCtrl.create({
-
-        header: 'Deposito de efectivo ',
-        subHeader: `Importe ${importeARS}`,
-        buttons: ['OK']
-      })
-      await alert.present();
-
-    } else {
-      const alert = await this.utilsSVC.alertasCtrl.create({
-
-        header: 'Retiro de efectivo ',
-        subHeader: `Importe ${importeARS}`,
-        buttons: ['OK']
-      })
-      await alert.present();
-    }
-  }
-
-  async confirmarDelete(movimiento) {
-
-    const alert = await this.utilsSVC.alertasCtrl.create({
-      header: 'Eliminar Movimiento',
-      message: '¿Estás seguro que deseas eliminarlo?',
-      buttons: [
-        {
-          text: 'No',
-          role: 'cancel',
-          handler: () => {
-          }
-        },
-        {
-          text: 'Si',
-          role: 'destructive',
-          handler: () => {
-            this.eliminarMovimiento(movimiento)
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  async eliminarMovimiento(movimiento: Movimiento) {
-
-    const loading = await this.utilsSVC.loading();
-    await loading.present();
-
-
-    let path = `users/${this.user.uid}/movimientos/${movimiento.id}`;
-
-    this.restarSaldos(movimiento);
-
-    this.firebaseSVC.deleteDocument(path).then(async res => {
-
-
-      this.utilsSVC.presentToast({
-        message: 'Movimiento eliminado con exito',
-        duration: 1500,
-        color: 'success',
-        position: 'middle',
-        icon: 'checkmark-circle-outline'
-      })
-
-    }).catch(error => {
-      console.log(error);
-
-      this.utilsSVC.presentToast({
-        message: error.message,
-        duration: 2500,
-        color: 'primary',
-        position: 'middle',
-        icon: 'alert-circle-outline'
-      })
-
-    }).finally(() => {
-      loading.dismiss();
-    })
-
-    this.obtenerMovimientosCuenta()
-
-  }
-
-  restarSaldos(movimiento) {
-    const path = `users/${this.user.uid}`;
-
-    let nuevoSaldoBco = this.user.saldo_banco;
-    let nuevoSaldoEfe = this.user.saldo_efectivo;
-
-    if (movimiento.genero === 'gasto') {
-      movimiento.tipo === 'Efectivo' ?
-        nuevoSaldoEfe += Number(movimiento.importe.replace(/\./g, '').replace(',', '.')) :
-        nuevoSaldoBco += Number(movimiento.importe.replace(/\./g, '').replace(',', '.'));
-    } else {
-      movimiento.tipo === 'Efectivo' ?
-        nuevoSaldoEfe -= Number(movimiento.importe.replace(/\./g, '').replace(',', '.')) :
-        nuevoSaldoBco -= Number(movimiento.importe.replace(/\./g, '').replace(',', '.'));
-    }
-
-    this.firebaseSVC.updateDocument(path, {
-      ...this.user,
-      saldo_banco: nuevoSaldoBco,
-      saldo_efectivo: nuevoSaldoEfe
-    })
-
-    this.utilsSVC.setUser({
-      ... this.user,
-      saldo_banco: nuevoSaldoBco,
-      saldo_efectivo: nuevoSaldoEfe
-    })
   }
 
   ngOnDestroy() {
     this.subscripcionUser?.unsubscribe();
   }
-
-
-
 }
-

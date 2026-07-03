@@ -12,10 +12,7 @@
       <div class="cotizaciones-grid">
         <div class="cotizacion-item" *ngFor="let dolar of cotizaciones">
           <div class="cotizacion-head">
-            <span class="cotizacion-nombre">{{ dolar.nombre }}</span>
-            <button class="calc-btn" (click)="abrirCalculadora(dolar)">
-              <ion-icon name="calculator-outline"></ion-icon>
-            </button>
+            <span class="cotizacion-nombre">{{ formatearNombre(dolar) }}</span>
           </div>
           <span class="cotizacion-precio">${{ dolar.compra | number:'1.2-2' }}</span>
           <span class="cotizacion-sub">Venta ${{ dolar.venta | number:'1.2-2' }}</span>
@@ -47,16 +44,17 @@
         </ion-segment>
       </div>
 
-      <div class="form-body" *ngIf="opcionSeleccionada !== ''">
+      <div class="form-body" *ngIf="opcionSeleccionada !== ''" [formGroup]="formulario">
         <div class="saldo-info">
           <ion-icon [name]="opcionSeleccionada === 'first' ? 'cash-outline' : 'business-outline'"></ion-icon>
-          <span>Saldo disponible: <strong>{{ (opcionSeleccionada === 'first' ? user.saldo_efectivo : user.saldo_banco) | currency:'ARS':'symbol':'1.2-2':'es-AR' }}</strong></span>
+          <span>Saldo disponible: <strong>{{ (opcionSeleccionada === 'first' ? user.saldo_efectivo : user.saldo_banco) |
+              currency:'ARS':'symbol':'1.2-2':'es-AR' }}</strong></span>
         </div>
 
         <div class="input-wrapper">
           <span class="input-prefix">$</span>
-          <ion-input [maskito]="mascara" [maskitoElement]="maskPredicate"
-            formControlName="importeAcambiar" inputmode="decimal" placeholder="0,00"></ion-input>
+          <ion-input [maskito]="mascara" [maskitoElement]="maskPredicate" formControlName="importeAcambiar"
+            inputmode="text" placeholder="0,00"></ion-input>
         </div>
 
         <ion-button expand="block" class="btn-finalizar" [disabled]="!formulario.valid" (click)="realizarIntercambio()">

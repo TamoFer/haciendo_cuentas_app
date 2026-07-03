@@ -1,6 +1,5 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>{{title}}</ion-title>
     <ion-buttons slot="start" *ngIf="mostrarVolver">
       <ion-button (click)="volver()">
         <ion-icon name="arrow-back"></ion-icon>
@@ -11,5 +10,27 @@
         <ion-icon name="close-circle-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
+
+    <ion-title>{{title}}</ion-title>
+
+    <ion-buttons slot="end" *ngIf="!isModal" class="avatar-btn">
+      <ion-button (click)="toggleDropdown()">
+        <div class="avatar-circle">{{ iniciales }}</div>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
+
+  <div class="avatar-dropdown" *ngIf="dropdownOpen" (click)="cerrarDropdown()">
+    <div class="dropdown-menu" (click)="$event.stopPropagation()">
+      <button class="dropdown-item" (click)="configuracion()">
+        <ion-icon name="settings-outline"></ion-icon>
+        <span>Configuración</span>
+      </button>
+      <div class="dropdown-divider"></div>
+      <button class="dropdown-item danger" (click)="salir()">
+        <ion-icon name="log-out-outline"></ion-icon>
+        <span>Salir</span>
+      </button>
+    </div>
+  </div>
 </ion-header>
