@@ -1,55 +1,70 @@
-<app-header title="Cambio dinero" (volverAccion)="cerrarModal()" [isModal]="mostrarBack">
-</app-header>
+<app-header title="Cambio dinero" (volverAccion)="cerrarModal()" [isModal]="mostrarBack"></app-header>
+
 <ion-content>
-    <div class="formulario">
-        <ion-segment *ngIf="user?.saldo_banco > 0 || user?.saldo_efectivo > 0" [(ngModel)]="opcionSeleccionada">
+  <div class="cambio-container">
 
-            <!-- Mostrar solo si hay saldo en efectivo -->
-            <ion-segment-button content-id="first" *ngIf="user?.saldo_efectivo > 0" value="first">
-                <div class="titulo-segmento">
-                    <p>Efectivo</p>
-                    <ion-icon name="swap-horizontal-outline" style="font-size: 1.5rem; margin-top: 0.5rem;"></ion-icon>
-                    <p>Banco</p>
-                </div>
-            </ion-segment-button>
+    <!-- Cotizaciones -->
+    <div class="cotizaciones-card">
+      <div class="cotizaciones-header">
+        <ion-icon name="trending-up-outline"></ion-icon>
+        <span>Cotizaciones</span>
+      </div>
+      <div class="cotizaciones-grid">
+        <div class="cotizacion-item" *ngFor="let dolar of cotizaciones">
+          <div class="cotizacion-head">
+            <span class="cotizacion-nombre">{{ dolar.nombre }}</span>
+            <button class="calc-btn" (click)="abrirCalculadora(dolar)">
+              <ion-icon name="calculator-outline"></ion-icon>
+            </button>
+          </div>
+          <span class="cotizacion-precio">${{ dolar.compra | number:'1.2-2' }}</span>
+          <span class="cotizacion-sub">Venta ${{ dolar.venta | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
 
-            <!-- Mostrar solo si hay saldo en el banco -->
-            <ion-segment-button content-id="second" *ngIf="user?.saldo_banco > 0" value="second">
-                <div class="titulo-segmento">
-                    <p>Banco</p>
-                    <ion-icon name="swap-horizontal-outline" style="font-size: 1.5rem; margin-top: 0.5rem;"></ion-icon>
-                    <p>Efectivo</p>
-                </div>
-            </ion-segment-button>
+    <!-- Intercambio -->
+    <div class="intercambio-card">
+      <div class="intercambio-header">
+        <ion-icon name="swap-horizontal-outline"></ion-icon>
+        <span>Mové tu dinero</span>
+      </div>
 
+      <div class="segment-wrapper" *ngIf="user?.saldo_banco > 0 || user?.saldo_efectivo > 0">
+        <ion-segment [(ngModel)]="opcionSeleccionada" class="segment-moderno">
+          <ion-segment-button value="first" *ngIf="user?.saldo_efectivo > 0">
+            <div class="segment-content">
+              <ion-icon name="cash-outline"></ion-icon>
+              <span>Efectivo → Banco</span>
+            </div>
+          </ion-segment-button>
+          <ion-segment-button value="second" *ngIf="user?.saldo_banco > 0">
+            <div class="segment-content">
+              <ion-icon name="business-outline"></ion-icon>
+              <span>Banco → Efectivo</span>
+            </div>
+          </ion-segment-button>
         </ion-segment>
+      </div>
 
-        <ion-segment-view *ngIf="opcionSeleccionada!==''">
-            <ion-segment-content [id]="opcionSeleccionada">
-                <form [formGroup]="formulario">
-                    <p>
-                        Contás con un saldo de :
-                        {{opcionSeleccionada === 'first'? (user.saldo_efectivo | currency: 'ARS')
-                        : (user.saldo_banco | currency: 'ARS')
-                        }}
-                    </p>
-                    <p>Ingrese el importe a cambiar:</p>
-                    <ion-input [maskito]="mascara" class="custom" [maskitoElement]="maskPredicate"
-                        formControlName="importeAcambiar" inputmode="decimal">
-                        <ion-icon slot="start" name="logo-usd" color="light"></ion-icon>
-                    </ion-input>
-                </form>
-            </ion-segment-content>
-        </ion-segment-view>
+      <div class="form-body" *ngIf="opcionSeleccionada !== ''">
+        <div class="saldo-info">
+          <ion-icon [name]="opcionSeleccionada === 'first' ? 'cash-outline' : 'business-outline'"></ion-icon>
+          <span>Saldo disponible: <strong>{{ (opcionSeleccionada === 'first' ? user.saldo_efectivo : user.saldo_banco) | currency:'ARS':'symbol':'1.2-2':'es-AR' }}</strong></span>
+        </div>
 
-    </div>
+        <div class="input-wrapper">
+          <span class="input-prefix">$</span>
+          <ion-input [maskito]="mascara" [maskitoElement]="maskPredicate"
+            formControlName="importeAcambiar" inputmode="decimal" placeholder="0,00"></ion-input>
+        </div>
 
-    <div style="width: 100% ; display: flex; flex-direction: row; justify-content: center;">
-        <ion-button expand="block" shape="round" style="width: fit-content;" [disabled]="!formulario.valid"
-            (click)="realizarIntercambio()">
-            Finalizar
+        <ion-button expand="block" class="btn-finalizar" [disabled]="!formulario.valid" (click)="realizarIntercambio()">
+          <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+          Finalizar
         </ion-button>
+      </div>
     </div>
 
+  </div>
 </ion-content>
-<app-footer></app-footer>

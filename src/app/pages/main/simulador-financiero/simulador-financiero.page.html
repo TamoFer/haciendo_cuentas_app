@@ -8,10 +8,7 @@
   <div class="simulador-container">
 
     <div class="input-section">
-      <div class="input-header">
-        <ion-icon name="calculator-outline"></ion-icon>
-        <span>Tu Proyección</span>
-      </div>
+
 
       <div class="input-card">
         <div class="income-group">
@@ -21,9 +18,8 @@
           </div>
           <div class="income-input-wrap">
             <span class="income-symbol">$</span>
-            <ion-input [formControl]="ingresoMensualControl" [maskito]="mascara"
-              [maskitoElement]="maskPredicate" inputmode="decimal" type="text" placeholder="0,00"
-              (ionInput)="calcularProyeccion()"></ion-input>
+            <ion-input [formControl]="ingresoMensualControl" [maskito]="mascara" [maskitoElement]="maskPredicate"
+              inputmode="decimal" type="text" placeholder="0,00" (ionInput)="calcularProyeccion()"></ion-input>
           </div>
         </div>
 
@@ -66,15 +62,15 @@
       <div class="summary-card">
         <div class="summary-row main">
           <div class="summary-icon" [class.negativo]="getSaldoDisponible() < 0">
-            @if (getSaldoDisponible() < 0) {
-            <ion-icon name="warning-outline"></ion-icon>
-            } @else {
-            <ion-icon name="wallet-outline"></ion-icon>
-            }
+            @if (getSaldoDisponible() < 0) { <ion-icon name="warning-outline"></ion-icon>
+              } @else {
+              <ion-icon name="wallet-outline"></ion-icon>
+              }
           </div>
           <div class="summary-content">
             <span class="summary-label">Disponible</span>
-            <span class="summary-value" [class.negativo]="getSaldoDisponible() < 0">{{ formatearMonto(getSaldoDisponible()) }}</span>
+            <span class="summary-value" [class.negativo]="getSaldoDisponible() < 0">{{
+              formatearMonto(getSaldoDisponible()) }}</span>
           </div>
         </div>
         <div class="summary-divider"></div>

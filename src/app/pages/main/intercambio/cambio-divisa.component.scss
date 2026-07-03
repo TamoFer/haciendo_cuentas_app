@@ -1,30 +1,411 @@
-.formulario {
-    width: auto;
-    height: auto;
-    display: block;
-    margin: 2rem;
+.cambio-container {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.titulo-segmento {
+// ─── Cotizaciones ───────────────────────────────
+.cotizaciones-card {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.cotizaciones-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+  ion-icon {
+    font-size: 1.2rem;
+    color: var(--ion-color-primary);
+  }
+
+  span {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+  }
+}
+
+.cotizaciones-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.cotizacion-item {
+  background: rgba(var(--ion-color-primary-rgb), 0.04);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: background 0.2s;
+}
+
+.cotizacion-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.cotizacion-nombre {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ion-color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.calc-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+
+  ion-icon {
+    font-size: 1.1rem;
+    color: var(--ion-color-medium);
+    transition: color 0.2s;
+  }
+
+  &:hover ion-icon,
+  &:active ion-icon {
+    color: var(--ion-color-primary);
+  }
+}
+
+.cotizacion-precio {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--ion-color-dark);
+  line-height: 1.2;
+}
+
+.cotizacion-sub {
+  font-size: 0.7rem;
+  color: var(--ion-color-medium);
+}
+
+// ─── Intercambio ──────────────────────────────
+.intercambio-card {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.intercambio-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+  ion-icon {
+    font-size: 1.2rem;
+    color: var(--ion-color-primary);
+  }
+
+  span {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+  }
+}
+
+.segment-wrapper {
+  margin-bottom: 16px;
+}
+
+.segment-moderno {
+  --background: rgba(var(--ion-color-primary-rgb), 0.06);
+
+  ion-segment-button {
+    --background-checked: var(--ion-color-primary);
+    --color-checked: white;
+    --indicator-color: transparent;
+    --border-radius: 10px;
+    min-height: 44px;
+  }
+
+  .segment-content {
     display: flex;
-    flex-direction: row;
-    width: 100%;
+    align-items: center;
+    gap: 6px;
+
+    ion-icon { font-size: 1.1rem; }
+    span { font-size: 0.8rem; font-weight: 600; }
+  }
+}
+
+.form-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.saldo-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(var(--ion-color-success-rgb), 0.08);
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: var(--ion-color-dark);
+
+  ion-icon {
+    font-size: 1.2rem;
+    color: var(--ion-color-success);
+  }
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+  padding: 2px 2px 2px 18px;
+  transition: border-color 0.2s;
+
+  &:focus-within {
+    border-color: var(--ion-color-primary);
+  }
+
+  .input-prefix {
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: var(--ion-color-medium);
+    margin-right: 6px;
+  }
+
+  ion-input {
+    flex: 1;
+    --padding-start: 0;
+    --padding-end: 12px;
+    --padding-top: 14px;
+    --padding-bottom: 14px;
+    --background: transparent;
+    --border-color: transparent;
+    --highlight-height: 0;
+    --box-shadow: none;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+
+    input { caret-color: var(--ion-color-primary); }
+  }
+}
+
+.btn-finalizar {
+  --border-radius: 12px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 0;
+}
+
+// ─── Calculadora Swal (estilo verGasto) ─────────
+::ng-deep {
+  .calc-swal-popup {
+    border-radius: 20px !important;
+    padding: 24px 20px 20px !important;
+    background: #fff !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .calc-swal-close {
+    color: var(--ion-color-medium) !important;
+    font-size: 1.8rem !important;
+    font-weight: 300 !important;
+    transition: color 0.2s;
+
+    &:hover {
+      color: var(--ion-color-dark) !important;
+    }
+  }
+
+  .calc-card {
+    margin-top: 8px;
+  }
+
+  .calc-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 8px 16px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ion-color-primary);
+    border-bottom: 1px solid var(--ion-color-light);
+    margin-bottom: 4px;
+
+    ion-icon {
+      font-size: 1.4rem;
+    }
+  }
+
+  .calc-row {
+    display: flex;
     justify-content: space-between;
+    align-items: center;
+    padding: 12px 8px;
+    border-bottom: 1px solid var(--ion-color-light);
 
-}
+    &:last-of-type {
+      border-bottom: none;
+    }
+  }
 
-ion-input.custom {
-    --background: #373737;
-    --color: #fff;
-    --placeholder-color: #ddd;
-    --placeholder-opacity: 0.8;
+  .calc-label {
+    font-size: 0.9rem;
+    color: var(--ion-color-medium);
+    font-weight: 500;
+  }
 
-    --padding-bottom: 10px;
-    --padding-end: 10px;
-    --padding-start: 10px;
-    --padding-top: 10px;
-}
+  .calc-val {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+  }
 
-ion-segment {
-    --background: #54dc98;
+  .calc-divider {
+    height: 1px;
+    background: var(--ion-color-light);
+    margin: 4px 0;
+  }
+
+  .calc-input-wrapper {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(0, 0, 0, 0.06);
+    border-radius: 10px;
+    padding: 0 2px 0 12px;
+    transition: border-color 0.2s;
+    width: 140px;
+
+    &:focus-within {
+      border-color: var(--ion-color-primary);
+    }
+  }
+
+  .calc-input-prefix {
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: var(--ion-color-medium);
+    margin-right: 4px;
+  }
+
+  .calc-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 8px 8px 8px 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    text-align: right;
+    min-width: 0;
+
+    &::placeholder {
+      color: var(--ion-color-medium);
+      font-weight: 400;
+    }
+
+  }
+
+  .calc-direccion {
+    display: flex;
+    gap: 8px;
+    padding: 12px 8px;
+  }
+
+  .dir-btn {
+    flex: 1;
+    padding: 10px 8px;
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    background: transparent;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ion-color-medium);
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: var(--ion-color-primary);
+    }
+
+    &.dir-active {
+      background: var(--ion-color-primary);
+      border-color: var(--ion-color-primary);
+      color: #fff;
+    }
+  }
+
+  .calc-convertir-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: var(--ion-color-primary);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.9;
+    }
+
+    &:active {
+      opacity: 0.8;
+    }
+  }
+
+  .calc-resultado {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 8px 0;
+  }
+
+  .calc-exito {
+    font-size: 1.1rem;
+    color: var(--ion-color-primary);
+    text-align: center;
+  }
+
+  .calc-error {
+    font-size: 0.9rem;
+    color: var(--ion-color-danger);
+    font-weight: 500;
+  }
 }

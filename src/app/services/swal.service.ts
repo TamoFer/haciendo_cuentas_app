@@ -35,7 +35,7 @@ export class SwalService {
       text,
       icon,
       showCancelButton: true,
-      confirmButtonText,
+      confirmButtonText: confirmText,
       reverseButtons: true,
       ...this.getSwalOptions()
     });

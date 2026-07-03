@@ -1,22 +1,34 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+
+export interface DolarCotizacion {
+  moneda: string;
+  casa: string;
+  nombre: string;
+  compra: number;
+  venta: number;
+  fechaActualizacion: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class CotizacionService {
 
-  private apiUrlOficial: string = 'https://dolarapi.com/v1/dolares/oficial';
-  private apiUrlTarjeta: string = 'https://dolarapi.com/v1/dolares/tarjeta';
-
+  private baseUrl = 'https://dolarapi.com/v1/dolares';
 
   constructor(private http: HttpClient) { }
 
+  obtenerCotizacion(tipo: 'oficial' | 'blue' | 'bolsa' | 'tarjeta'): Observable<DolarCotizacion> {
+    return this.http.get<DolarCotizacion>(`${this.baseUrl}/${tipo}`);
+  }
+
   obtenerCotizacionDolarOficial() {
-    return this.http.get<any>(this.apiUrlOficial);
+    return this.obtenerCotizacion('oficial');
   }
 
   obtenerCotizacionDolarTarjeta() {
-    return this.http.get<any>(this.apiUrlTarjeta);
+    return this.obtenerCotizacion('tarjeta');
   }
 }

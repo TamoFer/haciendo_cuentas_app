@@ -1,33 +1,17 @@
-<ion-footer>
-  <ion-tab-bar slot="bottom">
-    <ion-tab-button tab="inicio" [routerLink]="['/home']">
-      <ion-icon name="home-outline" color="dark"></ion-icon>
-      <ion-label>Inicio</ion-label>
-    </ion-tab-button>
-
-    <ion-tab-button tab="gastos" [routerLink]="['/gastos']">
-      <ion-icon name="receipt-outline" color="dark"></ion-icon>
-      <ion-label>Gastos</ion-label>
-    </ion-tab-button>
-    <ion-tab-button tab="ingresos" [routerLink]="['/ingresos']">
-      <ion-icon name="push-outline" color="dark"></ion-icon>
-      <ion-label>Ingresos</ion-label>
-    </ion-tab-button>
-    <ion-tab-button tab="mensual" [routerLink]="['/simulador']">
-      <ion-icon name="calendar-number-outline" color="dark"></ion-icon>
-      <ion-label>Mes a mes</ion-label>
-    </ion-tab-button>
-    <!-- <ion-tab-button tab="tarjetas" [routerLink]="['/tarjetas']">
-      <ion-icon name="wallet-outline" color="dark"></ion-icon>
-      <ion-label>Tarjetas</ion-label>
-    </ion-tab-button> -->
-    <!-- <ion-tab-button tab="metas" [routerLink]="['/metas']">
-      <ion-icon name="trophy-outline" color="dark"></ion-icon>
-      <ion-label>Metas</ion-label>
-    </ion-tab-button> -->
-    <!-- <ion-tab-button tab="ahorros" [routerLink]="['/ahorros']">
-      <ion-icon name="cash-outline" color="dark"></ion-icon>
-      <ion-label>Ahorros</ion-label>
-    </ion-tab-button> -->
-  </ion-tab-bar>
-</ion-footer>
+<div class="nav-float">
+  <a class="nav-item" [routerLink]="['/home']" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+    <ion-icon name="home-outline"></ion-icon>
+  </a>
+  <a class="nav-item" [routerLink]="['/gastos']" routerLinkActive="active">
+    <ion-icon name="receipt-outline"></ion-icon>
+  </a>
+  <a class="nav-item" [routerLink]="['/ingresos']" routerLinkActive="active">
+    <ion-icon name="trending-up-outline"></ion-icon>
+  </a>
+  <a class="nav-item" (click)="abrirIntercambio()">
+    <ion-icon name="swap-horizontal-outline"></ion-icon>
+  </a>
+  <a class="nav-item" [routerLink]="['/simulador']" routerLinkActive="active">
+    <ion-icon name="calendar-number-outline"></ion-icon>
+  </a>
+</div>

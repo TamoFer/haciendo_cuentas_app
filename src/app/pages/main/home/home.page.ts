@@ -10,7 +10,6 @@ import { AddUpdtDeleteGastoComponent } from '../gastos/add-updt-delete-gasto/add
 import { AddUpdtDeleteIngresosComponent } from '../ingresos/add-updt-delete-ingresos/add-updt-delete-ingresos.component';
 import { User } from 'src/app/models/user.model';
 import { Subscription } from 'rxjs';
-import { CambioDivisaComponent } from '../intercambio/cambio-divisa.component';
 import { IdleTimeoutService } from 'src/app/services/idle-timeout.service';
 import { Cambio } from 'src/app/models/cambio';
 
@@ -335,14 +334,6 @@ export class HomePage implements OnInit, OnDestroy {
       saldo_banco: nuevoSaldoBco,
       saldo_efectivo: nuevoSaldoEfe
     })
-  }
-
-  async intercambioSaldos() {
-    const modal = await this.utilsSVC.modalsCtrl.create({
-      component: CambioDivisaComponent
-    })
-    await modal.present();
-
   }
 
   ngOnDestroy() {

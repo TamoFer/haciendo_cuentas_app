@@ -1,3 +1,61 @@
-ion-tab-button:active {
-    color: green; // el color del ícono activo
+.nav-float {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 20px;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.12),
+    0 2px 6px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  z-index: 100;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 40px;
+    border-radius: 12px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+
+    ion-icon {
+      font-size: 1.35rem;
+      color: var(--ion-color-medium);
+      transition: color 0.2s ease;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      border-radius: 10px;
+      background: var(--ion-color-primary);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    &.active {
+      background: rgba(var(--ion-color-primary-rgb), 0.1);
+
+      ion-icon {
+        color: var(--ion-color-primary);
+      }
+    }
+
+    &:active {
+      transform: scale(0.92);
+    }
+  }
 }

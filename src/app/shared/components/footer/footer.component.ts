@@ -1,29 +1,23 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { UtilsService } from 'src/app/services/utils.service';
+import { CambioDivisaComponent } from 'src/app/pages/main/intercambio/cambio-divisa.component';
 
 @Component({
   selector: 'app-footer',
   templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.scss'],
-  imports: [IonicModule, RouterLink]
+  imports: [IonicModule, RouterLink, RouterLinkActive]
 })
-export class FooterComponent implements OnInit {
+export class FooterComponent {
 
-  utilsSV = inject(UtilsService);
+  utilsSvc = inject(UtilsService);
 
-  ngOnInit() { }
-
-  async enDesarrollo() {
-    const alert = await this.utilsSV.alertasCtrl.create({
-      header: 'Trabajando',
-      message: 'Momentaneamente esta seccion esta en desarrollo',
-      buttons: ['Gracias']
+  async abrirIntercambio() {
+    const modal = await this.utilsSvc.modalsCtrl.create({
+      component: CambioDivisaComponent
     });
-
-    await alert.present();
+    await modal.present();
   }
-
-
 }
