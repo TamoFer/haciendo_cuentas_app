@@ -21,6 +21,10 @@
     grid-column: 1;
   }
 
+  .proyectado-card {
+    grid-column: 1;
+  }
+
   .empty-state {
     grid-column: 1;
   }
@@ -110,6 +114,107 @@
 
     ion-icon {
       font-size: 1.1rem;
+    }
+  }
+}
+
+// ─── Mes proyectado ─────────────────────────────
+.proyectado-card {
+  background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-shade) 100%);
+  border-radius: var(--app-radius-md);
+  padding: 18px;
+  color: white;
+  box-shadow: var(--app-shadow-sm);
+}
+
+.proyectado-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+
+  .proyectado-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    font-weight: var(--app-font-weight-semibold, 600);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+
+    ion-icon {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+.proyectado-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+
+  &.negativo {
+    flex-direction: row;
+    gap: 12px;
+    align-items: flex-start;
+
+    ion-icon {
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+  }
+}
+
+.proyectado-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+
+  .fig-label {
+    font-size: 0.78rem;
+    font-weight: var(--app-font-weight-medium, 500);
+    opacity: 0.85;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .fig-value {
+    font-size: 2rem;
+    font-weight: var(--app-font-weight-bold, 700);
+    letter-spacing: -0.5px;
+  }
+}
+
+.proyectado-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.proyectado-meta {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  gap: 12px;
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: var(--app-font-weight-medium, 500);
+    opacity: 0.92;
+
+    ion-icon {
+      font-size: 1rem;
     }
   }
 }

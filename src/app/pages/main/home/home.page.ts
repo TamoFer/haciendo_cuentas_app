@@ -45,6 +45,11 @@ export class HomePage implements OnInit, OnDestroy {
 
   ultimosMovimientos: MovimientoItem[] = [];
 
+  // Mes proyectado
+  diasRestantesMes: number = 0;
+  gastoDiario: number = 0;
+  nombreMesActual: string = '';
+
   private subs: Subscription[] = [];
   private fechaFormatter = new Intl.DateTimeFormat('es-AR', {
     day: '2-digit',
@@ -87,6 +92,7 @@ export class HomePage implements OnInit, OnDestroy {
     this.saldo_total = this.saldo_bco + this.saldo_efe;
     this.usuarioLogeado = true;
     this.mostrarSaldos = user.censurar_montos;
+    this.calcularMesProyectado();
 
     if (!this.movimientosCuenta.length) {
       this.obtenerMovimientosCuenta();
@@ -196,6 +202,24 @@ export class HomePage implements OnInit, OnDestroy {
       error: err => console.error('Error obteniendo cambios', err)
     });
     this.subs.push(sub);
+  }
+
+  calcularMesProyectado() {
+    const hoy = new Date();
+    const ultimoDiaMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate();
+    this.diasRestantesMes = ultimoDiaMes - hoy.getDate();
+    this.nombreMesActual = hoy.toLocaleDateString('es-AR', { month: 'long' });
+
+    if (this.diasRestantesMes <= 0) {
+      // Último día del mes: gasta todo lo que queda hoy
+      this.diasRestantesMes = 1;
+    }
+
+    if (this.saldo_total > 0) {
+      this.gastoDiario = this.saldo_total / this.diasRestantesMes;
+    } else {
+      this.gastoDiario = 0;
+    }
   }
 
   ngOnDestroy() {

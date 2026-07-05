@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { RouterLink } from '@angular/router';
 import { UtilsService } from 'src/app/services/utils.service';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
@@ -19,7 +18,7 @@ import { NgIf, NgFor } from '@angular/common';
   selector: 'app-cambio-divisa',
   templateUrl: './cambio-divisa.component.html',
   styleUrls: ['./cambio-divisa.component.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, RouterLink, CommonModule, MaskitoDirective, ReactiveFormsModule, FormsModule, NgIf, NgFor]
+  imports: [IonicModule, HeaderComponent, FooterComponent, CommonModule, MaskitoDirective, ReactiveFormsModule, FormsModule, NgIf, NgFor]
 })
 export class CambioDivisaComponent implements OnInit {
 

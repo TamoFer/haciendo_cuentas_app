@@ -1,4 +1,4 @@
-/* ── Estilo unificado Gastos/Ingresos (simulador-like) ── */
+/* ── Estilo unificado Gastos/Ingresos ── */
 .page-container {
   max-width: var(--app-content-max, 1200px);
   margin: 0 auto;
@@ -36,39 +36,156 @@
 .filtros-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
-.filtro-bloque {
+/* ─── Search bar ────────────────────────────────── */
+.search-bar {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
+  background: var(--ion-color-white);
+  border-radius: 12px;
+  padding: 0 14px;
+  min-height: 48px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
 
-  ion-checkbox {
-    font-weight: 500;
+  .search-icon {
+    font-size: 1.2rem;
+    color: var(--ion-color-medium);
+    flex-shrink: 0;
+  }
+
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.95rem;
+    color: var(--ion-color-dark);
+    min-width: 0;
+  }
+
+  input::placeholder {
+    color: var(--ion-color-medium);
+  }
+
+  .clear-icon {
+    font-size: 1.2rem;
+    color: var(--ion-color-medium);
+    cursor: pointer;
+    flex-shrink: 0;
   }
 }
 
-.subfiltro {
-  padding-left: 12px;
+/* ─── Section labels ────────────────────────────── */
+.section-label {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.sub-item {
-  margin-left: 0;
-}
-
-.filtros-fecha {
-  display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 6px;
-  padding-left: 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ion-color-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-top: 4px;
+
+  ion-icon {
+    font-size: 1rem;
+  }
 }
 
-.fecha-row {
+/* ─── Chips de período (wrap en mobile, scroll solo si necesario) ─ */
+.chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  background: var(--ion-color-white);
+  color: var(--ion-color-dark);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+
+  ion-icon {
+    font-size: 1.05rem;
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
+
+  &.active {
+    background: var(--ion-color-primary);
+    border-color: var(--ion-color-primary);
+    color: white;
+
+    ion-icon {
+      color: white;
+    }
+  }
+
+  &.chip-ghost.active {
+    background: var(--ion-color-dark);
+    border-color: var(--ion-color-dark);
+  }
+}
+
+/* ─── Rubros chips ──────────────────────────────── */
+.rubros-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rubro-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  background: var(--ion-color-white);
+  color: var(--ion-color-dark);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  ion-icon {
+    font-size: 1.05rem;
+    color: var(--ion-color-medium);
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
+
+  &.active {
+    background: rgba(var(--ion-color-success-rgb), 0.12);
+    border-color: var(--ion-color-success);
+    color: var(--ion-color-success);
+
+    ion-icon {
+      color: var(--ion-color-success);
+    }
+  }
+}
+
+/* ─── Rango custom ──────────────────────────────── */
+.rango-row {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
@@ -77,80 +194,53 @@
 .fecha-item {
   --background: var(--ion-color-white);
   --border-color: transparent;
-  border-radius: var(--app-radius-sm);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
   flex: 1;
   min-width: 140px;
 
   ion-label[position="stacked"] {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: var(--ion-color-medium);
     margin-bottom: 4px;
   }
 
   ion-input {
-    --background: var(--ion-color-white);
     --padding-start: 12px;
     --padding-end: 12px;
-    border-radius: 8px;
     min-height: 44px;
   }
 }
 
-.detalle-item {
-  --background: var(--ion-color-white);
-  --border-color: transparent;
-  border-radius: var(--app-radius-sm);
-  margin-top: 6px;
-
-  ion-input {
-    --padding-start: 12px;
-    --padding-end: 12px;
-  }
-}
-
-.radio-group {
+/* ─── Hint 15 días ─────────────────────────────── */
+.hint-15 {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
-  padding-left: 12px;
-  margin-top: 6px;
-}
+  padding: 10px 14px;
+  background: rgba(var(--ion-color-primary-rgb), 0.08);
+  border-left: 3px solid var(--ion-color-primary);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  color: var(--ion-color-dark);
+  line-height: 1.4;
 
-.radio-dias {
-  flex-direction: row;
-  gap: 18px;
-
-  ion-radio {
-    width: fit-content;
-    font-weight: 600;
+  ion-icon {
+    font-size: 1.15rem;
+    color: var(--ion-color-primary);
+    flex-shrink: 0;
   }
 }
 
-.opciones-rubro {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-
-  .opcion {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    ion-icon {
-      font-size: 1.25rem;
-      color: var(--ion-color-primary);
-    }
-  }
-}
-
+/* ─── Botones ───────────────────────────────────── */
 .botones-filtros {
   display: flex;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: 4px;
 
   ion-button {
     flex: 1;
-    --border-radius: 8px;
+    --border-radius: 12px;
   }
 }
 
@@ -358,5 +448,42 @@
 
   &:active {
     transform: scale(0.9);
+  }
+}
+
+/* ─── Desktop ≥768px ─── */
+@media (min-width: 768px) {
+  .rubros-chips {
+    gap: 10px;
+  }
+
+  .rubro-chip {
+    padding: 10px 18px;
+    font-size: 0.9rem;
+  }
+}
+
+/* ─── Desktop ≥1024px: filtros y lista lado a lado ── */
+@media (min-width: 1024px) {
+  .page-container {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 24px;
+    padding: 24px 16px 100px;
+  }
+
+  .filtros-card {
+    margin: 0;
+    position: sticky;
+    top: 24px;
+    align-self: start;
+  }
+
+  .lista-section {
+    margin: 0;
+  }
+
+  .empty-state {
+    margin: 0;
   }
 }

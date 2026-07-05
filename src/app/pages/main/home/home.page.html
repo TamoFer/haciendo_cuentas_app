@@ -28,6 +28,41 @@
       </div>
     </div>
 
+    <!-- Mes proyectado -->
+    <div class="proyectado-card" *ngIf="usuarioLogeado">
+      <div class="proyectado-header">
+        <div class="proyectado-titulo">
+          <ion-icon name="analytics-outline"></ion-icon>
+          <span>Mes proyectado · {{ nombreMesActual }}</span>
+        </div>
+      </div>
+
+      <div class="proyectado-body" *ngIf="gastoDiario > 0; else saldoNegativo">
+        <div class="proyectado-figure">
+          <span class="fig-label">Gasto diario sugerido</span>
+          <span class="fig-value">{{ mostrarSaldos ? (gastoDiario | currency:'ARS':'symbol':'1.2-2':'es-AR') : '••••••' }}</span>
+        </div>
+        <div class="proyectado-divider"></div>
+        <div class="proyectado-meta">
+          <div class="meta-item">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <span>{{ diasRestantesMes }} días restantes</span>
+          </div>
+          <div class="meta-item">
+            <ion-icon name="wallet-outline"></ion-icon>
+            <span>Saldo: {{ mostrarSaldos ? (saldo_total | currency:'ARS':'symbol':'1.0-0':'es-AR') : '••••••' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #saldoNegativo>
+        <div class="proyectado-body negativo">
+          <ion-icon name="warning-outline"></ion-icon>
+          <p>Tu saldo es insuficiente. Revisá tus gastos para equilibrar el mes.</p>
+        </div>
+      </ng-template>
+    </div>
+
     <!-- Empty state -->
     <div class="empty-state" *ngIf="movimientosCuenta.length === 0 && movimientosCambios.length === 0">
       <ion-icon name="wallet-outline"></ion-icon>

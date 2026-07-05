@@ -3,7 +3,7 @@
 <ion-content>
   <div class="page-container">
 
-    <!-- Sección filtros -->
+    <!-- ====== Panel de búsqueda ====== -->
     <div class="filtros-card">
       <div class="card-header">
         <ion-icon name="filter-outline"></ion-icon>
@@ -11,83 +11,106 @@
       </div>
 
       <form [formGroup]="formulario" class="filtros-form">
-        <div class="filtro-bloque">
-          <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorFecha = !busquedaPorFecha">Buscar por fecha</ion-checkbox>
-          <div class="subfiltro" *ngIf="busquedaPorFecha">
-            <ion-checkbox labelPlacement="end" justify="start" class="sub-item" formControlName="hoy">Hoy</ion-checkbox>
-            <div class="filtros-fecha">
-              <ion-checkbox labelPlacement="end" justify="start" class="sub-item" (click)="busquedaPorFechas = !busquedaPorFechas">Rango de fechas</ion-checkbox>
-              <div class="fecha-row" *ngIf="busquedaPorFechas">
-                <ion-item class="fecha-item">
-                  <ion-label position="stacked">Desde</ion-label>
-                  <ion-input type="date" formControlName="desde"></ion-input>
-                </ion-item>
-                <ion-item class="fecha-item">
-                  <ion-label position="stacked">Hasta</ion-label>
-                  <ion-input type="date" formControlName="hasta"></ion-input>
-                </ion-item>
-              </div>
-            </div>
-          </div>
+
+        <!-- Search bar siempre visible -->
+        <div class="search-bar">
+          <ion-icon name="search-outline" class="search-icon"></ion-icon>
+          <input type="text" formControlName="detalle" placeholder="Buscar por detalle..."
+                 (input)="actualizarLimiteAuto()">
+          <ion-icon name="close-circle" class="clear-icon"
+                    *ngIf="formulario.controls.detalle.value"
+                    (click)="formulario.controls.detalle.reset(); actualizarLimiteAuto()"></ion-icon>
         </div>
 
-        <div class="filtro-bloque">
-          <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorRubro = !busquedaPorRubro">Buscar por rubro</ion-checkbox>
-          <ion-radio-group *ngIf="busquedaPorRubro" formControlName="rubro" class="radio-group">
-            <div class="opciones-rubro">
-              <div class="opcion">
-                <ion-icon name="receipt-outline"></ion-icon>
-                <ion-radio value="sueldo" labelPlacement="end">Sueldo</ion-radio>
-              </div>
-              <div class="opcion">
-                <ion-icon name="cash-outline"></ion-icon>
-                <ion-radio value="venta" labelPlacement="end">Venta</ion-radio>
-              </div>
-              <div class="opcion">
-                <ion-icon name="download-outline"></ion-icon>
-                <ion-radio value="prestamo" labelPlacement="end">Préstamo</ion-radio>
-              </div>
-              <div class="opcion">
-                <ion-icon name="football-outline"></ion-icon>
-                <ion-radio value="apuesta" labelPlacement="end">Apuesta</ion-radio>
-              </div>
-              <div class="opcion">
-                <ion-icon name="construct-outline"></ion-icon>
-                <ion-radio value="changa" labelPlacement="end">Changa</ion-radio>
-              </div>
-              <div class="opcion">
-                <ion-icon name="wallet-outline"></ion-icon>
-                <ion-radio value="saldo" labelPlacement="end">Saldo</ion-radio>
-              </div>
-            </div>
-          </ion-radio-group>
+        <!-- Chips de período rápido -->
+        <div class="section-label">
+          <ion-icon name="calendar-outline"></ion-icon> Período
+        </div>
+        <div class="chips-row">
+          <button type="button" class="chip" [class.active]="quickFilter === 'hoy'"
+                  (click)="seleccionarQuick('hoy')">
+            <ion-icon name="today-outline"></ion-icon> Hoy
+          </button>
+          <button type="button" class="chip" [class.active]="quickFilter === '7'"
+                  (click)="seleccionarQuick('7')">7 días</button>
+          <button type="button" class="chip" [class.active]="quickFilter === '15'"
+                  (click)="seleccionarQuick('15')">15 días</button>
+          <button type="button" class="chip" [class.active]="quickFilter === '30'"
+                  (click)="seleccionarQuick('30')">30 días</button>
+          <button type="button" class="chip" [class.active]="quickFilter === 'rango'"
+                  (click)="seleccionarQuick('rango')">
+            <ion-icon name="date-range-outline"></ion-icon> Rango
+          </button>
+          <button type="button" class="chip chip-ghost" [class.active]="quickFilter === 'todo'"
+                  (click)="seleccionarQuick('todo')">
+            <ion-icon name="infinity-outline"></ion-icon> Todo
+          </button>
         </div>
 
-        <div class="filtro-bloque">
-          <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorDetalle = !busquedaPorDetalle">Buscar por detalle</ion-checkbox>
-          <ion-item *ngIf="busquedaPorDetalle" class="detalle-item">
-            <ion-input formControlName="detalle" placeholder="Escribe el detalle"></ion-input>
+        <!-- Rango custom -->
+        <div class="rango-row" *ngIf="quickFilter === 'rango'">
+          <ion-item class="fecha-item">
+            <ion-label position="stacked">Desde</ion-label>
+            <ion-input type="date" formControlName="desde"></ion-input>
+          </ion-item>
+          <ion-item class="fecha-item">
+            <ion-label position="stacked">Hasta</ion-label>
+            <ion-input type="date" formControlName="hasta"></ion-input>
           </ion-item>
         </div>
 
-        <div class="filtro-bloque">
-          <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorDias = !busquedaPorDias">Últimos días</ion-checkbox>
-          <ion-radio-group *ngIf="busquedaPorDias" formControlName="dias" class="radio-group radio-dias">
-            <ion-radio value="8" labelPlacement="end">7 días</ion-radio>
-            <ion-radio value="16" labelPlacement="end">15 días</ion-radio>
-            <ion-radio value="31" labelPlacement="end">30 días</ion-radio>
-          </ion-radio-group>
+        <!-- Rubros pills -->
+        <div class="section-label">
+          <ion-icon name="pricetag-outline"></ion-icon> Rubro
+        </div>
+        <div class="rubros-chips">
+          <button type="button" class="rubro-chip"
+                  [class.active]="formulario.controls.rubro.value === 'sueldo'"
+                  (click)="toggleRubro('sueldo')">
+            <ion-icon name="receipt-outline"></ion-icon> Sueldo
+          </button>
+          <button type="button" class="rubro-chip"
+                  [class.active]="formulario.controls.rubro.value === 'venta'"
+                  (click)="toggleRubro('venta')">
+            <ion-icon name="cash-outline"></ion-icon> Venta
+          </button>
+          <button type="button" class="rubro-chip"
+                  [class.active]="formulario.controls.rubro.value === 'prestamo'"
+                  (click)="toggleRubro('prestamo')">
+            <ion-icon name="download-outline"></ion-icon> Préstamo
+          </button>
+          <button type="button" class="rubro-chip"
+                  [class.active]="formulario.controls.rubro.value === 'apuesta'"
+                  (click)="toggleRubro('apuesta')">
+            <ion-icon name="football-outline"></ion-icon> Apuesta
+          </button>
+          <button type="button" class="rubro-chip"
+                  [class.active]="formulario.controls.rubro.value === 'changa'"
+                  (click)="toggleRubro('changa')">
+            <ion-icon name="construct-outline"></ion-icon> Changa
+          </button>
+          <button type="button" class="rubro-chip"
+                  [class.active]="formulario.controls.rubro.value === 'saldo'"
+                  (click)="toggleRubro('saldo')">
+            <ion-icon name="wallet-outline"></ion-icon> Saldo
+          </button>
+        </div>
+
+        <!-- Aviso límite 15 días -->
+        <div class="hint-15" *ngIf="limiteAuto15">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          Sin filtro de fecha, la búsqueda se limita automáticamente a los últimos 15 días.
+        </div>
+
+        <div class="botones-filtros">
+          <ion-button expand="block" (click)="filtrarDatos(formulario)">
+            <ion-icon slot="start" name="search-outline"></ion-icon> Filtrar
+          </ion-button>
+          <ion-button expand="block" fill="clear" color="medium" (click)="limpiarFiltros()">
+            <ion-icon slot="start" name="close-outline"></ion-icon> Limpiar
+          </ion-button>
         </div>
       </form>
-
-      <div class="botones-filtros">
-        <ion-button expand="block" fill="outline" (click)="filtrarDatos(formulario)">
-          <ion-icon slot="start" name="search-outline"></ion-icon>Filtrar
-        </ion-button>
-        <ion-button expand="block" fill="clear" color="medium" (click)="limpiarFiltros()">
-          <ion-icon slot="start" name="close-outline"></ion-icon>Limpiar
-        </ion-button>
-      </div>
     </div>
 
     <!-- Lista -->
