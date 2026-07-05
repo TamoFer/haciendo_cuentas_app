@@ -42,57 +42,71 @@ export class HomePage implements OnInit, OnDestroy {
   movimientosCuenta: Movimiento[] = [];
   movimientosCambios: Cambio[] = [];
   user!: User;
-  subscripcionUser!: Subscription;
 
-  private opciones: Intl.DateTimeFormatOptions = {
+  ultimosMovimientos: MovimientoItem[] = [];
+
+  private subs: Subscription[] = [];
+  private fechaFormatter = new Intl.DateTimeFormat('es-AR', {
     day: '2-digit',
     month: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
     hour12: false
-  };
-
-  fechaFormateada = new Intl.DateTimeFormat('es-AR', this.opciones).format(this.hora);
+  });
+  fechaFormateada = this.fechaFormatter.format(this.hora);
 
   constructor(private idleService: IdleTimeoutService) {
     this.idleService.startWatching();
   }
 
   ngOnInit() {
-    this.subscripcionUser = this.utilsSVC.user$.subscribe((user) => {
-      if (user) {
-        this.user = user;
-        this.obtenerDatosUsuario(user);
-      }
+    const subUser = this.utilsSVC.user$.subscribe((user) => {
+      if (!user) return;
+      this.user = user;
+      this.obtenerDatosUsuario(user);
     });
+    this.subs.push(subUser);
 
-    this.utilsSVC.movimientos$.subscribe(movs => {
-      this.movimientosCuenta = movs.sort((a, b) =>
-        new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
-      );
+    const subMovs = this.utilsSVC.movimientos$.subscribe(movs => {
+      this.movimientosCuenta = movs;
+      this.recalcUltimosMov();
     });
+    this.subs.push(subMovs);
 
-    this.utilsSVC.cambios$.subscribe(movs => {
-      this.movimientosCambios = movs.sort((a, b) =>
-        new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
-      );
+    const subCambios = this.utilsSVC.cambios$.subscribe(movs => {
+      this.movimientosCambios = movs;
+      this.recalcUltimosMov();
     });
-
-    this.obtenerMovimientosCuenta();
-    this.obtenerMovimientosCambios();
+    this.subs.push(subCambios);
   }
 
-  get ultimosMovimientos(): MovimientoItem[] {
+  obtenerDatosUsuario(user: User) {
+    this.nombreUser = user.name;
+    this.saldo_bco = user?.saldo_banco || 0;
+    this.saldo_efe = user?.saldo_efectivo || 0;
+    this.saldo_total = this.saldo_bco + this.saldo_efe;
+    this.usuarioLogeado = true;
+    this.mostrarSaldos = user.censurar_montos;
+
+    if (!this.movimientosCuenta.length) {
+      this.obtenerMovimientosCuenta();
+    }
+    if (!this.movimientosCambios.length) {
+      this.obtenerMovimientosCambios();
+    }
+  }
+
+  private recalcUltimosMov() {
     const items: MovimientoItem[] = [];
 
     for (const m of this.movimientosCuenta) {
       const fecha = new Date(m.fecha);
+      const montoStr = this.formatARS(m.importe);
+      const esGasto = m.genero === 'gasto';
       items.push({
-        tipoMov: m.genero === 'gasto' ? 'gasto' : 'ingreso',
+        tipoMov: esGasto ? 'gasto' : 'ingreso',
         concepto: m.rubro || m.detalle || '',
-        importe: m.genero === 'gasto'
-          ? `- $${Number(m.importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`
-          : `+ $${Number(m.importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
+        importe: esGasto ? `- ${montoStr}` : `+ ${montoStr}`,
         fecha: fecha.toLocaleDateString('es-AR', { day: '2-digit', month: 'short' }),
         icono: m.tipo === 'Efectivo' ? 'cash-outline' : 'card-outline',
         rawFecha: fecha
@@ -104,46 +118,87 @@ export class HomePage implements OnInit, OnDestroy {
       items.push({
         tipoMov: 'cambio',
         concepto: c.desde === 'efectivo' ? 'Depósito a banco' : 'Retiro de efectivo',
-        importe: `$${c.importe.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
+        importe: this.formatARS(c.importe),
         fecha: fecha.toLocaleDateString('es-AR', { day: '2-digit', month: 'short' }),
         icono: 'swap-horizontal-outline',
         rawFecha: fecha
       });
     }
 
-    return items
+    this.ultimosMovimientos = items
       .sort((a, b) => b.rawFecha.getTime() - a.rawFecha.getTime())
-      .slice(0, 6);
+      .slice(0, 5);
   }
 
-  obtenerDatosUsuario(user: User) {
-    this.nombreUser = user.name;
-    this.saldo_bco = user?.saldo_banco || 0;
-    this.saldo_efe = user?.saldo_efectivo || 0;
-    this.saldo_total = this.saldo_bco + this.saldo_efe;
-    this.usuarioLogeado = true;
-    this.mostrarSaldos = user.censurar_montos;
-    this.obtenerMovimientosCuenta();
-    this.obtenerMovimientosCambios();
+  // Formatea un importe a moneda AR: separador de miles con "." y decimal con ",".
+  // Acepta number, string numérico ("10883"), o string enmascarado AR ("10.883,00").
+  private formatARS(value: number | string): string {
+    const n = this.parseARS(value);
+    const [enteroRaw, decimalRaw] = Math.abs(n).toFixed(2).split('.');
+    const entero = enteroRaw.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    const signo = n < 0 ? '-' : '';
+    return `${signo}$${entero},${decimalRaw}`;
+  }
+
+  // Convierte cualquier entrada a number. Datos guardados con maskito AR:
+  // "10.883,00" (con decimal), "10.883" (entero, el "." es separador de miles),
+  // "10883" (sin formato), o number. También tolera EN ("10,883.00").
+  private parseARS(value: number | string): number {
+    if (value == null) return 0;
+    if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+    let s = String(value).trim().replace(/[^0-9.,-]/g, '');
+    if (!s) return 0;
+    const hasComma = s.includes(',');
+    const hasDot = s.includes('.');
+
+    if (hasComma && hasDot) {
+      // Si "," está después de "." → AR: "." miles, "," decimal.
+      if (s.lastIndexOf(',') > s.lastIndexOf('.')) {
+        return Number(s.replace(/\./g, '').replace(',', '.'));
+      }
+      // EN: "," miles, "." decimal.
+      return Number(s.replace(/,/g, ''));
+    }
+    if (hasDot) {
+      // Solo "." sin ",": en contexto AR puede ser miles ("10.883") o decimal ("10.5").
+      const dots = s.split('.');
+      if (dots.length > 2) {
+        // Varios "." → miles. "1.000.000"
+        return Number(s.replace(/\./g, ''));
+      }
+      // Un solo ".": si la parte decimal tiene 3 dígitos → miles. Si 1-2 → decimal.
+      const decPart = dots[1] || '';
+      if (decPart.length === 3) {
+        return Number(s.replace('.', ''));
+      }
+      return Number(s);
+    }
+    if (hasComma) {
+      // Solo "," sin ".": en AR es decimal ("10883,00").
+      return Number(s.replace(',', '.'));
+    }
+    return Number(s);
   }
 
   obtenerMovimientosCuenta() {
     const path = `users/${this.user.uid}/movimientos`;
-    this.firebaseSVC.getCollectionData(path).subscribe({
+    const sub = this.firebaseSVC.getCollectionData(path).subscribe({
       next: (res: Movimiento[]) => this.utilsSVC.setMovimientos(res),
       error: err => console.error('Error obteniendo movimientos', err)
     });
+    this.subs.push(sub);
   }
 
   obtenerMovimientosCambios() {
     const path = `users/${this.user.uid}/cambios`;
-    this.firebaseSVC.getCollectionData(path).subscribe({
+    const sub = this.firebaseSVC.getCollectionData(path).subscribe({
       next: (res: Cambio[]) => this.utilsSVC.setCambios(res),
       error: err => console.error('Error obteniendo cambios', err)
     });
+    this.subs.push(sub);
   }
 
   ngOnDestroy() {
-    this.subscripcionUser?.unsubscribe();
+    this.subs.forEach(s => s?.unsubscribe());
   }
 }

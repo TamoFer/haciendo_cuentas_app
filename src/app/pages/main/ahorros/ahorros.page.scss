@@ -1,0 +1,72 @@
+.ahorros-grid {
+  display: flex;
+  flex-direction: column;
+  max-width: var(--app-content-max, 1200px);
+  margin: 0 auto;
+  padding: 8px;
+}
+
+.ahorro-slide {
+  margin: 0;
+}
+
+.ahorro-item {
+  --background: var(--app-surface);
+  --border-color: var(--app-border);
+}
+
+.ahorro-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+  padding: 8px 4px;
+  font-size: 0.92rem;
+  color: var(--app-text);
+
+  .ahorro-fecha {
+    font-weight: var(--app-font-weight-semibold, 600);
+    width: 22%;
+  }
+
+  .ahorro-detalle {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ahorro-importe {
+    color: var(--ion-color-success);
+    font-weight: var(--app-font-weight-bold, 700);
+    white-space: nowrap;
+  }
+
+  .ahorro-icono {
+    width: 1.6rem;
+    height: 1.6rem;
+    flex-shrink: 0;
+  }
+}
+
+/* El componente add-updt-delete-ahorros también inyecta contenido; sin reglas extra */
+
+@media (min-width: 768px) {
+  .ahorros-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .ahorro-slide {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-md);
+    box-shadow: var(--app-shadow-sm);
+    overflow: hidden;
+  }
+}

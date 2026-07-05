@@ -1,4 +1,4 @@
-.simulador-container { padding: 0; background: var(--ion-color-light); }
+.simulador-container { padding: 0; background: var(--ion-color-light); max-width: var(--app-content-max, 1200px); margin: 0 auto; }
 
 .input-section {
   padding: 16px;
@@ -396,3 +396,31 @@
 ion-list { background: transparent; }
 ion-item { --border-color: transparent; }
 ion-button { --padding-start: 12px; --padding-end: 12px; min-height: 36px; }
+
+/* ─── Desktop responsive ─────────────────────────── */
+@media (min-width: 1024px) {
+  .input-section,
+  .summary-section,
+  .gastos-section,
+  .proyecciones-section {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .gastos-section .section-header,
+  .proyecciones-section .section-header {
+    cursor: default;
+  }
+
+  .gastos-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 8px;
+  }
+
+  .proyecciones-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 8px;
+  }
+}

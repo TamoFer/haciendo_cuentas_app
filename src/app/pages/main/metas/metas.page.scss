@@ -1,8 +1,87 @@
 .spinner-container {
-    height: 70vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.metas-grid {
+  max-width: var(--app-content-max, 1200px);
+  margin: 0 auto;
+  padding: 8px;
+}
+
+.meta-slide {
+  margin: 8px 0;
+}
+
+.meta-item {
+  --background: transparent;
+  --border-color: transparent;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+}
+
+.meta-card {
+  width: 100%;
+  margin: 0;
+  box-shadow: var(--app-shadow-sm);
+}
+
+.meta-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.meta-avatar {
+  margin: 1rem;
+
+  ion-avatar {
+    width: 4rem;
+    height: 4rem;
+  }
+}
+
+.meta-progreso {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+
+  ion-progress-bar {
+    flex: 1;
+  }
+
+  .meta-trofeo {
+    font-size: 1.4rem;
+    color: var(--ion-color-warning);
+  }
+}
+
+.meta-valores {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.5rem;
+  gap: 4px;
+}
+
+@media (min-width: 768px) {
+  .metas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .meta-slide {
+    margin: 0;
+  }
+
+  .meta-card {
+    height: 100%;
+  }
 }

@@ -46,6 +46,10 @@ const routes: Routes = [
     path: 'ahorros',
     loadChildren: () => import('./pages/main/ahorros/ahorros.module').then(m => m.AhorrosPageModule), canActivate: [AuthGuard]
   },
+  {
+    path: 'intercambio',
+    loadComponent: () => import('./pages/main/intercambio/cambio-divisa.component').then(m => m.CambioDivisaComponent), canActivate: [AuthGuard]
+  },
 
   {
     path: 'simulador',

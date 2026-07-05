@@ -2,7 +2,34 @@
 // For information on how to create your own theme, please see:
 // http://ionicframework.com/docs/theming/
 
+// Forzamos el tema light: cualquier preferencia del sistema se sobreescribe.
 :root {
+  color-scheme: light;
+  supported-color-schemes: light;
+
+  // ── Tokens minimalistas compartidos ───────────────────────
+  --app-surface: #ffffff;
+  --app-surface-muted: #f7f8fa;
+  --app-border: #eceef1;
+  --app-border-strong: #e0e3e8;
+  --app-text: #1a1d21;
+  --app-text-muted: #6b7280;
+  --app-radius-sm: 8px;
+  --app-radius-md: 12px;
+  --app-radius-lg: 16px;
+  --app-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --app-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --app-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.06);
+
+  /* Breakpoints responsive (referencia, se usan en media-queries) */
+  --app-breakpoint-md: 768px;
+  --app-breakpoint-lg: 1024px;
+  --app-content-max: 1200px;
+  --app-sidenav-width: 220px;
+  --app-sidenav-width-collapsed: 64px;
+  --app-gap-md: 20px;
+  --app-gap-lg: 28px;
+
   --ion-color-primary: #0066cc;
   --ion-color-primary-rgb: 0, 102, 204;
   --ion-color-primary-contrast: #ffffff;
@@ -66,15 +93,30 @@
   --ion-text-color-rgb: 0, 0, 0;
 
   --ion-toolbar-background: #ffffff;
-  --ion-toolbar-border-color: #e0e0e0;
+  --ion-toolbar-color: var(--app-text);
+  --ion-toolbar-border-color: var(--app-border);
 
   --ion-item-background: #ffffff;
-  --ion-item-border-color: #e0e0e0;
+  --ion-item-background-rgb: 255, 255, 255;
+  --ion-item-border-color: var(--app-border);
+  --ion-item-color: var(--app-text);
 
   --ion-card-background: #ffffff;
-  --ion-card-border-radius: 12px;
+  --ion-card-color: var(--app-text);
+  --ion-card-border-radius: var(--app-radius-md);
 
   --ion-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-
+// Bloquea light incluso si el SO pide dark.
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ion-background-color: #ffffff;
+    --ion-background-color-rgb: 255, 255, 255;
+    --ion-text-color: #000000;
+    --ion-text-color-rgb: 0, 0, 0;
+    --ion-toolbar-background: #ffffff;
+    --ion-item-background: #ffffff;
+    --ion-card-background: #ffffff;
+  }
+}

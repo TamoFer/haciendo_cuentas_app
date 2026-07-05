@@ -7,13 +7,11 @@
 
 // ─── Cotizaciones ───────────────────────────────
 .cotizaciones-card {
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 16px;
+  background: var(--app-surface);
+  border-radius: var(--app-radius-lg);
   padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow-md);
 }
 
 .cotizaciones-header {
@@ -81,13 +79,11 @@
 
 // ─── Intercambio ──────────────────────────────
 .intercambio-card {
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 16px;
+  background: var(--app-surface);
+  border-radius: var(--app-radius-lg);
   padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow-md);
 }
 
 .intercambio-header {

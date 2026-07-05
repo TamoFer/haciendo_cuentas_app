@@ -1,186 +1,140 @@
-<app-header title="Gastos" [mostrarVolver]="usuarioLogeado" [routerLink]="['/home']"></app-header>
+<app-header title="Gastos"></app-header>
+
 <ion-content>
+  <div class="page-container">
 
-  <form [formGroup]="formulario">
-
-    <div class="filtros">
-      <!-- BUSQUEDA POR FECHAS -->
-      <div id="filtro-fechas">
-        <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorFecha = !busquedaPorFecha">Buscar
-          por
-          fecha
-        </ion-checkbox>
-        <ion-list *ngIf="busquedaPorFecha">
-          <ion-checkbox labelPlacement="end" justify="start" style="margin-left: 1rem;margin-top: 1rem;"
-            formControlName="hoy">
-            Hoy</ion-checkbox>
-          <div class="filtros-fecha">
-            <ion-checkbox labelPlacement="end" justify="start" style="margin-left: 1rem;margin-top: 1rem;"
-              (click)="busquedaPorFechas = !busquedaPorFechas"> Rango de
-              fechas</ion-checkbox>
-            <ion-item *ngIf="busquedaPorFechas" style="margin-left: 1rem;">
-              <ion-label style="font-weight: bold;">Desde</ion-label>
-              <ion-input type="date" formControlName="desde"></ion-input>
-            </ion-item>
-            <ion-item *ngIf="busquedaPorFechas" style="margin-left: 1rem;">
-              <ion-label style="font-weight: bold;">Hasta</ion-label>
-              <ion-input type="date" formControlName="hasta"></ion-input>
-            </ion-item>
-          </div>
-        </ion-list>
+    <!-- Sección filtros -->
+    <div class="filtros-card">
+      <div class="card-header">
+        <ion-icon name="filter-outline"></ion-icon>
+        <span>Filtros</span>
       </div>
 
-      <!-- BUSQUEDA POR RUBRO -->
-      <div id="filtro-rubro">
-        <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorRubro = !busquedaPorRubro">Buscar
-          por rubro
-        </ion-checkbox>
-
-        <ion-radio-group *ngIf="busquedaPorRubro" formControlName="rubro">
-          <div class="opciones-rubro">
-            <div>
-              <div class="opcion">
-                <ion-icon slot="start" name="cart-outline"
-                  style="font-size: 1.3rem; margin-right: 0.5rem;"></ion-icon><ion-radio value="compra">
-                  Compras</ion-radio>
-              </div>
-              <div class="opcion">
-                <ion-icon slot="start" name="gift-outline"
-                  style="font-size: 1.3rem; margin-right: 0.5rem;"></ion-icon><ion-radio
-                  value="regalo">Regalos</ion-radio>
-              </div>
-              <div class="opcion">
-                <ion-icon slot="start" name="receipt-outline"
-                  style="font-size: 1.3rem; margin-right: 0.5rem;"></ion-icon><ion-radio
-                  value="deudas">Deudas</ion-radio>
+      <form [formGroup]="formulario" class="filtros-form">
+        <div class="filtro-bloque">
+          <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorFecha = !busquedaPorFecha">Buscar por fecha</ion-checkbox>
+          <div class="subfiltro" *ngIf="busquedaPorFecha">
+            <ion-checkbox labelPlacement="end" justify="start" class="sub-item" formControlName="hoy">Hoy</ion-checkbox>
+            <div class="filtros-fecha">
+              <ion-checkbox labelPlacement="end" justify="start" class="sub-item" (click)="busquedaPorFechas = !busquedaPorFechas">Rango de fechas</ion-checkbox>
+              <div class="fecha-row" *ngIf="busquedaPorFechas">
+                <ion-item class="fecha-item">
+                  <ion-label position="stacked">Desde</ion-label>
+                  <ion-input type="date" formControlName="desde"></ion-input>
+                </ion-item>
+                <ion-item class="fecha-item">
+                  <ion-label position="stacked">Hasta</ion-label>
+                  <ion-input type="date" formControlName="hasta"></ion-input>
+                </ion-item>
               </div>
             </div>
           </div>
-          <div>
-            <div class="opcion">
-              <ion-icon slot="start" name="globe-outline" style="font-size: 1.3rem; margin-right: 0.5rem;"></ion-icon>
-              <ion-radio value="servicios">Servicios</ion-radio>
+        </div>
+
+        <div class="filtro-bloque">
+          <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorRubro = !busquedaPorRubro">Buscar por rubro</ion-checkbox>
+          <ion-radio-group *ngIf="busquedaPorRubro" formControlName="rubro" class="radio-group">
+            <div class="opciones-rubro">
+              <div class="opcion">
+                <ion-icon name="cart-outline"></ion-icon>
+                <ion-radio value="compra" labelPlacement="end">Compras</ion-radio>
+              </div>
+              <div class="opcion">
+                <ion-icon name="gift-outline"></ion-icon>
+                <ion-radio value="regalo" labelPlacement="end">Regalos</ion-radio>
+              </div>
+              <div class="opcion">
+                <ion-icon name="receipt-outline"></ion-icon>
+                <ion-radio value="deudas" labelPlacement="end">Deudas</ion-radio>
+              </div>
+              <div class="opcion">
+                <ion-icon name="globe-outline"></ion-icon>
+                <ion-radio value="servicios" labelPlacement="end">Servicios</ion-radio>
+              </div>
             </div>
-          </div>
-        </ion-radio-group>
-      </div>
+          </ion-radio-group>
+        </div>
 
-      <!-- BUSQUEDA POR DETALLE -->
-      <div id="filtro-detalle">
-        <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorDetalle = !busquedaPorDetalle">Buscar
-          por detalle
-        </ion-checkbox>
-        <ion-list *ngIf="busquedaPorDetalle">
-          <div class="filtros-especificos">
-            <ion-item>
-              <ion-label>Detalle</ion-label>
-              <ion-input formControlName="detalle"></ion-input>
-            </ion-item>
-          </div>
-        </ion-list>
-      </div>
+        <div class="filtro-bloque">
+          <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorDetalle = !busquedaPorDetalle">Buscar por detalle</ion-checkbox>
+          <ion-item *ngIf="busquedaPorDetalle" class="detalle-item">
+            <ion-input formControlName="detalle" placeholder="Escribe el detalle"></ion-input>
+          </ion-item>
+        </div>
 
-      <!-- BUSQUEDA POR FECHAS -->
-      <div id="filtro-dias">
-        <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorDias = !busquedaPorDias">Ver
-          gastos de los
-          ultimos ...
-        </ion-checkbox>
+        <div class="filtro-bloque">
+          <ion-checkbox labelPlacement="end" justify="start" (click)="busquedaPorDias = !busquedaPorDias">Últimos días</ion-checkbox>
+          <ion-radio-group *ngIf="busquedaPorDias" formControlName="dias" class="radio-group radio-dias">
+            <ion-radio value="8" labelPlacement="end">7 días</ion-radio>
+            <ion-radio value="16" labelPlacement="end">15 días</ion-radio>
+            <ion-radio value="31" labelPlacement="end">30 días</ion-radio>
+          </ion-radio-group>
+        </div>
+      </form>
 
-        <ion-radio-group *ngIf="busquedaPorDias" formControlName="dias">
-          <ion-radio value="8" style="font-weight: bold; width: fit-content;" labelPlacement="end">7
-            dias</ion-radio>
-          <ion-radio value="16" style="font-weight: bold; width: fit-content;" labelPlacement="end">15
-            dias</ion-radio>
-          <ion-radio value="31" style="font-weight: bold; width: fit-content;" labelPlacement="end">30
-            dias</ion-radio>
-        </ion-radio-group>
+      <div class="botones-filtros">
+        <ion-button expand="block" fill="outline" (click)="filtrarDatos(formulario)">
+          <ion-icon slot="start" name="search-outline"></ion-icon>Filtrar
+        </ion-button>
+        <ion-button expand="block" fill="clear" color="medium" (click)="limpiarFiltros()">
+          <ion-icon slot="start" name="close-outline"></ion-icon>Limpiar
+        </ion-button>
       </div>
     </div>
 
-  </form>
+    <!-- Lista -->
+    <div class="lista-section" *ngIf="movimientosFiltrados.length > 0">
+      <div class="section-header gastos">
+        <div class="section-title">
+          <ion-icon name="receipt-outline"></ion-icon>
+          <span>Movimientos</span>
+          <span class="contador">{{ movimientosFiltrados.length }}</span>
+        </div>
+      </div>
 
-  <div class="botones-filtros">
-    <ion-button (click)=" filtrarDatos(formulario)">Filtrar</ion-button>
-    <ion-button (click)=" limpiarFiltros()">Limpiar
-      filtros</ion-button>
+      <ion-list class="movimientos-list">
+        <ion-item-sliding *ngFor="let mov of movimientosFiltrados" class="mov-slide">
+          <ion-item class="mov-item" (click)="agregarGastos(mov)">
+            <div slot="start" class="mov-icon">
+              <ion-icon name="arrow-down-circle-outline"></ion-icon>
+            </div>
+            <ion-label>
+              <h3>{{ mov.detalle | uppercase }}</h3>
+              <p>
+                <ion-icon name="calendar-outline"></ion-icon>
+                {{ mov.fecha | date:'dd/MM/yyyy' }}
+                <span class="rubro-tag" *ngIf="mov.rubro">{{ mov.rubro }}</span>
+              </p>
+            </ion-label>
+            <ion-note slot="end" class="mov-monto">$ {{ mov.importe }}</ion-note>
+          </ion-item>
+          <ion-item-options side="end">
+            <ion-item-option (click)="agregarGastos(mov)">
+              <ion-icon name="create-outline"></ion-icon>
+            </ion-item-option>
+            <ion-item-option color="danger" (click)="confirmarDelete(mov)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      </ion-list>
+
+      <div class="total-bar gastos">
+        <span>Total</span>
+        <span class="total-monto">{{ totalGastos | currency:'ARS':'symbol':'1.2-2':'es-AR' }}</span>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="!movimientosFiltrados.length">
+      <ion-icon name="receipt-outline"></ion-icon>
+      <p>No hay gastos para mostrar. Usá los filtros para buscar.</p>
+    </div>
+
   </div>
 
-  <!-- ROTULO ORDEN MOVIMIENTOS GASTOS -->
-  <!-- BARRA CABECERA -->
-  <ion-list style="margin-top: 1rem;margin-bottom: 1rem;">
-
-    <ion-chip *ngIf="movimientosFiltrados.length!=0"
-      style="width: 100%; display: flex; flex-direction: row; justify-content: space-between; font-weight: bold;">
-      <ion-label style="display: flex; flex-direction: row;"><ion-icon name="calendar-number-outline" color="dark"
-          style="margin-right: 5px;"></ion-icon>FECHA</ion-label>
-      <ion-label style="display: flex; flex-direction: row;"><ion-icon name="reader-outline" color="dark"
-          style="margin-right: 5px;"></ion-icon>DETALLE</ion-label>
-      <ion-label style="display: flex; flex-direction: row;"><ion-icon name="logo-usd" color="dark"
-          style="margin-right: 5px;"></ion-icon>IMP</ion-label>
-      <ion-label style="display: flex; flex-direction: row;"></ion-label>
-    </ion-chip>
-    <!-- COMO SALEN DETALLADOS LOS MOVIMIENTOS  -->
-
-    <ion-item-sliding *ngFor="let mov of movimientosFiltrados" style="margin: 0px;">
-      <ion-item>
-        <ion-chip
-          style="width: 100%; display: flex; flex-direction: row; justify-content: space-between; background-color: #e74c3c ; font-weight: bold;"
-          color="success">
-          <div style="display: flex; flex-direction: row; width: 20%;">
-            <ion-label color="dark">{{ mov.fecha | date:'dd/MM' }}</ion-label>
-          </div>
-          <div style="display: flex; flex-direction: row; width: 50%;">
-            <ion-label color="dark">{{ mov.detalle | uppercase | slice:0:15 }}</ion-label>
-          </div>
-          <div style="display: flex; flex-direction: row; width: 30%;">
-            <ion-label color="dark">$ {{ mov.importe }}</ion-label>
-          </div>
-
-        </ion-chip>
-      </ion-item>
-
-      <ion-item-options>
-        <ion-item-option color="#FFFFF">
-          <ion-chip color="#F0EBEB">
-            <ion-icon name="create-outline" color="dark" style="font-weight: 800; font-size: 1.5rem;"
-              (click)="agregarGastos(mov)"></ion-icon>
-          </ion-chip>
-        </ion-item-option>
-        <ion-item-option color="#FFFFF">
-          <ion-chip color="#FFFFF">
-            <ion-icon name="trash-outline" color="danger" style="font-weight: 800; font-size: 1.5rem;"
-              (click)="confirmarDelete(mov)"></ion-icon>
-          </ion-chip>
-        </ion-item-option>
-      </ion-item-options>
-
-    </ion-item-sliding>
-
-    <!-- CHIP FINAL CON TOTAL DE LOS GATOS FILTRADOS  -->
-    <ion-label *ngIf="movimientosFiltrados && movimientosFiltrados.length > 0">
-      <ion-chip *ngIf="movimientosFiltrados.length!=0"
-        style="width: 100%; display: flex; flex-direction: row; justify-content: space-between; margin-top: 10px; font-weight: bold;">
-        <ion-label style="display: flex; flex-direction: row;">
-
-        </ion-label>
-        <ion-label style="display: flex; flex-direction: row; ">
-          TOTAL
-        </ion-label>
-        <ion-label style="display: flex; flex-direction: row; ">
-          {{totalGastos | currency:'ARS':'symbol':'1.2-2':'es-AR' }}
-        </ion-label>
-        <ion-label style="display: flex; flex-direction: row;"></ion-label>
-
-
-      </ion-chip>
-    </ion-label>
-
-  </ion-list>
-
-  <button class="fab-glass" (click)="agregarGastos()">
+  <button class="fab" (click)="agregarGastos()">
     <ion-icon name="add-outline"></ion-icon>
   </button>
-
 </ion-content>
 <app-footer></app-footer>

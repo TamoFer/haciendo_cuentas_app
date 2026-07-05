@@ -17,22 +17,14 @@ ion-button {
   text-transform: none;
 }
 
-// ion-header {
-//   margin-top: 2.5rem;
-// }
 
-// ion-footer {
-//   margin-bottom: 3rem;
-// }
 
 ion-modal::part(content) {
-  --background: black;
-  /* color que combine con tu app */
+  --background: #ffffff;
 }
 
 ion-app {
-  background-color: black;
-  /* mismo color que el modal */
+  background-color: #ffffff;
 }
 
 // SweetAlert2 custom styles
@@ -68,5 +60,21 @@ ion-app {
 // Bottom safe area for Android navigation bar (home, back, multitask)
 ion-content {
   --padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+/* Offset del sidenav en desktop: el sidebar es fixed en left:0.
+   Empujamos el contenido visible a la derecha usando CSS vars de Ionic. */
+@media (min-width: 1024px) {
+  /* Toolbar del header: padding inicial = ancho sidebar colapsado + extra */
+  ion-header ion-toolbar {
+    --padding-start: calc(var(--app-sidenav-width-collapsed, 64px) + 16px);
+  }
+
+  /* Contenido: padding inicial para que nada quede debajo del sidebar.
+     Incluye ion-content con fullscreen (simulador). */
+  ion-content,
+  ion-content[fullscreen] {
+    --padding-start: calc(var(--app-sidenav-width-collapsed, 64px) + 24px);
+  }
 }
 

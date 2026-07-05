@@ -61,9 +61,12 @@ export class UtilsService {
     return this.movimientosSubject.getValue();
   }
 
-  // ✅ Establecer movimientos
+  // ✅ Establecer movimientos (ordenados por fecha desc, una sola vez)
   setMovimientos(movimientos: Movimiento[]) {
-    this.movimientosSubject.next(movimientos);
+    const ordenados = [...movimientos].sort(
+      (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+    );
+    this.movimientosSubject.next(ordenados);
   }
 
   // ✅ Agregar movimiento (opcional helper)
@@ -315,9 +318,12 @@ export class UtilsService {
     return this.cambiosSubject.getValue();
   }
 
-  // ✅ Establecer cambio
+  // ✅ Establecer cambio (ordenados por fecha desc, una sola vez)
   setCambios(cambios: Cambio[]) {
-    this.cambiosSubject.next(cambios);
+    const ordenados = [...cambios].sort(
+      (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+    );
+    this.cambiosSubject.next(ordenados);
   }
   // ✅ Agregar cambio (opcional helper)
   agregarCambios(nuevo: Cambio) {

@@ -1,6 +1,6 @@
 import { NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { ActionSheetController, IonicModule } from '@ionic/angular';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { User } from 'src/app/models/user.model';
@@ -20,12 +20,16 @@ export class HeaderComponent implements OnInit {
 
   utilsSVC = inject(UtilsService);
   firebaseSVC = inject(FirebaseService);
+  private actionSheetCtrl = inject(ActionSheetController);
 
   dropdownOpen = false;
   user: User | null = null;
+  cerrandoSesion = false;
 
   ngOnInit() {
-    this.user = this.utilsSVC.obtenerDatosLS('user');
+    this.utilsSVC.user$.subscribe(user => {
+      this.user = user;
+    });
   }
 
   get iniciales(): string {
@@ -50,20 +54,32 @@ export class HeaderComponent implements OnInit {
   }
 
   async salir() {
+    if (this.cerrandoSesion) return;
+    this.cerrandoSesion = true;
     this.cerrarDropdown();
-    const alert = await this.utilsSVC.alertasCtrl.create({
+
+    const actionSheet = await this.actionSheetCtrl.create({
       header: 'Cerrar sesión',
-      message: '¿Estás seguro que deseas salir?',
+      subHeader: '¿Estás seguro que deseas salir?',
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Salir',
           role: 'destructive',
-          handler: () => this.firebaseSVC.signOut()
+          data: { action: 'logout' }
+        },
+        {
+          text: 'Cancelar',
+          role: 'cancel'
         }
       ]
     });
-    await alert.present();
+    await actionSheet.present();
+
+    const { data } = await actionSheet.onDidDismiss();
+    this.cerrandoSesion = false;
+    if (data?.action === 'logout') {
+      this.firebaseSVC.signOut();
+    }
   }
 
   volver() {

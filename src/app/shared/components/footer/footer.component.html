@@ -1,3 +1,26 @@
+<aside class="app-sidenav" aria-label="Navegación">
+  <a class="sidenav-item" [routerLink]="['/home']" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" title="Inicio">
+    <ion-icon name="home-outline"></ion-icon>
+    <span>Inicio</span>
+  </a>
+  <a class="sidenav-item" [routerLink]="['/gastos']" routerLinkActive="active" title="Gastos">
+    <ion-icon name="receipt-outline"></ion-icon>
+    <span>Gastos</span>
+  </a>
+  <a class="sidenav-item" [routerLink]="['/ingresos']" routerLinkActive="active" title="Ingresos">
+    <ion-icon name="trending-up-outline"></ion-icon>
+    <span>Ingresos</span>
+  </a>
+  <a class="sidenav-item" [routerLink]="['/intercambio']" routerLinkActive="active" title="Cambio de divisa">
+    <ion-icon name="swap-horizontal-outline"></ion-icon>
+    <span>Cambio</span>
+  </a>
+  <a class="sidenav-item" [routerLink]="['/simulador']" routerLinkActive="active" title="Simulador financiero">
+    <ion-icon name="calendar-number-outline"></ion-icon>
+    <span>Simulador</span>
+  </a>
+</aside>
+
 <div class="nav-float">
   <a class="nav-item" [routerLink]="['/home']" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
     <ion-icon name="home-outline"></ion-icon>
@@ -8,7 +31,7 @@
   <a class="nav-item" [routerLink]="['/ingresos']" routerLinkActive="active">
     <ion-icon name="trending-up-outline"></ion-icon>
   </a>
-  <a class="nav-item" (click)="abrirIntercambio()">
+  <a class="nav-item" [routerLink]="['/intercambio']" routerLinkActive="active">
     <ion-icon name="swap-horizontal-outline"></ion-icon>
   </a>
   <a class="nav-item" [routerLink]="['/simulador']" routerLinkActive="active">

@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
+import { RouterLink } from '@angular/router';
 import { UtilsService } from 'src/app/services/utils.service';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
+import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 import { MaskitoElementPredicate } from '@maskito/core';
 import { MaskitoDirective } from '@maskito/angular';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -17,7 +19,7 @@ import { NgIf, NgFor } from '@angular/common';
   selector: 'app-cambio-divisa',
   templateUrl: './cambio-divisa.component.html',
   styleUrls: ['./cambio-divisa.component.scss'],
-  imports: [IonicModule, HeaderComponent, CommonModule, MaskitoDirective, ReactiveFormsModule, FormsModule, NgIf, NgFor]
+  imports: [IonicModule, HeaderComponent, FooterComponent, RouterLink, CommonModule, MaskitoDirective, ReactiveFormsModule, FormsModule, NgIf, NgFor]
 })
 export class CambioDivisaComponent implements OnInit {
 
@@ -25,7 +27,7 @@ export class CambioDivisaComponent implements OnInit {
   utilsSVC = inject(UtilsService);
   cotizacionSvc = inject(CotizacionService);
 
-  mostrarBack: boolean = true;
+  usuarioLogeado: boolean = false;
   user = {} as User;
   opcionSeleccionada: string = '';
 
@@ -39,6 +41,7 @@ export class CambioDivisaComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.utilsSVC.obtenerDatosLS('user');
+    this.usuarioLogeado = !!this.user;
     this.cargarCotizaciones();
   }
 
@@ -173,7 +176,7 @@ export class CambioDivisaComponent implements OnInit {
     });
   }
 
-  cerrarModal() {
-    this.utilsSVC.dismissModal();
+  volverHome() {
+    this.utilsSVC.routerLink('/home');
   }
 }
