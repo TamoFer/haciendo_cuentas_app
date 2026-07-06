@@ -9,6 +9,8 @@ export interface GastoSimulador {
   cantidadCuotas?: number;
   detalles?: string;
   fechaCreacion: Date;
+  pagado?: boolean;
+  mesPagado?: string;
 }
 
 export interface GastoConCuota extends GastoSimulador {

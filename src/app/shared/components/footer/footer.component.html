@@ -19,6 +19,10 @@
     <ion-icon name="calendar-number-outline"></ion-icon>
     <span>Simulador</span>
   </a>
+  <a class="sidenav-item" [routerLink]="['/pagos']" routerLinkActive="active" title="Pagos del mes">
+    <ion-icon name="checkmark-done-outline"></ion-icon>
+    <span>Pagos</span>
+  </a>
 </aside>
 
 <div class="nav-float">
@@ -36,5 +40,8 @@
   </a>
   <a class="nav-item" [routerLink]="['/simulador']" routerLinkActive="active">
     <ion-icon name="calendar-number-outline"></ion-icon>
+  </a>
+  <a class="nav-item" [routerLink]="['/pagos']" routerLinkActive="active">
+    <ion-icon name="checkmark-done-outline"></ion-icon>
   </a>
 </div>

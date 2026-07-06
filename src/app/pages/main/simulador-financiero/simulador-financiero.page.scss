@@ -251,45 +251,70 @@
 
   .gastos-list { background: transparent; padding: 0; margin: 0 16px; &.IOS ion-item { --inner-padding-end: 0; } }
 
+  .gasto-slide {
+    margin-bottom: 2px;
+  }
+
   .gasto-item {
     --background: var(--ion-color-white);
     --padding-start: 0;
     --padding-end: 0;
-    --inner-padding-end: 16px;
-    margin-bottom: 2px;
+    --inner-padding-end: 0;
     border-radius: 10px;
     min-height: 60px;
+    overflow: hidden;
+  }
 
-    .gasto-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 12px;
+  .gasto-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
 
-      ion-icon { font-size: 1.2rem; color: white; }
-      &.fijo { background: var(--ion-color-primary); }
-      &.proy { background: var(--ion-color-warning); }
-    }
+  .gasto-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 
-    ion-label {
-      h3 { font-size: 0.95rem; font-weight: 600; color: var(--ion-color-dark); margin-bottom: 2px; }
-      p { font-size: 0.8rem; color: var(--ion-color-medium); display: flex; align-items: center; gap: 6px; }
-    }
+    ion-icon { font-size: 1.2rem; color: white; }
+    &.fijo { background: var(--ion-color-primary); }
+    &.proy { background: var(--ion-color-warning); }
+  }
 
-    .gasto-monto { font-size: 1rem; font-weight: 700; color: var(--ion-color-danger); }
+  .gasto-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 
-    .cuota-badge {
-      background: var(--ion-color-warning);
-      color: white;
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: none;
-    }
+    h3 { font-size: 0.95rem; font-weight: 600; color: var(--ion-color-dark); margin: 0; }
+    p { font-size: 0.8rem; color: var(--ion-color-medium); display: flex; align-items: center; gap: 6px; margin: 0; }
+  }
+
+  .gasto-monto {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ion-color-danger);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .cuota-badge {
+    background: var(--ion-color-warning);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: none;
   }
 
   .total-bar {

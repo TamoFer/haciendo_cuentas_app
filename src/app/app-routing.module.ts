@@ -56,6 +56,10 @@ const routes: Routes = [
     loadChildren: () => import('./pages/main/simulador-financiero/simulador-financiero.module').then(m => m.SimuladorFinancieroModule), canActivate: [AuthGuard]
   },
   {
+    path: 'pagos',
+    loadComponent: () => import('./pages/main/pagos/pagos.page').then(m => m.PagosPage), canActivate: [AuthGuard]
+  },
+  {
     path: 'meses',
     loadChildren: () => import('./pages/main/meses/meses.module').then(m => m.MesesModule)
   }

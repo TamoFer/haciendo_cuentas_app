@@ -1,0 +1,257 @@
+/* ── Pagos del mes ── */
+.page-container {
+  max-width: var(--app-content-max, 1200px);
+  margin: 0 auto;
+  padding: 16px;
+  padding-bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ─── Banner del mes ─────────────────────────────── */
+.mes-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-shade) 100%);
+  border-radius: var(--app-radius-md);
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: capitalize;
+
+  ion-icon {
+    font-size: 1.3rem;
+  }
+}
+
+/* ─── Sección ───────────────────────────────────── */
+.pago-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-radius: var(--app-radius-md);
+  cursor: pointer;
+  user-select: none;
+  transition: filter 0.15s ease;
+
+  &:active {
+    filter: brightness(0.95);
+  }
+
+  &.mensuales {
+    background: linear-gradient(135deg, var(--ion-color-danger) 0%, var(--ion-color-danger-shade) 100%);
+  }
+
+  &.cuotas {
+    background: linear-gradient(135deg, var(--ion-color-warning) 0%, var(--ion-color-warning-shade) 100%);
+  }
+
+  .section-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+
+    ion-icon {
+      font-size: 1.25rem;
+      color: white;
+    }
+
+    span {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .contador {
+      background: rgba(255, 255, 255, 0.25);
+      padding: 2px 10px;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+  }
+
+  .section-resumen {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    font-size: 0.82rem;
+    font-weight: 600;
+    opacity: 0.95;
+
+    .resumen-texto {
+      white-space: nowrap;
+    }
+
+    .chevron {
+      font-size: 1.1rem;
+      transition: transform 0.18s ease;
+    }
+  }
+}
+
+/* ─── Lista ─────────────────────────────────────── */
+.pago-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pago-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--ion-color-white);
+  border-radius: 10px;
+  border: 1px solid var(--app-border);
+
+  ion-checkbox {
+    --size: 24px;
+    flex-shrink: 0;
+  }
+
+  .pago-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(var(--ion-color-danger-rgb), 0.1);
+
+    ion-icon {
+      font-size: 1.1rem;
+      color: var(--ion-color-danger);
+    }
+
+    &.proy {
+      background: rgba(var(--ion-color-warning-rgb), 0.12);
+
+      ion-icon {
+        color: var(--ion-color-warning);
+      }
+    }
+  }
+
+  .pago-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .pago-nombre {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pago-meta {
+    font-size: 0.76rem;
+    color: var(--ion-color-medium);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .cat-tag,
+    .cuota-tag {
+      background: rgba(var(--ion-color-primary-rgb), 0.08);
+      color: var(--ion-color-primary);
+      padding: 1px 8px;
+      border-radius: 8px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .cuota-tag {
+      background: rgba(var(--ion-color-warning-rgb), 0.12);
+      color: var(--ion-color-warning-shade);
+    }
+  }
+
+  .pago-monto {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ion-color-dark);
+    flex-shrink: 0;
+  }
+
+  &.pagado {
+    opacity: 0.55;
+
+    .pago-nombre {
+      text-decoration: line-through;
+    }
+  }
+}
+
+/* ─── Empty mini (dentro de la sección colapsable) ── */
+.empty-mini {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--ion-color-white);
+  border-radius: 10px;
+  border: 1px dashed var(--app-border);
+  color: var(--ion-color-medium);
+  font-size: 0.85rem;
+  font-weight: 500;
+
+  ion-icon {
+    font-size: 1.15rem;
+    opacity: 0.55;
+  }
+}
+
+/* ─── Empty state ───────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  background: var(--ion-color-white);
+  border-radius: var(--app-radius-md);
+
+  ion-icon {
+    font-size: 2.6rem;
+    color: var(--ion-color-medium);
+    opacity: 0.4;
+  }
+
+  p {
+    margin: 0;
+    color: var(--ion-color-medium);
+    font-size: 0.9rem;
+    text-align: center;
+  }
+}
+
+/* ─── Desktop ≥1024px: dos columnas ──────────────── */
+@media (min-width: 1024px) {
+  .page-container {
+    padding: 24px 16px 100px;
+  }
+
+  .pago-section {
+    gap: 12px;
+  }
+}

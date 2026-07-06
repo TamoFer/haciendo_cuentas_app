@@ -7,6 +7,8 @@ export interface Movimiento {
   tipo: string;
   genero?: string
   fijo?: boolean,
-  meses?: number
+  meses?: number,
+  pagado?: boolean,
+  mesPagado?: string,
 }
 

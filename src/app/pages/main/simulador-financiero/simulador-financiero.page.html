@@ -124,23 +124,25 @@
       } @else {
       <ion-list class="gastos-list">
         @for (gasto of gastosFijos; track gasto.id) {
-        <ion-item-sliding>
+        <ion-item-sliding class="gasto-slide">
           <ion-item class="gasto-item" (click)="verInfoGasto(gasto)">
-            <div slot="start" class="gasto-icon fijo">
-              <ion-icon [name]="getIconoPorCategoria(gasto.categoria)"></ion-icon>
+            <div class="gasto-content">
+              <div class="gasto-icon fijo">
+                <ion-icon [name]="getIconoPorCategoria(gasto.categoria)"></ion-icon>
+              </div>
+              <div class="gasto-body">
+                <h3>{{ gasto.nombre | uppercase }}</h3>
+                <p>{{ gasto.categoria }}</p>
+              </div>
+              <span class="gasto-monto">{{ formatearMonto(gasto.importe) }}</span>
             </div>
-            <ion-label>
-              <h3>{{ gasto.nombre | uppercase }}</h3>
-              <p>{{ gasto.categoria }}</p>
-            </ion-label>
-            <ion-note slot="end" class="gasto-monto">{{ formatearMonto(gasto.importe) }}</ion-note>
           </ion-item>
           <ion-item-options side="end">
             <ion-item-option (click)="abrirModalGasto('fijo', null, gasto)" color="primary">
-              <ion-icon style="font-size: 1.3rem;" name="create-outline"></ion-icon>
+              <ion-icon name="create-outline"></ion-icon>
             </ion-item-option>
             <ion-item-option (click)="confirmarEliminarGasto(gasto, 'fijo')" color="danger">
-              <ion-icon style="font-size: 1.3rem;" name="trash-outline"></ion-icon>
+              <ion-icon name="trash-outline"></ion-icon>
             </ion-item-option>
           </ion-item-options>
         </ion-item-sliding>
@@ -186,28 +188,30 @@
       } @else {
       <ion-list class="gastos-list">
         @for (gasto of gastosTemporales; track gasto.id) {
-        <ion-item-sliding>
+        <ion-item-sliding class="gasto-slide">
           <ion-item class="gasto-item" (click)="verInfoGasto(gasto)">
-            <div slot="start" class="gasto-icon proy">
-              <ion-icon [name]="getIconoPorCategoria(gasto.categoria)"></ion-icon>
+            <div class="gasto-content">
+              <div class="gasto-icon proy">
+                <ion-icon [name]="getIconoPorCategoria(gasto.categoria)"></ion-icon>
+              </div>
+              <div class="gasto-body">
+                <h3>{{ gasto.nombre | uppercase }}</h3>
+                <p>
+                  {{ gasto.categoria }}
+                  @if (gasto.cantidadCuotas) {
+                  <span class="cuota-badge">{{ gasto.cantidadCuotas }} cuotas</span>
+                  }
+                </p>
+              </div>
+              <span class="gasto-monto">{{ formatearMonto(gasto.importe) }}</span>
             </div>
-            <ion-label>
-              <h3>{{ gasto.nombre | uppercase }}</h3>
-              <p>
-                {{ gasto.categoria }}
-                @if (gasto.cantidadCuotas) {
-                <span class="cuota-badge">{{ gasto.cantidadCuotas }} cuotas</span>
-                }
-              </p>
-            </ion-label>
-            <ion-note slot="end" class="gasto-monto">{{ formatearMonto(gasto.importe) }}</ion-note>
           </ion-item>
           <ion-item-options side="end">
             <ion-item-option (click)="abrirModalGasto('temporal', null, gasto)" color="primary">
-              <ion-icon style="font-size: 1.3rem;" name="create-outline"></ion-icon>
+              <ion-icon name="create-outline"></ion-icon>
             </ion-item-option>
             <ion-item-option (click)="confirmarEliminarGasto(gasto, 'temporal')" color="danger">
-              <ion-icon style="font-size: 1.3rem;" name="trash-outline"></ion-icon>
+              <ion-icon name="trash-outline"></ion-icon>
             </ion-item-option>
           </ion-item-options>
         </ion-item-sliding>
