@@ -28,6 +28,17 @@ export class IngresosPage implements OnInit {
   usuario = this.utilsSVC.obtenerDatosLS('user');
   totalGastos: number = 0;
 
+  rubros = [
+    { nombre: 'Sueldo', icono: 'receipt-outline' },
+    { nombre: 'Venta', icono: 'cash-outline' },
+    { nombre: 'Préstamo', icono: 'download-outline' },
+    { nombre: 'Apuesta', icono: 'football-outline' },
+    { nombre: 'Changa', icono: 'construct-outline' },
+    { nombre: 'Saldo', icono: 'wallet-outline' },
+    { nombre: 'Ahorro', icono: 'piggy-bank-outline' },
+    { nombre: 'Otros', icono: 'pricetag-outline' },
+  ];
+
   // Tipo de filtro rápido de fecha seleccionado
   // 'hoy' | '7' | '15' | '30' | 'rango' | 'todo' | null
   quickFilter: string | null = '15';
@@ -124,8 +135,10 @@ export class IngresosPage implements OnInit {
   async agregarIngresos(movimiento?: Movimiento) {
     const modal = await this.utilsSVC.modalsCtrl.create({
       component: AddUpdtDeleteIngresosComponent,
+      cssClass: 'modal-fullscreen',
       componentProps: {
-        ingreso: movimiento // ✅ PASA el movimiento si existe
+        ingreso: movimiento,
+        rubros: this.rubros
       }
     });
 
@@ -254,18 +267,18 @@ export class IngresosPage implements OnInit {
     this.actualizarLimiteAuto();
 
     this.movimientosFiltrados = this.movimientosCuenta.filter(mov => {
-      const fechaMov = new Date(mov.fecha);
+      const fechaMov = this.parseLocalDate(mov.fecha);
       const importe = Number(String(mov.importe).replace(/\./g, '').replace(',', '.'));
 
-      const fechaMovStr = fechaMov.toISOString().split('T')[0];
-      const hoyStr = today.toISOString().split('T')[0];
+      const fechaMovStr = this.toLocalDateStr(fechaMov);
+      const hoyStr = this.toLocalDateStr(today);
 
 
       const coincideHoy = hoy ? (fechaMovStr === hoyStr) : true;
       const coincideRubro = rubro ? mov.rubro.toLowerCase() === rubro.toLowerCase() : true;
       const coincideDetalle = detalle ? mov.detalle.toLowerCase().includes(detalle.toLowerCase()) : true;
       const coincideDias = fechaLimite ? fechaMov >= fechaLimite : true;
-      const coincideFechas = (desde && hasta) ? (fechaMov >= new Date(desde) && fechaMov <= new Date(hasta)) : true;
+      const coincideFechas = (desde && hasta) ? (fechaMov >= this.parseLocalDate(desde) && fechaMov <= this.parseLocalDate(hasta)) : true;
 
       const pasaFiltros = coincideRubro && coincideDetalle && coincideDias && coincideFechas && coincideHoy;
 
@@ -324,6 +337,23 @@ export class IngresosPage implements OnInit {
 
   cerrarModal() {
     this.utilsSVC.dismissModal();
+  }
+
+  toLocalDateStr(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  parseLocalDate(fecha: any): Date {
+    if (typeof fecha === 'string') {
+      return new Date(fecha + 'T00:00:00');
+    }
+    if (fecha && typeof fecha.toDate === 'function') {
+      return fecha.toDate();
+    }
+    return new Date(fecha);
   }
 
   limpiarFiltros() {

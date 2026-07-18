@@ -2,43 +2,41 @@ import { NgIf } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
+import { MaskitoDirective } from '@maskito/angular';
 import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import { Movimiento } from 'src/app/models/movimiento.model';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
-import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
-import { HeaderComponent } from 'src/app/shared/components/header/header.component';
-import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/ingreso-datos.component';
 import { MaskitoElementPredicate } from '@maskito/core';
 
-
+interface Rubro {
+  nombre: string;
+  icono: string;
+}
 
 @Component({
   selector: 'app-add-updt-delete-gasto',
   templateUrl: './add-updt-delete-gasto.component.html',
   styleUrls: ['./add-updt-delete-gasto.component.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, ReactiveFormsModule, IngresoDatosComponent, NgIf,]
+  imports: [IonicModule, ReactiveFormsModule, MaskitoDirective, NgIf]
 
 })
 export class AddUpdtDeleteGastoComponent {
 
 
   @Input() gasto: Movimiento;
-  @Input() maskito: any;
-  @Input() maskitoElement: any;
+  @Input() rubros: Rubro[] = [];
 
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
 
 
-  mostrarBack: boolean = true;
   user = {} as User;
-
-  opcionesRubro = ['A medias', 'Compra', 'Deudas', 'Regalo', 'Servicios'];
-  opcionesTipo = ['Banco', 'Efectivo'];
-
-
+  tipos = [
+    { nombre: 'Banco', icono: 'business-outline' },
+    { nombre: 'Efectivo', icono: 'cash-outline' },
+  ];
 
   formulario = new FormGroup({
     id: new FormControl(null),
@@ -57,13 +55,20 @@ export class AddUpdtDeleteGastoComponent {
     maximumFractionDigits: 2,
   });
 
-
   readonly maskPredicate: MaskitoElementPredicate = async (el) => ((el as unknown) as HTMLIonInputElement).getInputElement();
 
+  get esEdicion(): boolean {
+    return !!this.gasto;
+  }
 
   ngOnInit() {
     this.user = this.utilsSVC.obtenerDatosLS('user');
-    this.gasto ? this.formulario.patchValue(this.gasto) : this.formulario;
+    if (this.gasto) {
+      this.formulario.patchValue(this.gasto);
+      this.formulario.controls.importe.setValue(
+        this.gasto.importe.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      );
+    }
   }
 
 
@@ -77,6 +82,7 @@ export class AddUpdtDeleteGastoComponent {
 
       this.formulario.value.id = String(this.utilsSVC.crearId())
 
+      this.formulario.value.importe = String(this.formulario.value.importe).replace(/\./g, '').replace(',', '.');
 
       this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
@@ -84,7 +90,7 @@ export class AddUpdtDeleteGastoComponent {
         const movimiento: Movimiento = {
           id: this.formulario.value.id,
           fecha: this.formulario.value.fecha!,
-          importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
+          importe: Number(this.formulario.value.importe),
           detalle: this.formulario.value.detalle!,
           rubro: this.formulario.value.rubro!,
           tipo: this.formulario.value.tipo!,
@@ -132,13 +138,15 @@ export class AddUpdtDeleteGastoComponent {
       let path = `users/${this.user.uid}/movimientos/${this.gasto.id}`;
       this.actualizarMovimiento(this.gasto);
 
+      this.formulario.value.importe = String(this.formulario.value.importe).replace(/\./g, '').replace(',', '.');
+
       this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
 
 
         const movimiento: Movimiento = {
           id: this.gasto.id,
           fecha: this.formulario.value.fecha!,
-          importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
+          importe: Number(this.formulario.value.importe),
           detalle: this.formulario.value.detalle!,
           rubro: this.formulario.value.rubro!,
           tipo: this.formulario.value.tipo!,
@@ -181,11 +189,10 @@ export class AddUpdtDeleteGastoComponent {
     const nuevo = this.formulario.value;
     const original = Number(String(this.gasto.importe).replace(/\./g, '').replace(',', '.'));
 
-
     let saldoEfectivoNuevo = this.user.saldo_efectivo
     let saldoBancoNuevo = this.user.saldo_banco
 
-    const nuevoImporte = Number(nuevo.importe.replace(/\./g, '').replace(',', '.'))
+    const nuevoImporte = Number(nuevo.importe)
     const importeAnterior = original;
 
     const diferencia = Math.abs(nuevoImporte - importeAnterior);
@@ -217,8 +224,6 @@ export class AddUpdtDeleteGastoComponent {
       saldo_efectivo: saldoEfectivoNuevo
     })
 
-
-
   }
 
   restarSaldos(movimiento) {
@@ -228,9 +233,8 @@ export class AddUpdtDeleteGastoComponent {
     let nuevoSaldoEfe = this.user.saldo_efectivo;
 
     movimiento.tipo === 'Efectivo' ?
-      nuevoSaldoEfe -= Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')) :
-      nuevoSaldoBco -= Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.'));
-
+      nuevoSaldoEfe -= Number(this.formulario.value.importe) :
+      nuevoSaldoBco -= Number(this.formulario.value.importe);
 
     this.firebaseSVC.updateDocument(path, {
       ...this.user,
@@ -247,7 +251,7 @@ export class AddUpdtDeleteGastoComponent {
 
   saldoNegativoAlert(movimiento) {
 
-    const importe = Number(movimiento.importe);
+    const importe = Number(String(movimiento.importe).replace(/\./g, '').replace(',', '.'));
     const tipo = movimiento.tipo;
     let condicional: boolean = false
 
@@ -268,11 +272,21 @@ export class AddUpdtDeleteGastoComponent {
     }
   }
 
-
   cambiarEstado() {
     this.formulario.value.fijo = !this.formulario.value.fijo;
   }
 
+  seleccionarRubro(nombre: string) {
+    this.formulario.controls.rubro.setValue(
+      this.formulario.controls.rubro.value === nombre ? null : nombre
+    );
+  }
+
+  seleccionarTipo(nombre: string) {
+    this.formulario.controls.tipo.setValue(
+      this.formulario.controls.tipo.value === nombre ? null : nombre
+    );
+  }
 
   submit() {
     if (this.formulario.valid) {
@@ -284,4 +298,3 @@ export class AddUpdtDeleteGastoComponent {
     this.utilsSVC.dismissModal();
   }
 }
-

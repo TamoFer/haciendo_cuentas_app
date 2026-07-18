@@ -8,34 +8,32 @@ import { Movimiento } from 'src/app/models/movimiento.model';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
-import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
-import { HeaderComponent } from 'src/app/shared/components/header/header.component';
-import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/ingreso-datos.component';
 import { MaskitoElementPredicate } from '@maskito/core';
 
+interface Rubro {
+  nombre: string;
+  icono: string;
+}
 
 @Component({
   selector: 'app-add-updt-delete-ingresos',
   templateUrl: './add-updt-delete-ingresos.component.html',
   styleUrls: ['./add-updt-delete-ingresos.component.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, IngresoDatosComponent, NgIf, ReactiveFormsModule, MaskitoDirective]
+  imports: [IonicModule, NgIf, ReactiveFormsModule, MaskitoDirective]
 })
 export class AddUpdtDeleteIngresosComponent {
 
   @Input() ingreso: Movimiento;
+  @Input() rubros: Rubro[] = [];
 
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
 
-  mostrarBack: boolean = true;
-
-
-  opcionesRubro = ['Ahorro', 'Prestamo', 'Sueldo', 'Venta', 'Otro'];
-  opcionesTipo = ['Banco', 'Efectivo'];
-
   user = {} as User;
-
-
+  tipos = [
+    { nombre: 'Banco', icono: 'business-outline' },
+    { nombre: 'Efectivo', icono: 'cash-outline' },
+  ];
 
   mascara = maskitoNumberOptionsGenerator({
     decimalSeparator: ',',
@@ -54,9 +52,11 @@ export class AddUpdtDeleteIngresosComponent {
     tipo: new FormControl(null, Validators.required),
     fijo: new FormControl(false),
     genero: new FormControl('ingreso')
-
   });
 
+  get esEdicion(): boolean {
+    return !!this.ingreso;
+  }
 
   ngOnInit() {
     this.user = this.utilsSVC.obtenerDatosLS('user');
@@ -73,28 +73,24 @@ export class AddUpdtDeleteIngresosComponent {
         genero: this.ingreso.genero
       });
     }
-
-
   }
-
-
 
   async editarIngreso() {
 
     const loading = await this.utilsSVC.loading();
     await loading.present();
 
-
     let path = `users/${this.user.uid}/movimientos/${this.ingreso.id}`;
     this.actualizarMovimiento(this.ingreso);
 
-    this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
+    this.formulario.value.importe = String(this.formulario.value.importe).replace(/\./g, '').replace(',', '.');
 
+    this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
 
       const movimiento: Movimiento = {
         id: this.ingreso.id,
         fecha: this.formulario.value.fecha!,
-        importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
+        importe: Number(this.formulario.value.importe),
         detalle: this.formulario.value.detalle!,
         rubro: this.formulario.value.rubro!,
         tipo: this.formulario.value.tipo!,
@@ -127,8 +123,6 @@ export class AddUpdtDeleteIngresosComponent {
     }).finally(() => {
       loading.dismiss();
     })
-
-
   }
 
   async crearIngreso() {
@@ -136,11 +130,10 @@ export class AddUpdtDeleteIngresosComponent {
     const loading = await this.utilsSVC.loading();
     await loading.present();
 
-
     let path = `users/${this.user.uid}/movimientos`;
 
     this.formulario.value.id = String(this.utilsSVC.crearId())
-
+    this.formulario.value.importe = String(this.formulario.value.importe).replace(/\./g, '').replace(',', '.');
 
     this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
 
@@ -148,7 +141,7 @@ export class AddUpdtDeleteIngresosComponent {
       const movimiento: Movimiento = {
         id: this.formulario.value.id,
         fecha: this.formulario.value.fecha!,
-        importe: Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')),
+        importe: Number(this.formulario.value.importe),
         detalle: this.formulario.value.detalle!,
         rubro: this.formulario.value.rubro!,
         tipo: this.formulario.value.tipo!,
@@ -161,7 +154,7 @@ export class AddUpdtDeleteIngresosComponent {
       this.utilsSVC.dismissModal({ success: true });
 
       this.utilsSVC.presentToast({
-        message: 'Gasto ingresado con exito',
+        message: 'Ingreso ingresado con exito',
         duration: 1500,
         color: 'success',
         position: 'middle',
@@ -182,8 +175,6 @@ export class AddUpdtDeleteIngresosComponent {
     }).finally(() => {
       loading.dismiss();
     })
-
-
   }
 
   actualizarMovimiento(ingreso) {
@@ -195,7 +186,7 @@ export class AddUpdtDeleteIngresosComponent {
     let saldoEfectivoNuevo = this.user.saldo_efectivo
     let saldoBancoNuevo = this.user.saldo_banco
 
-    const nuevoImporte = Number(nuevo.importe?.replace(/\./g, '').replace(',', '.'));
+    const nuevoImporte = Number(nuevo.importe);
     const importeAnterior = original;
 
     const diferencia = Math.abs(nuevoImporte - importeAnterior);
@@ -226,9 +217,6 @@ export class AddUpdtDeleteIngresosComponent {
       saldo_banco: saldoBancoNuevo,
       saldo_efectivo: saldoEfectivoNuevo
     })
-
-
-
   }
 
   sumarSaldos(movimiento) {
@@ -238,8 +226,8 @@ export class AddUpdtDeleteIngresosComponent {
     let nuevoSaldoEfe = this.user.saldo_efectivo;
 
     movimiento.tipo === 'Efectivo' ?
-      nuevoSaldoEfe += Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.')) :
-      nuevoSaldoBco += Number(this.formulario.value.importe!.replace(/\./g, '').replace(',', '.'));
+      nuevoSaldoEfe += Number(this.formulario.value.importe) :
+      nuevoSaldoBco += Number(this.formulario.value.importe);
 
     this.firebaseSVC.updateDocument(path, {
       ...this.user,
@@ -258,6 +246,18 @@ export class AddUpdtDeleteIngresosComponent {
     this.formulario.value.fijo = !this.formulario.value.fijo;
   }
 
+  seleccionarRubro(nombre: string) {
+    this.formulario.controls.rubro.setValue(
+      this.formulario.controls.rubro.value === nombre ? null : nombre
+    );
+  }
+
+  seleccionarTipo(nombre: string) {
+    this.formulario.controls.tipo.setValue(
+      this.formulario.controls.tipo.value === nombre ? null : nombre
+    );
+  }
+
   submit() {
     if (this.formulario.valid) {
       this.ingreso ? this.editarIngreso() : this.crearIngreso();
@@ -267,5 +267,4 @@ export class AddUpdtDeleteIngresosComponent {
   cerrarModal() {
     this.utilsSVC.dismissModal();
   }
-
 }

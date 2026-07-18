@@ -64,26 +64,13 @@
           <ion-icon name="pricetag-outline"></ion-icon> Rubro
         </div>
         <div class="rubros-chips">
-          <button type="button" class="rubro-chip"
-                  [class.active]="formulario.controls.rubro.value === 'compra'"
-                  (click)="toggleRubro('compra')">
-            <ion-icon name="cart-outline"></ion-icon> Compras
-          </button>
-          <button type="button" class="rubro-chip"
-                  [class.active]="formulario.controls.rubro.value === 'regalo'"
-                  (click)="toggleRubro('regalo')">
-            <ion-icon name="gift-outline"></ion-icon> Regalos
-          </button>
-          <button type="button" class="rubro-chip"
-                  [class.active]="formulario.controls.rubro.value === 'deudas'"
-                  (click)="toggleRubro('deudas')">
-            <ion-icon name="receipt-outline"></ion-icon> Deudas
-          </button>
-          <button type="button" class="rubro-chip"
-                  [class.active]="formulario.controls.rubro.value === 'servicios'"
-                  (click)="toggleRubro('servicios')">
-            <ion-icon name="globe-outline"></ion-icon> Servicios
-          </button>
+          @for (rubro of rubros; track rubro.nombre) {
+            <button type="button" class="rubro-chip"
+                    [class.active]="formulario.controls.rubro.value === rubro.nombre"
+                    (click)="toggleRubro(rubro.nombre)">
+              <ion-icon [name]="rubro.icono"></ion-icon> {{ rubro.nombre }}
+            </button>
+          }
         </div>
 
         <!-- Aviso límite automático 15 días -->

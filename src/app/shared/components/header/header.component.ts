@@ -1,9 +1,10 @@
 import { NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
-import { ActionSheetController, IonicModule } from '@ionic/angular';
+import { ActionSheetController, ModalController, IonicModule } from '@ionic/angular';
 import { UtilsService } from 'src/app/services/utils.service';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { User } from 'src/app/models/user.model';
+import { ConfiguracionComponent } from 'src/app/pages/main/configuracion/configuracion.component';
 
 @Component({
   selector: 'app-header',
@@ -21,6 +22,7 @@ export class HeaderComponent implements OnInit {
   utilsSVC = inject(UtilsService);
   firebaseSVC = inject(FirebaseService);
   private actionSheetCtrl = inject(ActionSheetController);
+  private modalCtrl = inject(ModalController);
 
   dropdownOpen = false;
   user: User | null = null;
@@ -49,8 +51,13 @@ export class HeaderComponent implements OnInit {
     this.dropdownOpen = false;
   }
 
-  configuracion() {
+  async configuracion() {
     this.cerrarDropdown();
+    const modal = await this.modalCtrl.create({
+      component: ConfiguracionComponent,
+      cssClass: 'modal-fullscreen'
+    });
+    await modal.present();
   }
 
   async salir() {

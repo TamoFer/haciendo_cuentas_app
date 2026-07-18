@@ -40,7 +40,7 @@ export class SimuladorFinancieroPage implements OnInit {
   expandirTemporales: boolean = true;
 
   categoriasFijas: string[] = ['Servicios', 'Alquiler', 'Supermercado', 'Transporte', 'Seguros', 'Suscripciones', 'Otros'];
-  categoriasTemporales: string[] = ['Prestamo', 'Cuota', 'Compra', 'Deuda', 'Otro'];
+  categoriasTemporales: string[] = ['Prestamo', 'Cuota', 'Compra', 'Deuda', 'Otros'];
 
   mascara = maskitoNumberOptionsGenerator({
     decimalSeparator: ',',
@@ -226,6 +226,7 @@ export class SimuladorFinancieroPage implements OnInit {
 
     const modal = await this.utilsSvc.modalsCtrl.create({
       component: AgregarGastoComponent,
+      cssClass: 'modal-fullscreen',
       componentProps: {
         tipo,
         categorias: tipo === 'fijo' ? this.categoriasFijas : this.categoriasTemporales,

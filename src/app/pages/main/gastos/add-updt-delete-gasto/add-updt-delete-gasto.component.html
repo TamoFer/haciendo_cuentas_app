@@ -1,75 +1,116 @@
-<app-header [title]="gasto ? 'Modificar Gasto': 'Nuevo Gasto'" [isModal]="mostrarBack"
-    (volverAccion)="cerrarModal()"></app-header>
-<ion-content>
-    <form [formGroup]="formulario" (ngSubmit)="submit()">
+<ion-header class="gasto-header">
+  <ion-toolbar class="toolbar-gasto">
+    <ion-buttons slot="start">
+      <ion-button (click)="cerrarModal()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ esEdicion ? 'Editar' : 'Nuevo' }} Gasto</ion-title>
+  </ion-toolbar>
+</ion-header>
 
+<ion-content [fullscreen]="true" class="gasto-content">
+  <div class="form-wrap">
 
-        <!-- fecha del ingreso -->
+    <div class="fields-card">
 
-        <app-ingreso-datos icon="calendar-number-outline" autocomplete="detail" label="Fecha"
-            [control]="formulario.controls.fecha" type="date"></app-ingreso-datos>
-
-        <div *ngIf="formulario.controls.fecha.errors && formulario.controls.fecha.touched">
-            <div class="errores" *ngIf="formulario.controls.fecha.errors?.['required']">La fecha es necesario</div>
-
+      <!-- Fecha -->
+      <div class="field">
+        <div class="field-head">
+          <span>Fecha</span>
         </div>
-        <!-- Ingreo del importe -->
-        <app-ingreso-datos icon="logo-usd" autocomplete="detail" label="Importe" [control]="formulario.controls.importe"
-            [maskito]="mascara" [maskitoElement]="maskPredicate" type="text" inputmode="decimal"></app-ingreso-datos>
+        <ion-input [formControl]="formulario.controls.fecha" type="date" class="field-input"></ion-input>
+      </div>
 
+      <div class="field-divider"></div>
 
-        <div *ngIf="formulario.controls.importe.errors && formulario.controls.importe.touched">
-            <div class="errores" *ngIf="formulario.controls.importe.errors?.['required']">El importe es necesario</div>
-            <div class="errores" *ngIf="formulario.controls.importe.errors?.['minlength']">El importe debe ser mayor a 0
-            </div>
+      <!-- Importe -->
+      <div class="field">
+        <div class="field-head">
+          <span>Importe</span>
         </div>
-
-        <!-- detalle del ingreso -->
-        <app-ingreso-datos icon="document-text-outline" autocomplete="detail" label="Detalle"
-            [control]="formulario.controls.detalle" type="text" inputmode="text"></app-ingreso-datos>
-
-        <div *ngIf="formulario.controls.detalle.errors && formulario.controls.detalle.touched">
-            <div class="errores" *ngIf="formulario.controls.detalle.errors?.['required']">El detalle es necesario</div>
-            <div class="errores" *ngIf="formulario.controls.detalle.errors?.['minlength']">El detalle debe tener al
-                menos 1
-                caracteres</div>
+        <div class="importe-wrap">
+          <span class="importe-symbol">$</span>
+          <ion-input [formControl]="formulario.controls.importe" [maskito]="mascara" [maskitoElement]="maskPredicate"
+            inputmode="decimal" type="text" placeholder="0,00" class="field-input importe-input"></ion-input>
         </div>
-
-
-        <!-- rubro  -->
-        <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Motivo" [type]="'select'"
-            [options]="opcionesRubro" [control]="formulario.controls.rubro">
-        </app-ingreso-datos>
-
-        <div *ngIf="formulario.controls.rubro.errors && formulario.controls.rubro.touched">
-            <div class="errores" *ngIf="formulario.controls.rubro.errors?.['required']">El motivo es necesario</div>
-
+        <div class="errores" *ngIf="formulario.controls.importe.errors && formulario.controls.importe.touched">
+          <span *ngIf="formulario.controls.importe.errors?.['required']">El importe es necesario</span>
         </div>
+      </div>
 
+      <div class="field-divider"></div>
 
-        <!-- tipo-->
-        <app-ingreso-datos icon="list-outline" autocomplete="detail" label="Dinero en" [type]="'select'"
-            [options]="opcionesTipo" [control]="formulario.controls.tipo" *ngIf="!gasto">
-        </app-ingreso-datos>
-
-        <div *ngIf="formulario.controls.tipo.errors && formulario.controls.tipo.touched">
-            <div class="errores" *ngIf="formulario.controls.tipo.errors?.['required']">El tipo es necesario</div>
+      <!-- Detalle -->
+      <div class="field">
+        <div class="field-head">
+          <span>Detalle</span>
         </div>
-
-        <!-- gasto fijo -->
-        <!-- <ion-toggle (click)="cambiarEstado()">¿Es un gasto fijo?</ion-toggle> -->
-
-        <div
-            style="width: max-content; display: flex; flex-direction: row ; justify-content: center; margin: 10px auto;">
-            <ion-button type="submit" [disabled]="!formulario.valid" shape="round">
-                {{gasto ? 'Modificar ': 'Agregar'}}
-                <ion-icon slot="end" [name]="gasto? 'pencil' : 'checkmark-circle'"></ion-icon>
-            </ion-button>
+        <ion-input [formControl]="formulario.controls.detalle" placeholder="EJ: COMPRA SUPER" class="field-input upper"
+          type="text" inputmode="text"></ion-input>
+        <div class="errores" *ngIf="formulario.controls.detalle.errors && formulario.controls.detalle.touched">
+          <span *ngIf="formulario.controls.detalle.errors?.['required']">El detalle es necesario</span>
         </div>
+      </div>
 
+      <div class="field-divider"></div>
 
+      <!-- Rubro chips -->
+      <div class="field">
+        <div class="field-head">
+          <span>Rubro</span>
+        </div>
+        <div class="chips-wrap">
+          @for (rubro of rubros; track rubro.nombre) {
+            <ion-chip [color]="formulario.controls.rubro.value === rubro.nombre ? 'danger' : 'light'"
+              [outline]="formulario.controls.rubro.value !== rubro.nombre" (click)="seleccionarRubro(rubro.nombre)"
+              class="cat-chip">
+              <ion-icon [name]="rubro.icono"></ion-icon>
+              {{ rubro.nombre }}
+            </ion-chip>
+          }
+        </div>
+        <div class="errores" *ngIf="formulario.controls.rubro.errors && formulario.controls.rubro.touched">
+          <span *ngIf="formulario.controls.rubro.errors?.['required']">El rubro es necesario</span>
+        </div>
+      </div>
 
+      <div class="field-divider"></div>
 
-    </form>
+      <!-- Tipo chips -->
+      <div class="field" *ngIf="!gasto">
+        <div class="field-head">
+          <span>Dinero en</span>
+        </div>
+        <div class="tipo-wrap">
+          @for (tipo of tipos; track tipo.nombre) {
+            <ion-chip [color]="formulario.controls.tipo.value === tipo.nombre ? 'primary' : 'light'"
+              [outline]="formulario.controls.tipo.value !== tipo.nombre" (click)="seleccionarTipo(tipo.nombre)"
+              class="cat-chip">
+              <ion-icon [name]="tipo.icono"></ion-icon>
+              {{ tipo.nombre }}
+            </ion-chip>
+          }
+        </div>
+      </div>
+
+    </div>
+  </div>
 </ion-content>
-<app-footer></app-footer>
+
+<div class="actions-bar">
+  @if (esEdicion) {
+    <ion-button fill="clear" color="danger" (click)="cerrarModal()" class="action-btn">
+      <ion-icon slot="start" name="trash-outline"></ion-icon>
+      Eliminar
+    </ion-button>
+  }
+  <ion-button fill="clear" color="medium" (click)="cerrarModal()" class="action-btn">
+    <ion-icon slot="start" name="close-outline"></ion-icon>
+    Cancelar
+  </ion-button>
+  <ion-button class="action-btn save-btn save-gasto" [disabled]="!formulario.valid" (click)="submit()">
+    <ion-icon slot="start" [name]="esEdicion ? 'checkmark-outline' : 'add-outline'"></ion-icon>
+    {{ esEdicion ? 'Guardar' : 'Agregar' }}
+  </ion-button>
+</div>

@@ -10,6 +10,17 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "deploy-firebase",
+            "type": "shell",
+            "command": "npm run build && npx firebase-tools deploy --only hosting --project haciendo-cuentas-app",
+            "problemMatcher": [],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
         }
     ]
 }

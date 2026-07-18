@@ -64,36 +64,13 @@
           <ion-icon name="pricetag-outline"></ion-icon> Rubro
         </div>
         <div class="rubros-chips">
-          <button type="button" class="rubro-chip"
-                  [class.active]="formulario.controls.rubro.value === 'sueldo'"
-                  (click)="toggleRubro('sueldo')">
-            <ion-icon name="receipt-outline"></ion-icon> Sueldo
-          </button>
-          <button type="button" class="rubro-chip"
-                  [class.active]="formulario.controls.rubro.value === 'venta'"
-                  (click)="toggleRubro('venta')">
-            <ion-icon name="cash-outline"></ion-icon> Venta
-          </button>
-          <button type="button" class="rubro-chip"
-                  [class.active]="formulario.controls.rubro.value === 'prestamo'"
-                  (click)="toggleRubro('prestamo')">
-            <ion-icon name="download-outline"></ion-icon> Préstamo
-          </button>
-          <button type="button" class="rubro-chip"
-                  [class.active]="formulario.controls.rubro.value === 'apuesta'"
-                  (click)="toggleRubro('apuesta')">
-            <ion-icon name="football-outline"></ion-icon> Apuesta
-          </button>
-          <button type="button" class="rubro-chip"
-                  [class.active]="formulario.controls.rubro.value === 'changa'"
-                  (click)="toggleRubro('changa')">
-            <ion-icon name="construct-outline"></ion-icon> Changa
-          </button>
-          <button type="button" class="rubro-chip"
-                  [class.active]="formulario.controls.rubro.value === 'saldo'"
-                  (click)="toggleRubro('saldo')">
-            <ion-icon name="wallet-outline"></ion-icon> Saldo
-          </button>
+          @for (rubro of rubros; track rubro.nombre) {
+            <button type="button" class="rubro-chip"
+                    [class.active]="formulario.controls.rubro.value === rubro.nombre"
+                    (click)="toggleRubro(rubro.nombre)">
+              <ion-icon [name]="rubro.icono"></ion-icon> {{ rubro.nombre }}
+            </button>
+          }
         </div>
 
         <!-- Aviso límite 15 días -->

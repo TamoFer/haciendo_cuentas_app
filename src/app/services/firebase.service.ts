@@ -19,6 +19,8 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   updateProfile,
+  updateEmail,
+  updatePassword,
   sendPasswordResetEmail
 } from 'firebase/auth';
 import { UtilsService } from './utils.service';
@@ -58,6 +60,14 @@ export class FirebaseService {
 
   enviarRecuperacion(email: string) {
     return sendPasswordResetEmail(getAuth(), email);
+  }
+
+  updateUserEmail(newEmail: string) {
+    return updateEmail(getAuth().currentUser, newEmail);
+  }
+
+  updateUserPassword(newPassword: string) {
+    return updatePassword(getAuth().currentUser, newPassword);
   }
 
   // 📄 Base de datos - Firestore

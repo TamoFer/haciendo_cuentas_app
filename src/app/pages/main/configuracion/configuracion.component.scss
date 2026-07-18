@@ -1,0 +1,47 @@
+ion-header {
+  border-bottom: 1px solid var(--app-border);
+}
+
+.app-toolbar {
+  --background: var(--app-surface);
+  --color: var(--app-text);
+  --min-height: 56px;
+}
+
+.app-title {
+  font-size: 1.05rem;
+  font-weight: var(--app-font-weight-semibold, 600);
+  color: var(--app-text);
+}
+
+@media (min-width: 1024px) {
+  .app-toolbar {
+    --min-height: 60px;
+  }
+
+  .app-title {
+    font-size: 1.15rem;
+  }
+}
+
+form {
+    width: 100%;
+    padding-top: 20%;
+    padding-left: 20%;
+    padding-right: 20%;
+
+    @media screen and (max-width: 768px) {
+        padding: 5%;
+
+        ion-button {
+            margin: 10px;
+        }
+
+        .errores {
+            color: red;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+    }
+}

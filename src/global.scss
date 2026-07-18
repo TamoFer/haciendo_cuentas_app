@@ -23,6 +23,21 @@ ion-modal::part(content) {
   --background: #ffffff;
 }
 
+ion-modal.modal-fullscreen {
+  --width: 100%;
+  --height: 100%;
+  --border-radius: 0;
+  --box-shadow: none;
+}
+
+ion-modal.modal-fullscreen::part(content) {
+  border-radius: 0;
+}
+
+ion-modal.modal-fullscreen::part(handle) {
+  display: none;
+}
+
 ion-app {
   background-color: #ffffff;
 }
