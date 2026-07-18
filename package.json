@@ -35,6 +35,7 @@
     "@maskito/core": "^3.9.1",
     "@maskito/kit": "^3.9.1",
     "firebase": "^11.4.0",
+    "git": "^0.1.5",
     "ionic": "^5.4.16",
     "ionicons": "^7.0.0",
     "ngx-currency": "^19.0.0",
