@@ -52,17 +52,29 @@ export class GastosPage implements OnInit {
   // Mostrar advertencia de límite 15 días automático
   limiteAuto15 = false;
 
+  // Rubros colapsado por defecto
+  rubrosExpanded = false;
+
   formulario = new FormGroup({
     hoy: new FormControl(null),
     desde: new FormControl(null),
     hasta: new FormControl(null),
-    rubro: new FormControl(null),
+    rubro: new FormControl('Compras'),
     detalle: new FormControl(null, Validators.minLength(1)),
     dias: new FormControl('16')
   });
 
 
   constructor() { }
+
+  get rubroSelIcon(): string {
+    const sel = this.rubros.find(r => r.nombre === this.formulario.controls.rubro.value);
+    return sel ? sel.icono : 'pricetag-outline';
+  }
+
+  toggleRubros() {
+    this.rubrosExpanded = !this.rubrosExpanded;
+  }
 
   /** Selecciona un chip rápido de fecha */
   seleccionarQuick(tipo: string) {
@@ -336,7 +348,8 @@ export class GastosPage implements OnInit {
   limpiarFiltros() {
     this.formulario.reset();
     this.quickFilter = '15';
-    this.formulario.patchValue({ dias: '16' });
+    this.formulario.patchValue({ dias: '16', rubro: 'Compras' });
+    this.rubrosExpanded = false;
     this.limiteAuto15 = false;
     this.movimientosFiltrados = [];
     this.totalGastos = 0;

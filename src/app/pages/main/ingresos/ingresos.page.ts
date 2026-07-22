@@ -44,16 +44,27 @@ export class IngresosPage implements OnInit {
   quickFilter: string | null = '15';
   limiteAuto15 = false;
 
+  rubrosExpanded = false;
+
   formulario = new FormGroup({
     hoy: new FormControl(null),
     desde: new FormControl(null),
     hasta: new FormControl(null),
-    rubro: new FormControl(null),
+    rubro: new FormControl('Sueldo'),
     detalle: new FormControl(null, Validators.minLength(1)),
     dias: new FormControl('16')
   });
 
   constructor() { }
+
+  get rubroSelIcon(): string {
+    const sel = this.rubros.find(r => r.nombre === this.formulario.controls.rubro.value);
+    return sel ? sel.icono : 'pricetag-outline';
+  }
+
+  toggleRubros() {
+    this.rubrosExpanded = !this.rubrosExpanded;
+  }
 
   seleccionarQuick(tipo: string) {
     this.quickFilter = this.quickFilter === tipo ? null : tipo;
@@ -359,7 +370,8 @@ export class IngresosPage implements OnInit {
   limpiarFiltros() {
     this.formulario.reset();
     this.quickFilter = '15';
-    this.formulario.patchValue({ dias: '16' });
+    this.formulario.patchValue({ dias: '16', rubro: 'Sueldo' });
+    this.rubrosExpanded = false;
     this.limiteAuto15 = false;
     this.movimientosFiltrados = [];
     this.totalGastos = 0;

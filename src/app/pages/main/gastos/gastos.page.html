@@ -59,11 +59,16 @@
           </ion-item>
         </div>
 
-        <!-- Rubros como pills seleccionables -->
-        <div class="section-label">
-          <ion-icon name="pricetag-outline"></ion-icon> Rubro
-        </div>
-        <div class="rubros-chips">
+        <!-- Rubros expandible -->
+        <button type="button" class="rubro-toggle" (click)="toggleRubros()">
+          <ion-icon name="pricetag-outline"></ion-icon>
+          <span class="rubro-toggle-label">Rubro</span>
+          <span class="rubro-preview" *ngIf="formulario.controls.rubro.value && !rubrosExpanded">
+            <ion-icon [name]="rubroSelIcon"></ion-icon> {{ formulario.controls.rubro.value }}
+          </span>
+          <ion-icon class="chevron" [class.expanded]="rubrosExpanded" name="chevron-down"></ion-icon>
+        </button>
+        <div class="rubros-chips" *ngIf="rubrosExpanded">
           @for (rubro of rubros; track rubro.nombre) {
             <button type="button" class="rubro-chip"
                     [class.active]="formulario.controls.rubro.value === rubro.nombre"

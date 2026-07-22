@@ -143,6 +143,60 @@
   }
 }
 
+/* ─── Rubros expandible ─────────────────────────── */
+.rubro-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 4px 0;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ion-color-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+
+  > ion-icon[name="pricetag-outline"] {
+    font-size: 1rem;
+  }
+
+  .rubro-toggle-label {
+    flex: 1;
+    text-align: left;
+  }
+
+  .rubro-preview {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ion-color-success);
+    background: rgba(var(--ion-color-success-rgb), 0.12);
+    padding: 3px 12px;
+    border-radius: 10px;
+
+    ion-icon {
+      font-size: 0.95rem;
+    }
+  }
+
+  .chevron {
+    font-size: 1.1rem;
+    color: var(--ion-color-medium);
+    transition: transform 0.2s ease;
+
+    &.expanded {
+      transform: rotate(180deg);
+    }
+  }
+}
+
 /* ─── Rubros chips ──────────────────────────────── */
 .rubros-chips {
   display: flex;
