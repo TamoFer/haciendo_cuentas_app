@@ -1,159 +1,329 @@
-.fecha-item {
-  display: flex;
-  justify-content: space-between;
-
-  ion-label {
-    width: 60%;
-  }
-
-  ion-input {
-    width: 40%;
-    text-align: end;
-  }
-}
-
-.errores {
-  color: var(--ion-color-danger);
-  text-align: center;
-  font-weight: var(--app-font-weight-semibold, 600);
-  font-size: 0.85rem;
-  margin-top: 5px;
-}
-
-.fcierre {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-
-  .fc_info {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-
-    ion-icon {
-      font-size: 1.4rem;
-      color: var(--ion-color-warning);
-    }
-
-    .estilo-texto {
-      font-weight: var(--app-font-weight-medium, 500);
-    }
-  }
-}
-
-// ─── Tarjeta card ───────────────────────────────
-.tarjeta-card {
-  position: relative;
-  width: min(88vw, 340px);
-  min-height: 190px;
-  margin: 14px auto;
-  border-radius: var(--app-radius-md);
-  overflow: hidden;
-  box-shadow: var(--app-shadow-md);
-  border: none;
-}
-
-.card-title {
-  font-size: 1.4rem;
-  font-weight: var(--app-font-weight-bold, 700);
-}
-
-.card-subtitle {
-  font-size: 1rem;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-
-  .icono-tarjeta {
-    width: 3rem;
-    height: 3rem;
-    margin: 0;
-  }
-
-  .icono-banco {
-    width: 7rem;
-    height: 2.6rem;
-    margin: 0;
-  }
-}
-
-.botones {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-
-  ion-button {
-    --padding-start: 8px;
-    --padding-end: 8px;
-    margin: 0 2px;
-  }
-
-  ion-icon {
-    color: #fff;
-    width: 22px;
-    height: 22px;
-  }
-}
-
-.botones-acciones {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  width: 100%;
-  gap: 8px;
-  padding: 0 8px;
+.page-container {
   max-width: var(--app-content-max, 1200px);
   margin: 0 auto;
+  padding: 16px;
+  padding-bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-/* ─── Desktop responsive ─────────────────────────── */
-@media (min-width: 1024px) {
-  ion-content > .ion-page > ion-content {
-    --padding-start: 24px;
-    --padding-end: 24px;
-  }
+/* ─── Botón agregar ─────────────────────────────── */
+.add-bar {
+  display: flex;
+}
 
-  ion-item-sliding {
-    max-width: none;
-  }
+.add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border: 1.5px solid var(--ion-color-primary);
+  border-radius: 12px;
+  background: rgba(var(--ion-color-primary-rgb), 0.08);
+  color: var(--ion-color-primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
 
-  ion-card.tarjeta-card {
-    width: 100%;
-    max-width: 360px;
-  }
+  ion-icon { font-size: 1.2rem; }
+  &:active { transform: scale(0.97); }
+}
 
-  .botones-acciones {
+/* ─── Formulario inline ─────────────────────────── */
+.form-card {
+  background: var(--ion-color-white, #fff);
+  border-radius: var(--app-radius-md);
+  padding: 18px 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+
+  .form-row {
+    display: flex;
     gap: 12px;
+    margin-bottom: 14px;
+
+    .form-field {
+      flex: 1;
+      min-width: 120px;
+
+      .form-label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--ion-color-medium);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 6px;
+      }
+
+      select {
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: var(--ion-color-light);
+        font-size: 0.9rem;
+        color: var(--ion-color-dark);
+        outline: none;
+      }
+    }
+  }
+
+  .submit-btn {
+    --border-radius: 12px;
+    font-weight: 700;
+    margin-top: 4px;
   }
 }
 
-/* Grid de tarjetas (catálogos muchos): activable vía wrapper */
-.tarjetas-grid {
-  display: block;
+/* ─── Lista de tarjetas ─────────────────────────── */
+.tarjetas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
+/* ─── Tarjeta visual estilo banco ────────────────── */
+.card-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.bank-card {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px 22px;
+  border-radius: 18px;
+  background: var(--card-gradient);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  overflow: hidden;
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -30px;
+    left: -30px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+
+    .card-chip {
+      width: 38px;
+      height: 28px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #ffd700 0%, #e6c200 50%, #bfa200 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .chip-inner {
+        width: 70%;
+        height: 50%;
+        border: 1.5px solid rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+      }
+    }
+
+    .card-marca {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: white;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+
+      &.marca-visa {
+        font-style: italic;
+        font-size: 1.1rem;
+        font-family: 'Trebuchet MS', sans-serif;
+        letter-spacing: 1px;
+      }
+      &.marca-mastercard {
+        font-size: 0.75rem;
+        letter-spacing: 0;
+      }
+      &.marca-amex {
+        font-size: 0.78rem;
+        letter-spacing: 1.5px;
+      }
+    }
+  }
+
+  .card-middle {
+    position: relative;
+    z-index: 1;
+    margin: 10px 0;
+
+    .card-number {
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: white;
+      letter-spacing: 2px;
+      font-family: 'Courier New', monospace;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  .card-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+
+    .card-banco {
+      display: flex;
+      align-items: center;
+
+      .banco-logo {
+        height: 32px;
+        width: auto;
+        max-width: 90px;
+        object-fit: contain;
+        border-radius: 4px;
+      }
+
+      span {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: white;
+        opacity: 0.85;
+      }
+    }
+
+    .card-datos {
+      .card-label {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        opacity: 0.8;
+      }
+    }
+  }
+}
+
+/* ─── Panel expandido ────────────────────────────── */
+.card-detail {
+  max-width: 400px;
+  margin: 0 auto;
+  margin-top: 6px;
+  background: var(--ion-color-white, #fff);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--app-border, rgba(0,0,0,0.06));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .detail-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--ion-color-light);
+
+    &:last-of-type { border-bottom: none; }
+
+    .detail-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      color: var(--ion-color-medium);
+
+      ion-icon { font-size: 1rem; }
+    }
+
+    .detail-value {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+
+      &.mono { font-family: 'Courier New', monospace; letter-spacing: 2px; }
+
+      &.marca-visa { color: #1a1f71; font-style: italic; }
+      &.marca-mastercard { color: #eb001b; }
+      &.marca-amex { color: #006fcf; }
+    }
+  }
+
+  .detail-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+    margin-top: 4px;
+
+    ion-button {
+      --border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+  }
+}
+
+/* ─── Empty state ────────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  background: var(--ion-color-white, #fff);
+  border-radius: var(--app-radius-md);
+
+  ion-icon { font-size: 2.6rem; color: var(--ion-color-medium); opacity: 0.4; }
+  p { margin: 0; color: var(--ion-color-medium); font-size: 0.9rem; text-align: center; }
+}
+
+/* ─── Desktop ────────────────────────────────────── */
 @media (min-width: 768px) {
-  .tarjetas-grid {
+  .tarjetas-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
     gap: 16px;
-    max-width: var(--app-content-max, 1200px);
-    margin: 0 auto;
-    padding: 0 8px;
   }
 
-  .tarjetas-grid ion-item-sliding {
-    margin: 0;
-  }
-
-  .tarjetas-grid ion-card.tarjeta-card {
-    width: 100%;
-    max-width: none;
-    margin: 0;
+  .card-wrapper {
+    .bank-card, .card-detail {
+      margin: 0;
+      max-width: none;
+    }
   }
 }

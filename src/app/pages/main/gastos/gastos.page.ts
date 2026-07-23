@@ -1,5 +1,5 @@
-import { CommonModule, NgFor, NgIf } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule, NgFor, NgIf, NgTemplateOutlet } from '@angular/common';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
@@ -14,9 +14,14 @@ import { AddUpdtDeleteGastoComponent } from './add-updt-delete-gasto/add-updt-de
   selector: 'app-gastos',
   templateUrl: './gastos.page.html',
   styleUrls: ['./gastos.page.scss'],
-  imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor, CommonModule, ReactiveFormsModule]
+  imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor, CommonModule, ReactiveFormsModule, NgTemplateOutlet]
 })
 export class GastosPage implements OnInit {
+
+  @Input() ocultarHeader = false;
+  @Input() ocultarFooter = false;
+  @Input() embebido = false;
+  get contentTag(): string { return this.embebido ? 'div' : 'ion-content'; }
 
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);

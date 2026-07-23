@@ -102,12 +102,23 @@ export class SimuladorService {
   async eliminarGastosVencidos(): Promise<void> {
     const gastos = await this.obtenerGastos();
     const hoy = new Date();
+    const limite = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
 
     for (const gasto of gastos) {
-      if (gasto.fechaFin) {
+      if (gasto.fechaFin && gasto.tipo === 'temporal') {
         const fechaFin = this.safeParseDate(gasto.fechaFin);
-        if (fechaFin && fechaFin < hoy) {
-          await this.eliminarGasto(gasto.id);
+        if (fechaFin && fechaFin < limite) {
+          if (gasto.cantidadCuotas && gasto.cantidadCuotas > 0) {
+            const fechaInicio = this.safeParseDate(gasto.fechaInicio);
+            if (fechaInicio) {
+              const cuotaActual = (hoy.getFullYear() - fechaInicio.getFullYear()) * 12 + (hoy.getMonth() - fechaInicio.getMonth()) + 1;
+              if (cuotaActual > gasto.cantidadCuotas) {
+                await this.eliminarGasto(gasto.id);
+              }
+            }
+          } else {
+            await this.eliminarGasto(gasto.id);
+          }
         }
       }
     }

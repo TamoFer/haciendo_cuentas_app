@@ -1,4 +1,3 @@
-/* ── Pagos del mes ── */
 .page-container {
   max-width: var(--app-content-max, 1200px);
   margin: 0 auto;
@@ -9,21 +8,83 @@
   gap: 16px;
 }
 
-/* ─── Banner del mes ─────────────────────────────── */
+/* ─── Banner del mes con navegación ─────────────── */
 .mes-banner {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 18px;
+  justify-content: space-between;
+  padding: 12px 12px;
   background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-shade) 100%);
   border-radius: var(--app-radius-md);
   color: white;
-  font-size: 0.95rem;
-  font-weight: 600;
-  text-transform: capitalize;
 
-  ion-icon {
-    font-size: 1.3rem;
+  .mes-nav-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+
+    &:active { transform: scale(0.9); }
+
+    ion-icon { font-size: 1.2rem; color: white; }
+  }
+
+  .mes-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: capitalize;
+
+    ion-icon { font-size: 1.3rem; }
+  }
+}
+
+/* ─── Resumen general ───────────────────────────── */
+.resumen-general {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background: var(--ion-color-white);
+  border-radius: var(--app-radius-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  .resumen-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+
+    .resumen-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--ion-color-medium);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .resumen-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+
+      &.total { color: var(--ion-color-dark); }
+      &.pagado { color: var(--ion-color-success); }
+    }
+  }
+
+  .resumen-divider {
+    width: 1px;
+    height: 32px;
+    background: var(--ion-color-light);
   }
 }
 
@@ -44,32 +105,27 @@
   user-select: none;
   transition: filter 0.15s ease;
 
-  &:active {
-    filter: brightness(0.95);
-  }
+  &:active { filter: brightness(0.95); }
 
-  &.mensuales {
-    background: linear-gradient(135deg, var(--ion-color-danger) 0%, var(--ion-color-danger-shade) 100%);
-  }
-
-  &.cuotas {
-    background: linear-gradient(135deg, var(--ion-color-warning) 0%, var(--ion-color-warning-shade) 100%);
-  }
+  &.mensuales { background: linear-gradient(135deg, var(--ion-color-danger) 0%, var(--ion-color-danger-shade) 100%); }
+  &.cuotas { background: linear-gradient(135deg, var(--ion-color-warning) 0%, var(--ion-color-warning-shade) 100%); }
+  &.sin-tarjeta { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+  &.tarjeta { background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-shade) 100%); }
 
   .section-titulo {
     display: flex;
     align-items: center;
     gap: 8px;
     color: white;
+    flex-wrap: wrap;
 
-    ion-icon {
-      font-size: 1.25rem;
-      color: white;
-    }
+    ion-icon { font-size: 1.25rem; color: white; }
+    span { font-size: 1rem; font-weight: 600; }
 
-    span {
-      font-size: 1rem;
-      font-weight: 600;
+    .card-digits {
+      font-size: 0.82rem;
+      font-weight: 500;
+      opacity: 0.85;
     }
 
     .contador {
@@ -90,14 +146,8 @@
     font-weight: 600;
     opacity: 0.95;
 
-    .resumen-texto {
-      white-space: nowrap;
-    }
-
-    .chevron {
-      font-size: 1.1rem;
-      transition: transform 0.18s ease;
-    }
+    .resumen-texto { white-space: nowrap; }
+    .chevron { font-size: 1.1rem; transition: transform 0.18s ease; }
   }
 }
 
@@ -110,17 +160,14 @@
 
 .pago-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   padding: 12px 14px;
   background: var(--ion-color-white);
   border-radius: 10px;
   border: 1px solid var(--app-border);
 
-  ion-checkbox {
-    --size: 24px;
-    flex-shrink: 0;
-  }
+  ion-checkbox { --size: 24px; flex-shrink: 0; margin-top: 2px; }
 
   .pago-icon {
     width: 38px;
@@ -129,19 +176,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
     background: rgba(var(--ion-color-danger-rgb), 0.1);
 
-    ion-icon {
-      font-size: 1.1rem;
-      color: var(--ion-color-danger);
-    }
+    ion-icon { font-size: 1.1rem; color: var(--ion-color-danger); }
 
     &.proy {
       background: rgba(var(--ion-color-warning-rgb), 0.12);
+      ion-icon { color: var(--ion-color-warning); }
+    }
 
-      ion-icon {
-        color: var(--ion-color-warning);
-      }
+    &.warn {
+      background: rgba(var(--ion-color-warning-rgb), 0.15);
+      ion-icon { color: #f59e0b; font-size: 1.2rem; }
     }
   }
 
@@ -150,16 +197,13 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
   }
 
   .pago-nombre {
     font-size: 0.92rem;
     font-weight: 600;
     color: var(--ion-color-dark);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .pago-meta {
@@ -168,9 +212,9 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    flex-wrap: wrap;
 
-    .cat-tag,
-    .cuota-tag {
+    .cat-tag {
       background: rgba(var(--ion-color-primary-rgb), 0.08);
       color: var(--ion-color-primary);
       padding: 1px 8px;
@@ -182,6 +226,31 @@
     .cuota-tag {
       background: rgba(var(--ion-color-warning-rgb), 0.12);
       color: var(--ion-color-warning-shade);
+      padding: 1px 8px;
+      border-radius: 8px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+  }
+
+  .asignar-tarjeta-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+
+    ion-icon { font-size: 1rem; color: var(--ion-color-medium); }
+
+    select {
+      flex: 1;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 0.82rem;
+      color: var(--ion-color-dark);
+      background: var(--ion-color-light);
+      outline: none;
+      cursor: pointer;
     }
   }
 
@@ -194,14 +263,16 @@
 
   &.pagado {
     opacity: 0.55;
+    .pago-nombre { text-decoration: line-through; }
+  }
 
-    .pago-nombre {
-      text-decoration: line-through;
-    }
+  &.alerta {
+    border-color: rgba(245, 158, 11, 0.4);
+    border-left: 3px solid #f59e0b;
   }
 }
 
-/* ─── Empty mini (dentro de la sección colapsable) ── */
+/* ─── Empty mini ── */
 .empty-mini {
   display: flex;
   align-items: center;
@@ -214,13 +285,10 @@
   font-size: 0.85rem;
   font-weight: 500;
 
-  ion-icon {
-    font-size: 1.15rem;
-    opacity: 0.55;
-  }
+  ion-icon { font-size: 1.15rem; opacity: 0.55; }
 }
 
-/* ─── Empty state ───────────────────────────────── */
+/* ─── Empty state ── */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -231,27 +299,12 @@
   background: var(--ion-color-white);
   border-radius: var(--app-radius-md);
 
-  ion-icon {
-    font-size: 2.6rem;
-    color: var(--ion-color-medium);
-    opacity: 0.4;
-  }
-
-  p {
-    margin: 0;
-    color: var(--ion-color-medium);
-    font-size: 0.9rem;
-    text-align: center;
-  }
+  ion-icon { font-size: 2.6rem; color: var(--ion-color-medium); opacity: 0.4; }
+  p { margin: 0; color: var(--ion-color-medium); font-size: 0.9rem; text-align: center; }
 }
 
-/* ─── Desktop ≥1024px: dos columnas ──────────────── */
+/* ─── Desktop ── */
 @media (min-width: 1024px) {
-  .page-container {
-    padding: 24px 16px 100px;
-  }
-
-  .pago-section {
-    gap: 12px;
-  }
+  .page-container { padding: 24px 16px 100px; }
+  .pago-section { gap: 12px; }
 }

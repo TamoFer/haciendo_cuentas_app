@@ -3,17 +3,39 @@
 <ion-content>
   <div class="page-container">
 
+    <!-- Banner del mes con navegación -->
     <div class="mes-banner">
-      <ion-icon name="calendar-number-outline"></ion-icon>
-      <span>{{ nombreMes }}</span>
+      <button class="mes-nav-btn" (click)="mesAnterior()">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+      <div class="mes-info">
+        <ion-icon name="calendar-number-outline"></ion-icon>
+        <span>{{ nombreMes }}</span>
+      </div>
+      <button class="mes-nav-btn" (click)="mesSiguiente()">
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </button>
     </div>
 
-    <!-- Sección Consumos mensuales -->
+    <!-- Resumen general -->
+    <div class="resumen-general">
+      <div class="resumen-item">
+        <span class="resumen-label">Total a pagar</span>
+        <span class="resumen-value total">{{ (totalMensuales + totalCuotas) | currency:'ARS':'symbol':'1.0-0':'es-AR' }}</span>
+      </div>
+      <div class="resumen-divider"></div>
+      <div class="resumen-item">
+        <span class="resumen-label">Pagado</span>
+        <span class="resumen-value pagado">{{ (pagadoMensuales + pagadoCuotas) | currency:'ARS':'symbol':'1.0-0':'es-AR' }}</span>
+      </div>
+    </div>
+
+    <!-- Sección Gastos Fijos -->
     <div class="pago-section">
       <div class="section-head mensuales" (click)="toggleMensuales()">
         <div class="section-titulo">
           <ion-icon name="repeat-outline"></ion-icon>
-          <span>Consumos mensuales</span>
+          <span>Gastos Fijos</span>
           <span class="contador">{{ consumosMensuales.length }}</span>
         </div>
         <div class="section-resumen">
@@ -40,26 +62,66 @@
 
       <div class="empty-mini" *ngIf="expandirMensuales && consumosMensuales.length === 0">
         <ion-icon name="eye-off-outline"></ion-icon>
-        <span>No hay consumos mensuales registrados</span>
+        <span>No hay gastos fijos registrados</span>
       </div>
     </div>
 
-    <!-- Sección Consumos en cuotas -->
-    <div class="pago-section">
-      <div class="section-head cuotas" (click)="toggleCuotas()">
+    <!-- Sección Cuotificados sin tarjeta asignar -->
+    <div class="pago-section" *ngIf="consumosSinTarjeta.length > 0">
+      <div class="section-head sin-tarjeta" (click)="toggleSinTarjeta()">
         <div class="section-titulo">
-          <ion-icon name="card-outline"></ion-icon>
-          <span>Consumos en cuotas</span>
-          <span class="contador">{{ consumosCuotas.length }}</span>
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <span>Sin tarjeta asignada</span>
+          <span class="contador">{{ consumosSinTarjeta.length }}</span>
         </div>
         <div class="section-resumen">
-          <span class="resumen-texto">{{ pagadoCuotas | currency:'ARS':'symbol':'1.0-0':'es-AR' }} / {{ totalCuotas | currency:'ARS':'symbol':'1.0-0':'es-AR' }}</span>
-          <ion-icon class="chevron" [name]="expandirCuotas ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+          <span class="resumen-texto">{{ totalSinTarjeta | currency:'ARS':'symbol':'1.0-0':'es-AR' }}</span>
+          <ion-icon class="chevron" [name]="expandirSinTarjeta ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
         </div>
       </div>
 
-      <div class="pago-list" *ngIf="expandirCuotas">
-        <div class="pago-item" *ngFor="let item of consumosCuotas" [class.pagado]="item.pagado">
+      <div class="pago-list" *ngIf="expandirSinTarjeta">
+        <div class="pago-item alerta" *ngFor="let item of consumosSinTarjeta" [class.pagado]="item.pagado">
+          <ion-checkbox [checked]="item.pagado" (ionChange)="togglePagado(item)"></ion-checkbox>
+          <div class="pago-icon warn">
+            <ion-icon name="alert-circle"></ion-icon>
+          </div>
+          <div class="pago-body">
+            <span class="pago-nombre">{{ item.nombre }}</span>
+            <span class="pago-meta">
+              <span class="cat-tag" *ngIf="item.categoria">{{ item.categoria }}</span>
+              <span class="cuota-tag" *ngIf="item.cuotaInfo">{{ item.cuotaInfo }}</span>
+            </span>
+            <div class="asignar-tarjeta-row">
+              <ion-icon name="card-outline"></ion-icon>
+              <select (change)="asociarTarjeta(item, $any($event.target).value)">
+                <option value="">Asignar tarjeta...</option>
+                <option *ngFor="let t of tarjetas" [value]="t.id">{{ t.banco }} {{ t.tarjeta }} {{ t.digitos }}</option>
+              </select>
+            </div>
+          </div>
+          <span class="pago-monto">${{ item.importe | number:'1.0-0':'es-AR' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Secciones por tarjeta -->
+    <div class="pago-section" *ngFor="let grupo of tarjetasGrupos">
+      <div class="section-head tarjeta" (click)="toggleTarjetaGrupo(grupo)">
+        <div class="section-titulo">
+          <ion-icon name="card-outline"></ion-icon>
+          <span>{{ grupo.tarjeta.banco }} {{ grupo.tarjeta.tarjeta }}</span>
+          <span class="card-digits">{{ grupo.tarjeta.digitos }}</span>
+          <span class="contador">{{ grupo.items.length }}</span>
+        </div>
+        <div class="section-resumen">
+          <span class="resumen-texto">{{ grupo.pagado | currency:'ARS':'symbol':'1.0-0':'es-AR' }} / {{ grupo.total | currency:'ARS':'symbol':'1.0-0':'es-AR' }}</span>
+          <ion-icon class="chevron" [name]="grupo.expandido ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+        </div>
+      </div>
+
+      <div class="pago-list" *ngIf="grupo.expandido">
+        <div class="pago-item" *ngFor="let item of grupo.items" [class.pagado]="item.pagado">
           <ion-checkbox [checked]="item.pagado" (ionChange)="togglePagado(item)"></ion-checkbox>
           <div class="pago-icon proy">
             <ion-icon name="time-outline"></ion-icon>
@@ -74,11 +136,12 @@
           <span class="pago-monto">${{ item.importe | number:'1.0-0':'es-AR' }}</span>
         </div>
       </div>
+    </div>
 
-      <div class="empty-mini" *ngIf="expandirCuotas && consumosCuotas.length === 0">
-        <ion-icon name="eye-off-outline"></ion-icon>
-        <span>No hay consumos en cuotas registrados</span>
-      </div>
+    <!-- Empty state general -->
+    <div class="empty-state" *ngIf="consumosMensuales.length === 0 && tarjetasGrupos.length === 0 && consumosSinTarjeta.length === 0">
+      <ion-icon name="wallet-outline"></ion-icon>
+      <p>No hay pagos pendientes para este mes.</p>
     </div>
 
   </div>

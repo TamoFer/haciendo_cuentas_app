@@ -6,6 +6,7 @@ import { User } from '../models/user.model';
 import { Movimiento } from '../models/movimiento.model';
 import { Tarjeta } from '../models/tarjeta.model';
 import { Consumo } from '../models/consumoTarjeta.model';
+import { GastoSimulador } from '../models/gasto-simulador.model';
 import { MetasPageModule } from '../pages/main/metas/metas.module';
 import { Meta } from '../models/metas.model';
 import { Ahorro } from '../models/ahorro.model';
@@ -127,6 +128,39 @@ export class UtilsService {
     this.setTarjetas(lista);
   }
 
+
+  // @endsection
+
+
+  // @section: gastosSimulador
+
+  private gastosSimuladorSubject = new BehaviorSubject<GastoSimulador[]>([]);
+  gastosSimulador$ = this.gastosSimuladorSubject.asObservable();
+
+  getGastosSimuladorActuales(): GastoSimulador[] {
+    return this.gastosSimuladorSubject.getValue();
+  }
+
+  setGastosSimulador(gastos: GastoSimulador[]) {
+    this.gastosSimuladorSubject.next(gastos);
+  }
+
+  agregarGastoSimulador(nuevo: GastoSimulador) {
+    const actualizados = [nuevo, ...this.getGastosSimuladorActuales()];
+    this.setGastosSimulador(actualizados);
+  }
+
+  actualizarGastoSimulador(actualizado: GastoSimulador) {
+    const lista = this.getGastosSimuladorActuales().map(g =>
+      g.id === actualizado.id ? actualizado : g
+    );
+    this.setGastosSimulador(lista);
+  }
+
+  eliminarGastoSimulador(id: string) {
+    const lista = this.getGastosSimuladorActuales().filter(g => g.id !== id);
+    this.setGastosSimulador(lista);
+  }
 
   // @endsection
 

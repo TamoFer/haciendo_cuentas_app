@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header *ngIf="!oculto">
   <ion-toolbar class="app-toolbar">
     <ion-buttons slot="start" *ngIf="mostrarVolver">
       <ion-button (click)="volver()">

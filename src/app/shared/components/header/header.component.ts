@@ -15,6 +15,7 @@ import { ConfiguracionComponent } from 'src/app/pages/main/configuracion/configu
 })
 export class HeaderComponent implements OnInit {
   @Input() title!: string;
+  @Input() oculto: boolean = false;
   @Input() mostrarVolver: boolean = false;
   @Output() volverAccion = new EventEmitter<void>();
   @Input() isModal!: boolean;

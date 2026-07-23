@@ -11,6 +11,8 @@ export interface GastoSimulador {
   fechaCreacion: Date;
   pagado?: boolean;
   mesPagado?: string;
+  tarjetaId?: string;
+  tarjetaNombre?: string;
 }
 
 export interface GastoConCuota extends GastoSimulador {

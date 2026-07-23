@@ -1,6 +1,16 @@
-<app-header title="Gastos"></app-header>
+<app-header title="Gastos" [oculto]="ocultarHeader"></app-header>
 
-<ion-content>
+@if (embebido) {
+  <div class="page-content-embebido">
+    <ng-container [ngTemplateOutlet]="contenido"></ng-container>
+  </div>
+} @else {
+  <ion-content>
+    <ng-container [ngTemplateOutlet]="contenido"></ng-container>
+  </ion-content>
+}
+
+<ng-template #contenido>
   <div class="page-container">
 
     <!-- ====== Panel de búsqueda ====== -->
@@ -149,5 +159,6 @@
   <button class="fab" (click)="agregarGastos()">
     <ion-icon name="add-outline"></ion-icon>
   </button>
-</ion-content>
-<app-footer></app-footer>
+</ng-template>
+
+<app-footer *ngIf="!ocultarFooter"></app-footer>

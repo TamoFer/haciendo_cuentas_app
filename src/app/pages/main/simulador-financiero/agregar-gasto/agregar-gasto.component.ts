@@ -5,9 +5,11 @@ import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UtilsService } from 'src/app/services/utils.service';
 import { SimuladorService } from 'src/app/services/simulador.service';
 import { GastoSimulador } from 'src/app/models/gasto-simulador.model';
+import { Tarjeta } from 'src/app/models/tarjeta.model';
 import { MaskitoDirective } from '@maskito/angular';
 import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import { MaskitoElementPredicate } from '@maskito/core';
+import { FirebaseService } from 'src/app/services/firebase.service';
 
 @Component({
   selector: 'app-agregar-gasto',
@@ -79,6 +81,30 @@ import { MaskitoElementPredicate } from '@maskito/core';
           </div>
 
           @if (tipo === 'temporal') {
+            <div class="field-divider"></div>
+
+            <!-- Tarjeta asociada -->
+            <div class="field">
+              <div class="field-head">
+                <span>Tarjeta asociada</span>
+              </div>
+              @if (tarjetas.length > 0) {
+                <div class="chips-wrap">
+                  @for (t of tarjetas; track t.id) {
+                    <ion-chip [color]="tarjetaSeleccionada?.id === t.id ? 'warning' : 'light'"
+                      [outline]="tarjetaSeleccionada?.id !== t.id" (click)="seleccionarTarjeta(t)" class="cat-chip">
+                      {{ t.banco }} {{ t.tarjeta }} {{ t.digitos }}
+                    </ion-chip>
+                  }
+                </div>
+              } @else {
+                <div class="no-tarjetas-hint">
+                  <ion-icon name="alert-circle-outline"></ion-icon>
+                  <span>No tenés tarjetas cargadas. Creá una en la sección Tarjetas.</span>
+                </div>
+              }
+            </div>
+
             <div class="field-divider"></div>
 
             <!-- Cuotas -->
@@ -229,6 +255,23 @@ import { MaskitoElementPredicate } from '@maskito/core';
           }
         }
       }
+
+      .no-tarjetas-hint {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        background: rgba(var(--ion-color-warning-rgb), 0.1);
+        border-radius: 10px;
+        font-size: 0.82rem;
+        color: var(--ion-color-dark);
+
+        ion-icon {
+          font-size: 1.1rem;
+          color: var(--ion-color-warning);
+          flex-shrink: 0;
+        }
+      }
     }
 
     .field-divider {
@@ -286,10 +329,14 @@ export class AgregarGastoComponent implements OnInit {
 
   utilsSvc = inject(UtilsService);
   simuladorSvc = inject(SimuladorService);
+  firebaseSVC = inject(FirebaseService);
 
   @Input() tipo: 'fijo' | 'temporal' = 'fijo';
   @Input() categorias: string[] = [];
   @Input() gasto: GastoSimulador | null = null;
+  @Input() tarjetaPreseleccionadaId: string | null = null;
+  tarjetas: Tarjeta[] = [];
+  tarjetaSeleccionada: Tarjeta | null = null;
 
   nombre: string = '';
   categoria: string = '';
@@ -312,23 +359,54 @@ export class AgregarGastoComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.utilsSvc.tarjetas$.subscribe(tarjetas => {
+      this.tarjetas = tarjetas || [];
+      if (this.gasto?.tarjetaId) {
+        this.tarjetaSeleccionada = this.tarjetas.find(t => t.id === this.gasto!.tarjetaId) || null;
+      } else if (this.tarjetaPreseleccionadaId && this.tipo === 'temporal') {
+        this.tarjetaSeleccionada = this.tarjetas.find(t => t.id === this.tarjetaPreseleccionadaId) || null;
+      }
+    });
+    this.obtenerTarjetas();
+
     if (this.gasto) {
       this.nombre = this.gasto.nombre;
       this.categoria = this.gasto.categoria;
       this.importeControl.setValue(
         this.gasto.importe.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
       );
-      this.fechaInicio = this.gasto.fechaInicio instanceof Date
-        ? this.gasto.fechaInicio.toISOString().split('T')[0]
-        : new Date(this.gasto.fechaInicio).toISOString().split('T')[0];
+      this.fechaInicio = this.toDateStr(this.gasto.fechaInicio);
       if (this.gasto.fechaFin) {
-        this.fechaFin = this.gasto.fechaFin instanceof Date
-          ? this.gasto.fechaFin.toISOString().split('T')[0]
-          : new Date(this.gasto.fechaFin).toISOString().split('T')[0];
+        this.fechaFin = this.toDateStr(this.gasto.fechaFin);
       }
       this.cantidadCuotas = this.gasto.cantidadCuotas || null;
       this.detalles = this.gasto.detalles || '';
     }
+  }
+
+  obtenerTarjetas() {
+    const usuario = this.utilsSvc.obtenerDatosLS('user');
+    if (!usuario) return;
+    const path = `users/${usuario.uid}/tarjetas`;
+    this.firebaseSVC.getCollectionData(path).subscribe({
+      next: (res: Tarjeta[]) => {
+        this.utilsSvc.setTarjetas(res);
+      },
+      error: err => console.error('Error obteniendo tarjetas', err)
+    });
+  }
+
+  seleccionarTarjeta(t: Tarjeta) {
+    this.tarjetaSeleccionada = t;
+  }
+
+  private toDateStr(value: any): string {
+    if (!value) return '';
+    if (value instanceof Date) return value.toISOString().split('T')[0];
+    if (value && typeof value.toDate === 'function') return value.toDate().toISOString().split('T')[0];
+    if (value && value.seconds) return new Date(value.seconds * 1000).toISOString().split('T')[0];
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
   }
 
   guardar() {
@@ -336,6 +414,17 @@ export class AgregarGastoComponent implements OnInit {
       this.utilsSvc.presentToast({
         message: 'Ingresá un nombre',
         duration: 2000,
+        color: 'warning',
+        position: 'middle',
+        icon: 'alert-circle-outline'
+      });
+      return;
+    }
+
+    if (this.tipo === 'temporal' && !this.tarjetaSeleccionada) {
+      this.utilsSvc.presentToast({
+        message: 'Seleccioná una tarjeta para el consumo cuotificado',
+        duration: 2500,
         color: 'warning',
         position: 'middle',
         icon: 'alert-circle-outline'
@@ -370,6 +459,11 @@ export class AgregarGastoComponent implements OnInit {
       fechaFinDate = fecha;
     }
 
+    const tarjetaData = this.tarjetaSeleccionada ? {
+      tarjetaId: this.tarjetaSeleccionada.id,
+      tarjetaNombre: `${this.tarjetaSeleccionada.banco} ${this.tarjetaSeleccionada.tarjeta} ${this.tarjetaSeleccionada.digitos}`
+    } : {};
+
     if (this.esEdicion) {
       const gastoActualizado: Partial<GastoSimulador> & { id: string; existente: boolean } = {
         id: this.gasto!.id,
@@ -381,6 +475,7 @@ export class AgregarGastoComponent implements OnInit {
         fechaFin: fechaFinDate,
         cantidadCuotas: cuotas > 0 ? cuotas : null,
         detalles: this.detalles.trim() || null,
+        ...tarjetaData,
         existente: true
       };
       this.utilsSvc.dismissModal(gastoActualizado);
@@ -395,7 +490,8 @@ export class AgregarGastoComponent implements OnInit {
         fechaFin: fechaFinDate,
         cantidadCuotas: cuotas > 0 ? cuotas : null,
         detalles: this.detalles.trim() || null,
-        fechaCreacion: new Date()
+        fechaCreacion: new Date(),
+        ...tarjetaData
       };
       this.utilsSvc.dismissModal(gasto);
     }

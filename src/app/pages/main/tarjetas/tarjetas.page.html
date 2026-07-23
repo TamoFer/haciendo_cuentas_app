@@ -1,133 +1,118 @@
-<app-header title="Tarjetas" [mostrarVolver]="usuarioLogeado" [routerLink]="['/home']"></app-header>
+<app-header title="Tarjetas"></app-header>
+
 <ion-content>
-  <div class="ion-page" #page>
-    <ion-content class="ion-padding">
+  <div class="page-container">
 
-      <!-- MODAL COMPONENTE, SE VE SOLO CUANDO LE DAS A AGREGAR TARJETA -->
-      <div class="botones-acciones">
-        <ion-button id="open-modal" expand="block"> <ion-icon slot="start" name="add"></ion-icon> Nueva
-          Tarjeta</ion-button>
+    <!-- Botón agregar -->
+    <div class="add-bar">
+      <button class="add-btn" (click)="toggleForm()">
+        <ion-icon [name]="showForm ? 'close-outline' : 'add-outline'"></ion-icon>
+        <span>{{ showForm ? 'Cancelar' : 'Nueva Tarjeta' }}</span>
+      </button>
+    </div>
 
-        <ion-button expand="block" (click)="agregarConsumo()"> <ion-icon slot="start" name="add"></ion-icon>Nuevo
-          Consumo</ion-button>
-      </div>
+    <!-- Formulario inline -->
+    <div class="form-card" *ngIf="showForm">
+      <form [formGroup]="formulario" (ngSubmit)="crearTarjeta()">
+        <div class="form-row">
+          <div class="form-field">
+            <span class="form-label">Banco</span>
+            <select formControlName="banco">
+              <option value="" disabled selected>Elegí el banco</option>
+              <option *ngFor="let b of bancos" [value]="b">{{ b }}</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <span class="form-label">Marca</span>
+            <select formControlName="tarjeta">
+              <option value="" disabled selected>Elegí la marca</option>
+              <option *ngFor="let m of marcas" [value]="m">{{ m }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <span class="form-label">Últimos 4 dígitos</span>
+            <ion-input [maskito]="cardMask" [maskitoElement]="maskPredicate" formControlName="digitos"
+                       placeholder="0000" inputmode="numeric" class="form-input"></ion-input>
+          </div>
+          <div class="form-field">
+            <span class="form-label">Fecha de cierre</span>
+            <ion-input type="date" formControlName="fecha_cierre" class="form-input"></ion-input>
+          </div>
+        </div>
+        <ion-button expand="block" [disabled]="!formulario.valid" (click)="crearTarjeta()" class="submit-btn">
+          <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+          Agregar Tarjeta
+        </ion-button>
+      </form>
+    </div>
 
-      <!-- // MODAL PARA AGREGAR TARJETA -->
-      <ion-modal #modal trigger="open-modal" [canDismiss]="canDismiss" [presentingElement]="page">
-        <ng-template>
-          <ion-header>
-            <ion-toolbar>
-              <ion-title>Tarjeta de Credito</ion-title>
-              <ion-buttons slot="start">
-              </ion-buttons>
-              <ion-buttons slot="end">
-                <ion-button (click)="modal.dismiss()">Cancelar</ion-button>
-              </ion-buttons>
-            </ion-toolbar>
-          </ion-header>
-          <ion-content class="ion-padding">
-            <form [formGroup]="formulario" (ngSubmit)="crearTarjeta()">
-              <ion-item>
-                <ion-select justify="center" label="Banco" placeholder="Selecciona el banco" formControlName="banco">
-                  <ion-select-option value="Santander">Santander</ion-select-option>
-                  <ion-select-option value="Galicia">Galicia</ion-select-option>
-                  <ion-select-option value="Bbva">Bbva</ion-select-option>
-                  <ion-select-option value="Otro">Otro Banco</ion-select-option>
-
-                </ion-select>
-              </ion-item>
-              <div *ngIf="formulario.controls.banco.errors && formulario.controls.banco.touched">
-                <div class="errores" *ngIf="formulario.controls.banco.errors?.['required']">El banco es necesario</div>
+    <!-- Lista de tarjetas tipo acordeón -->
+    <div class="tarjetas-list" *ngIf="tarjetas.length > 0; else emptyState">
+      @for (t of tarjetas; track t.id) {
+        <div class="card-wrapper" [style.--card-gradient]="getColorBancoGradient(t.banco)">
+          <!-- Tarjeta visual colapsada -->
+          <div class="bank-card" (click)="toggleExpand(t)">
+            <div class="card-top">
+              <div class="card-chip">
+                <div class="chip-inner"></div>
               </div>
-
-              <ion-item>
-                <ion-select justify="center" label="Tipo" placeholder="Elegi que es tu tarjeta"
-                  formControlName="tarjeta">
-                  <ion-select-option value="Visa">Visa</ion-select-option>
-                  <ion-select-option value="Mastercard">Mastercard</ion-select-option>
-                  <ion-select-option value="American Express">American Express</ion-select-option>
-                </ion-select>
-              </ion-item>
-              <div *ngIf="formulario.controls.tarjeta.errors && formulario.controls.tarjeta.touched">
-                <div class="errores" *ngIf="formulario.controls.tarjeta.errors?.['required']">La tarjeta es necesario
-                </div>
-              </div>
-
-
-              <ion-item class="fecha-item">
-                <ion-label>Ultimos 4 digitos</ion-label>
-                <ion-input placeholder="**** **** **** 0000" [maskito]="cardMask" [maskitoElement]="maskPredicate"
-                  formControlName="digitos"></ion-input>
-              </ion-item>
-              <div *ngIf="formulario.controls.digitos.errors && formulario.controls.digitos.touched">
-                <div class="errores" *ngIf="formulario.controls.digitos.errors?.['required']">Los ultimos 4 digitos son
-                  necesarios
-                </div>
-                <div class="errores" *ngIf="formulario.controls.digitos.errors?.['minlength']">Deben ser 4 los digitos
-                </div>
-              </div>
-
-
-              <ion-item class="fecha-item">
-                <div class="fcierre">
-                  <div class="fc_info">
-                    <ion-label class="estilo-texto">Fecha de cierre </ion-label>
-                    <ion-icon slot="end" name="help-circle-outline" id="info-cierre" color="warning"></ion-icon>
-                    <ion-alert trigger="info-cierre" header="Info"
-                      message="La fecha de cierre indica que hasta esa fecha inclusive,todo gasto que realices con la tarjeta, va a entrar en el resumen proximo a abonar. Si compras luego de esa fecha, esos consumos que realices, vendran para abonar dentro de 30 dias, el siguiente resumen al corriente. La fecha de cierre varia mes a mes, la puedes ver en tu HomeBanking"
-                      [buttons]="alertaInfo"></ion-alert>
-                  </div>
-                  <ion-input type="date" formControlName="fecha_cierre"></ion-input>
-                </div>
-              </ion-item>
-              <div *ngIf="formulario.controls.fecha_cierre.errors && formulario.controls.fecha_cierre.touched">
-                <div class="errores" *ngIf="formulario.controls.fecha_cierre.errors?.['required']">La fecha de cierre es
-                  necesaria
-                </div>
-              </div>
-              <div
-                style="width: max-content; display: flex; flex-direction: row ; justify-content: center; margin: 10px auto;">
-                <ion-button type="submit" [disabled]="!formulario.valid" shape="round"> <ion-icon slot="start"
-                    name="checkmark-circle-outline"></ion-icon> Agregar
-                </ion-button>
-              </div>
-
-            </form>
-          </ion-content>
-
-        </ng-template>
-      </ion-modal>
-
-      <!-- // LISTA DE TARJETASk -->
-      <div class="tarjetas-grid">
-        <ion-item-sliding *ngFor="let tarjeta of tarjetas">
-          <ion-card class="tarjeta-card" [ngStyle]="{'background-color': getColorBanco(tarjeta.banco), color: 'white'}">
-            <ion-card-header>
-              <ion-card-title class="card-title">**** **** **** {{tarjeta.digitos}}
-              </ion-card-title>
-              <ion-card-subtitle class="card-subtitle">
-                <ion-img [src]="getIconoBanco(tarjeta.banco)" class="icono-banco"></ion-img>
-                <ion-img [src]="getIconoTarjeta(tarjeta.tarjeta)" class="icono-tarjeta"></ion-img>
-              </ion-card-subtitle>
-            </ion-card-header>
-
-            <div class="botones">
-              <ion-button fill="clear" (click)="verConsumos(tarjeta)">
-                <ion-icon name="receipt" labe> </ion-icon>
-              </ion-button>
-              <ion-button fill="clear" (click)="editarTarjeta(tarjeta)">
-                <ion-icon name="pencil"></ion-icon>
-              </ion-button>
-              <ion-button fill="clear" (click)="confirmarDelete(tarjeta)">
-                <ion-icon name="trash-outline"></ion-icon>
-              </ion-button>
-
+              <span class="card-marca" [ngClass]="getMarcaClass(t.tarjeta)">{{ getMarcaLabel(t.tarjeta) }}</span>
             </div>
-          </ion-card>
-        </ion-item-sliding>
-      </div>
+            <div class="card-middle">
+              <span class="card-number">•••• •••• •••• {{ t.digitos }}</span>
+            </div>
+            <div class="card-bottom">
+              <div class="card-banco">
+                <img [src]="getBancoLogo(t.banco)" alt="" class="banco-logo" *ngIf="t.banco.toLowerCase() !== 'otro'">
+                <span *ngIf="t.banco.toLowerCase() === 'otro'">{{ t.banco }}</span>
+              </div>
+              <div class="card-datos">
+                <span class="card-label">{{ t.banco }}</span>
+              </div>
+            </div>
+          </div>
 
-    </ion-content>
+          <!-- Panel expandido -->
+          <div class="card-detail" *ngIf="tarjetaExpandidaId === t.id">
+            <div class="detail-row">
+              <span class="detail-label"><ion-icon name="card-outline"></ion-icon> Marca</span>
+              <span class="detail-value" [ngClass]="getMarcaClass(t.tarjeta)">{{ t.tarjeta }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label"><ion-icon name="pricetag-outline"></ion-icon> Últimos 4 dígitos</span>
+              <span class="detail-value mono">{{ t.digitos }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label"><ion-icon name="calendar-outline"></ion-icon> Fecha de cierre</span>
+              <span class="detail-value">{{ formatFechaCierre(t.fecha_cierre) }}</span>
+            </div>
+            <div class="detail-actions">
+              <ion-button fill="clear" size="small" (click)="verConsumos(t)">
+                <ion-icon slot="start" name="receipt-outline"></ion-icon>
+                Consumos
+              </ion-button>
+              <ion-button fill="clear" size="small" color="primary" (click)="editarTarjeta(t)">
+                <ion-icon slot="start" name="create-outline"></ion-icon>
+                Editar
+              </ion-button>
+              <ion-button fill="clear" size="small" color="danger" (click)="confirmarDelete(t)">
+                <ion-icon slot="start" name="trash-outline"></ion-icon>
+                Eliminar
+              </ion-button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <ng-template #emptyState>
+      <div class="empty-state">
+        <ion-icon name="card-outline"></ion-icon>
+        <p>No tenés tarjetas cargadas. Tocá "Nueva Tarjeta" para agregar una.</p>
+      </div>
+    </ng-template>
 
   </div>
 </ion-content>
