@@ -41,6 +41,7 @@ export class IngresosPage implements OnInit {
     { nombre: 'Changa', icono: 'construct-outline' },
     { nombre: 'Saldo', icono: 'wallet-outline' },
     { nombre: 'Ahorro', icono: 'piggy-bank-outline' },
+    { nombre: 'Ayuda', icono: 'hand-right-outline' },
     { nombre: 'Otros', icono: 'pricetag-outline' },
   ];
 
