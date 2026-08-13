@@ -66,7 +66,7 @@ export class AddUpdtDeleteGastoComponent {
     if (this.gasto) {
       this.formulario.patchValue(this.gasto);
       this.formulario.controls.importe.setValue(
-        this.gasto.importe.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        this.utilsSVC.parseARS(this.gasto.importe).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
       );
     }
   }
@@ -187,7 +187,7 @@ export class AddUpdtDeleteGastoComponent {
     const path = `users/${this.user.uid}`;
 
     const nuevo = this.formulario.value;
-    const original = Number(String(this.gasto.importe).replace(/\./g, '').replace(',', '.'));
+    const original = this.utilsSVC.parseARS(this.gasto.importe);
 
     let saldoEfectivoNuevo = this.user.saldo_efectivo
     let saldoBancoNuevo = this.user.saldo_banco
@@ -251,7 +251,7 @@ export class AddUpdtDeleteGastoComponent {
 
   saldoNegativoAlert(movimiento) {
 
-    const importe = Number(String(movimiento.importe).replace(/\./g, '').replace(',', '.'));
+    const importe = this.utilsSVC.parseARS(movimiento.importe);
     const tipo = movimiento.tipo;
     let condicional: boolean = false
 

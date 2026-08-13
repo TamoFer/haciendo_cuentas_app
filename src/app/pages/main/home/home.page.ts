@@ -107,7 +107,7 @@ export class HomePage implements OnInit, OnDestroy {
 
     for (const m of this.movimientosCuenta) {
       const fecha = new Date(m.fecha);
-      const montoStr = this.formatARS(m.importe);
+      const montoStr = this.utilsSVC.formatARS(m.importe);
       const esGasto = m.genero === 'gasto';
       items.push({
         tipoMov: esGasto ? 'gasto' : 'ingreso',
@@ -124,7 +124,7 @@ export class HomePage implements OnInit, OnDestroy {
       items.push({
         tipoMov: 'cambio',
         concepto: c.desde === 'efectivo' ? 'Depósito a banco' : 'Retiro de efectivo',
-        importe: this.formatARS(c.importe),
+        importe: this.utilsSVC.formatARS(c.importe),
         fecha: fecha.toLocaleDateString('es-AR', { day: '2-digit', month: 'short' }),
         icono: 'swap-horizontal-outline',
         rawFecha: fecha
@@ -134,56 +134,6 @@ export class HomePage implements OnInit, OnDestroy {
     this.ultimosMovimientos = items
       .sort((a, b) => b.rawFecha.getTime() - a.rawFecha.getTime())
       .slice(0, 5);
-  }
-
-  // Formatea un importe a moneda AR: separador de miles con "." y decimal con ",".
-  // Acepta number, string numérico ("10883"), o string enmascarado AR ("10.883,00").
-  private formatARS(value: number | string): string {
-    const n = this.parseARS(value);
-    const [enteroRaw, decimalRaw] = Math.abs(n).toFixed(2).split('.');
-    const entero = enteroRaw.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    const signo = n < 0 ? '-' : '';
-    return `${signo}$${entero},${decimalRaw}`;
-  }
-
-  // Convierte cualquier entrada a number. Datos guardados con maskito AR:
-  // "10.883,00" (con decimal), "10.883" (entero, el "." es separador de miles),
-  // "10883" (sin formato), o number. También tolera EN ("10,883.00").
-  private parseARS(value: number | string): number {
-    if (value == null) return 0;
-    if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
-    let s = String(value).trim().replace(/[^0-9.,-]/g, '');
-    if (!s) return 0;
-    const hasComma = s.includes(',');
-    const hasDot = s.includes('.');
-
-    if (hasComma && hasDot) {
-      // Si "," está después de "." → AR: "." miles, "," decimal.
-      if (s.lastIndexOf(',') > s.lastIndexOf('.')) {
-        return Number(s.replace(/\./g, '').replace(',', '.'));
-      }
-      // EN: "," miles, "." decimal.
-      return Number(s.replace(/,/g, ''));
-    }
-    if (hasDot) {
-      // Solo "." sin ",": en contexto AR puede ser miles ("10.883") o decimal ("10.5").
-      const dots = s.split('.');
-      if (dots.length > 2) {
-        // Varios "." → miles. "1.000.000"
-        return Number(s.replace(/\./g, ''));
-      }
-      // Un solo ".": si la parte decimal tiene 3 dígitos → miles. Si 1-2 → decimal.
-      const decPart = dots[1] || '';
-      if (decPart.length === 3) {
-        return Number(s.replace('.', ''));
-      }
-      return Number(s);
-    }
-    if (hasComma) {
-      // Solo "," sin ".": en AR es decimal ("10883,00").
-      return Number(s.replace(',', '.'));
-    }
-    return Number(s);
   }
 
   obtenerMovimientosCuenta() {

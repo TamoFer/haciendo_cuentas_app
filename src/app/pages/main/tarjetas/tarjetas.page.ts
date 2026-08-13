@@ -220,7 +220,16 @@ export class TarjetasPage implements OnInit {
 
   formatFechaCierre(fecha: any): string {
     if (!fecha) return '';
-    const d = fecha instanceof Date ? fecha : new Date(fecha);
+    let d: Date;
+    if (fecha && typeof fecha.toDate === 'function') {
+      d = fecha.toDate();
+    } else if (fecha instanceof Date) {
+      d = fecha;
+    } else if (typeof fecha === 'string') {
+      d = new Date(fecha + 'T00:00:00');
+    } else {
+      d = new Date(fecha);
+    }
     return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' });
   }
 }

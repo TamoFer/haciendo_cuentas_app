@@ -23,12 +23,13 @@ import { UtilsService } from 'src/app/services/utils.service';
     </ion-header>
 
     <ion-content [fullscreen]="true" class="edit-content">
+      <form [formGroup]="formulario">
       <div class="form-wrap">
         <div class="fields-card">
           <div class="field">
             <div class="field-head"><span>Banco</span></div>
             <select class="field-select" formControlName="banco">
-              <option *ngFor="let b of bancos" [value]="b" [selected]="tarjeta?.banco === b">{{ b }}</option>
+              <option *ngFor="let b of bancos" [value]="b">{{ b }}</option>
             </select>
           </div>
 
@@ -37,7 +38,7 @@ import { UtilsService } from 'src/app/services/utils.service';
           <div class="field">
             <div class="field-head"><span>Marca</span></div>
             <select class="field-select" formControlName="tarjeta">
-              <option *ngFor="let m of marcas" [value]="m" [selected]="tarjeta?.tarjeta === m">{{ m }}</option>
+              <option *ngFor="let m of marcas" [value]="m">{{ m }}</option>
             </select>
           </div>
 
@@ -57,6 +58,7 @@ import { UtilsService } from 'src/app/services/utils.service';
           </div>
         </div>
       </div>
+      </form>
     </ion-content>
 
     <div class="actions-bar">
@@ -203,7 +205,29 @@ export class TarjetaAddUpdDeleteComponent implements OnInit {
 
   ngOnInit() {
     if (this.tarjeta) {
-      this.formulario.patchValue(this.tarjeta);
+      let fechaStr: string | null = null;
+      const f = this.tarjeta.fecha_cierre;
+      let fecha: Date;
+      if (f && typeof (f as any).toDate === 'function') {
+        fecha = (f as any).toDate() as Date;
+      } else if (f instanceof Date) {
+        fecha = f;
+      } else if (typeof f === 'string') {
+        fecha = new Date(f + 'T00:00:00');
+      } else {
+        fecha = new Date(f as any);
+      }
+      if (fecha && !isNaN(fecha.getTime())) {
+        fechaStr = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`;
+      }
+
+      this.formulario.patchValue({
+        id: this.tarjeta.id,
+        digitos: this.tarjeta.digitos != null ? String(this.tarjeta.digitos) : null,
+        fecha_cierre: fechaStr,
+        banco: this.tarjeta.banco,
+        tarjeta: this.tarjeta.tarjeta,
+      });
     }
   }
 

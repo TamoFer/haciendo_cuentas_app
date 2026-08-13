@@ -62,10 +62,11 @@ export class AddUpdtDeleteIngresosComponent {
     this.user = this.utilsSVC.obtenerDatosLS('user');
 
     if (this.ingreso) {
+      const num = this.utilsSVC.parseARS(this.ingreso.importe);
       this.formulario.setValue({
         id: this.ingreso.id,
         fecha: this.ingreso.fecha,
-        importe: this.ingreso.importe,
+        importe: num.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
         detalle: this.ingreso.detalle,
         rubro: this.ingreso.rubro,
         tipo: this.ingreso.tipo,
@@ -181,7 +182,7 @@ export class AddUpdtDeleteIngresosComponent {
     const path = `users/${this.user.uid}`;
 
     const nuevo = this.formulario.value;
-    const original = Number(String(this.ingreso.importe).replace(/\./g, '').replace(',', '.'));
+    const original = this.utilsSVC.parseARS(this.ingreso.importe);
 
     let saldoEfectivoNuevo = this.user.saldo_efectivo
     let saldoBancoNuevo = this.user.saldo_banco

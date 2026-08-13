@@ -95,7 +95,7 @@
         </div>
 
         <div class="botones-filtros">
-          <ion-button expand="block" (click)="filtrarDatos(formulario)">
+          <ion-button expand="block" (click)="filtrarDatos()">
             <ion-icon slot="start" name="search-outline"></ion-icon> Filtrar
           </ion-button>
           <ion-button expand="block" fill="clear" color="medium" (click)="limpiarFiltros()">
@@ -129,7 +129,7 @@
                 <span class="rubro-tag" *ngIf="mov.rubro">{{ mov.rubro }}</span>
               </p>
             </ion-label>
-            <ion-note slot="end" class="mov-monto">$ {{ mov.importe }}</ion-note>
+            <ion-note slot="end" class="mov-monto">{{ importeFmt(mov) }}</ion-note>
           </ion-item>
           <ion-item-options side="end">
             <ion-item-option (click)="agregarGastos(mov)">

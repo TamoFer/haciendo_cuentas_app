@@ -1,5 +1,5 @@
 import { CommonModule, NgFor, NgIf, NgTemplateOutlet } from '@angular/common';
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
@@ -9,6 +9,8 @@ import { UtilsService } from 'src/app/services/utils.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { AddUpdtDeleteIngresosComponent } from './add-updt-delete-ingresos/add-updt-delete-ingresos.component';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-ingresos',
@@ -17,7 +19,7 @@ import { AddUpdtDeleteIngresosComponent } from './add-updt-delete-ingresos/add-u
   imports: [IonicModule, HeaderComponent, FooterComponent, NgIf, NgFor, CommonModule, ReactiveFormsModule, NgTemplateOutlet]
 
 })
-export class IngresosPage implements OnInit {
+export class IngresosPage implements OnInit, OnDestroy {
 
   @Input() ocultarHeader = false;
   @Input() ocultarFooter = false;
@@ -32,6 +34,8 @@ export class IngresosPage implements OnInit {
   movimientosFiltrados: Movimiento[] = [];
   usuario = this.utilsSVC.obtenerDatosLS('user');
   totalGastos: number = 0;
+
+  private destroy$ = new Subject<void>();
 
   rubros = [
     { nombre: 'Sueldo', icono: 'receipt-outline' },
@@ -55,7 +59,7 @@ export class IngresosPage implements OnInit {
     hoy: new FormControl(null),
     desde: new FormControl(null),
     hasta: new FormControl(null),
-    rubro: new FormControl('Sueldo'),
+    rubro: new FormControl(null),
     detalle: new FormControl(null, Validators.minLength(1)),
     dias: new FormControl('16')
   });
@@ -65,6 +69,10 @@ export class IngresosPage implements OnInit {
   get rubroSelIcon(): string {
     const sel = this.rubros.find(r => r.nombre === this.formulario.controls.rubro.value);
     return sel ? sel.icono : 'pricetag-outline';
+  }
+
+  importeFmt(mov: Movimiento): string {
+    return this.utilsSVC.formatARS(mov.importe);
   }
 
   toggleRubros() {
@@ -124,19 +132,24 @@ export class IngresosPage implements OnInit {
       this.usuarioLogeado = true;
     }
 
-    this.utilsSVC.movimientos$.subscribe(movs => {
-      this.movimientosCuenta = movs.sort((a, b) =>
-        new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
-      ) && movs.filter(mov => mov.genero != 'gasto');
-
+    this.utilsSVC.movimientos$.pipe(takeUntil(this.destroy$)).subscribe(movs => {
+      this.movimientosCuenta = movs.filter(mov => mov.genero !== 'gasto');
     });
-    this.obtenerMovimientosCuenta();
+
+    if (!this.utilsSVC.getMovimientosActuales().length) {
+      this.obtenerMovimientosCuenta();
+    }
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   obtenerMovimientosCuenta() {
     const path = `users/${this.usuario.uid}/movimientos`;
 
-    this.firebaseSVC.getCollectionData(path).subscribe({
+    this.firebaseSVC.getCollectionData(path).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: Movimiento[]) => {
         this.utilsSVC.setMovimientos(res);
       },
@@ -160,7 +173,6 @@ export class IngresosPage implements OnInit {
 
 
     await modal.present();
-    this.obtenerMovimientosCuenta()
     this.limpiarFiltros()
   }
 
@@ -201,6 +213,7 @@ export class IngresosPage implements OnInit {
 
     this.firebaseSVC.deleteDocument(path).then(async res => {
 
+      this.utilsSVC.eliminarMovimiento(movimiento.id);
 
       this.utilsSVC.presentToast({
         message: 'Movimiento eliminado con exito',
@@ -225,7 +238,6 @@ export class IngresosPage implements OnInit {
       loading.dismiss();
     })
 
-    this.obtenerMovimientosCuenta()
     this.limpiarFiltros()
   }
 
@@ -239,12 +251,12 @@ export class IngresosPage implements OnInit {
 
     if (movimiento.genero === 'gasto') {
       movimiento.tipo === 'Efectivo' ?
-        nuevoSaldoEfe += Number(movimiento.importe.replace(/\./g, '').replace(',', '.')) :
-        nuevoSaldoBco += Number(movimiento.importe.replace(/\./g, '').replace(',', '.'));
+        nuevoSaldoEfe += this.utilsSVC.parseARS(movimiento.importe) :
+        nuevoSaldoBco += this.utilsSVC.parseARS(movimiento.importe);
     } else {
       movimiento.tipo === 'Efectivo' ?
-        nuevoSaldoEfe -= Number(movimiento.importe.replace(/\./g, '').replace(',', '.')) :
-        nuevoSaldoBco -= Number(movimiento.importe.replace(/\./g, '').replace(',', '.'));
+        nuevoSaldoEfe -= this.utilsSVC.parseARS(movimiento.importe) :
+        nuevoSaldoBco -= this.utilsSVC.parseARS(movimiento.importe);
     }
 
     this.firebaseSVC.updateDocument(path, {
@@ -261,8 +273,8 @@ export class IngresosPage implements OnInit {
   }
 
 
-  filtrarDatos(formulario: FormGroup) {
-    const { rubro, detalle, dias, desde, hasta, hoy } = formulario.value;
+  aplicarFiltros() {
+    const { rubro, detalle, dias, desde, hasta, hoy } = this.formulario.value;
     let total = 0;
 
     const today = new Date();
@@ -277,14 +289,12 @@ export class IngresosPage implements OnInit {
       fechaLimite.setDate(today.getDate() - 15);
     } else if (dias != null) {
       fechaLimite = new Date();
-      fechaLimite.setDate(today.getDate() - dias);
+      fechaLimite.setDate(today.getDate() - Number(dias));
     }
-
-    this.actualizarLimiteAuto();
 
     this.movimientosFiltrados = this.movimientosCuenta.filter(mov => {
       const fechaMov = this.parseLocalDate(mov.fecha);
-      const importe = Number(String(mov.importe).replace(/\./g, '').replace(',', '.'));
+      const importe = this.utilsSVC.parseARS(mov.importe);
 
       const fechaMovStr = this.toLocalDateStr(fechaMov);
       const hoyStr = this.toLocalDateStr(today);
@@ -305,12 +315,16 @@ export class IngresosPage implements OnInit {
       return pasaFiltros;
     });
 
-
-    if (total === 0) {
-      this.sinIngresos();
-
-    }
     this.totalGastos = total;
+  }
+
+  filtrarDatos() {
+    this.actualizarLimiteAuto();
+    this.aplicarFiltros();
+
+    if (this.totalGastos === 0) {
+      this.sinIngresos();
+    }
   }
 
   iconPorRubro(rubro: string) {
@@ -375,7 +389,7 @@ export class IngresosPage implements OnInit {
   limpiarFiltros() {
     this.formulario.reset();
     this.quickFilter = '15';
-    this.formulario.patchValue({ dias: '16', rubro: 'Sueldo' });
+    this.formulario.patchValue({ dias: '16', rubro: null });
     this.rubrosExpanded = false;
     this.limiteAuto15 = false;
     this.movimientosFiltrados = [];
