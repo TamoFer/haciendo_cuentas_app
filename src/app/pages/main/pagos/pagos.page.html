@@ -107,7 +107,8 @@
 
     <!-- Secciones por tarjeta -->
     <div class="pago-section" *ngFor="let grupo of tarjetasGrupos">
-      <div class="section-head tarjeta" (click)="toggleTarjetaGrupo(grupo)">
+      <div class="section-head tarjeta" (click)="toggleTarjetaGrupo(grupo)"
+          [style.background]="getColorBancoGradient(grupo.tarjeta.banco)">
         <div class="section-titulo">
           <ion-icon name="card-outline"></ion-icon>
           <span>{{ grupo.tarjeta.banco }} {{ grupo.tarjeta.tarjeta }}</span>
@@ -121,7 +122,8 @@
       </div>
 
       <div class="pago-list" *ngIf="grupo.expandido">
-        <div class="pago-item" *ngFor="let item of grupo.items" [class.pagado]="item.pagado">
+        <div class="pago-item" *ngFor="let item of grupo.items" [class.pagado]="item.pagado"
+           [style.borderLeftColor]="getColorBanco(grupo.tarjeta.banco)">
           <ion-checkbox [checked]="item.pagado" (ionChange)="togglePagado(item)"></ion-checkbox>
           <div class="pago-icon proy">
             <ion-icon name="time-outline"></ion-icon>

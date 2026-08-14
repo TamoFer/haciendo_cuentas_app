@@ -3,9 +3,9 @@ import { Component, inject, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { GastoSimulador } from 'src/app/models/gasto-simulador.model';
 import { Tarjeta } from 'src/app/models/tarjeta.model';
-import { Movimiento } from 'src/app/models/movimiento.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
+import { SimuladorService } from 'src/app/services/simulador.service';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 
@@ -39,6 +39,7 @@ export class PagosPage implements OnInit {
 
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
+  simuladorSvc = inject(SimuladorService);
 
   mesActual: string = '';
   nombreMes: string = '';
@@ -151,19 +152,27 @@ export class PagosPage implements OnInit {
         gastoOriginal: g
       }));
 
-      const cuotasItems = temporales
-        .map(g => ({
+      const cuotasItems: ItemPago[] = [];
+
+      for (const g of temporales) {
+        const tarjeta = g.tarjetaId ? this.tarjetas.find(t => t.id === g.tarjetaId) || null : null;
+        const fechaCierreDia = this.getFechaCierreDia(tarjeta);
+        const evalResult = this.evaluarGastoEnMes(g, fechaCierreDia);
+
+        if (!evalResult.activo) continue;
+
+        cuotasItems.push({
           id: g.id,
           nombre: g.nombre || g.categoria || 'Consumo en cuotas',
           categoria: g.categoria || '',
           importe: this.parseImporte(g.importe),
-          cuotaInfo: this.calcularCuotaInfo(g),
+          cuotaInfo: evalResult.cuotaInfo,
           pagado: this.estaPagado(g),
           tarjetaId: g.tarjetaId,
           tarjetaNombre: g.tarjetaNombre,
           gastoOriginal: g
-        }))
-        .filter(i => !!i.cuotaInfo);
+        });
+      }
 
       this.consumosSinTarjeta = cuotasItems.filter(i => !i.tarjetaId);
 
@@ -187,25 +196,70 @@ export class PagosPage implements OnInit {
     }
   }
 
-  private calcularCuotaInfo(g: GastoSimulador): string | null {
-    if (!g.cantidadCuotas || g.cantidadCuotas <= 1) return null;
-    if (!g.fechaInicio) return null;
+  private getFechaCierreDia(tarjeta: Tarjeta | null): number | null {
+    if (!tarjeta || !tarjeta.fecha_cierre) return null;
+    const f = tarjeta.fecha_cierre;
+    if (f && typeof (f as any).toDate === 'function') {
+      return (f as any).toDate().getDate();
+    } else if (f instanceof Date) {
+      return f.getDate();
+    } else {
+      const str = String(f as any);
+      const d = new Date(str.includes('T') ? str : str + 'T00:00:00');
+      return isNaN(d.getTime()) ? null : d.getDate();
+    }
+  }
 
-    const inicio = new Date(g.fechaInicio);
-    const fechaRef = new Date();
-    if (this.mesOffset !== 0) {
-      const hoy = new Date();
-      fechaRef.setFullYear(hoy.getFullYear(), hoy.getMonth() + this.mesOffset, 15);
+  private evaluarGastoEnMes(g: GastoSimulador, fechaCierreDia: number | null): { activo: boolean, cuotaInfo: string | null } {
+    const inicio = this.simuladorSvc.safeParseDate(g.fechaInicio);
+    if (!inicio) return { activo: false, cuotaInfo: null };
+
+    const hoy = new Date();
+    const fechaRef = new Date(hoy.getFullYear(), hoy.getMonth() + this.mesOffset, 1);
+
+    let mesInicioEfectivo: Date;
+    if (fechaCierreDia && fechaCierreDia > 0) {
+      if (inicio.getDate() <= fechaCierreDia) {
+        mesInicioEfectivo = new Date(inicio.getFullYear(), inicio.getMonth() + 1, 1);
+      } else {
+        mesInicioEfectivo = new Date(inicio.getFullYear(), inicio.getMonth() + 2, 1);
+      }
+    } else {
+      mesInicioEfectivo = new Date(inicio.getFullYear(), inicio.getMonth(), 1);
     }
 
-    const cuotaActual =
-      (fechaRef.getFullYear() - inicio.getFullYear()) * 12 +
-      (fechaRef.getMonth() - inicio.getMonth()) + 1;
+    const fechaFin = g.fechaFin ? this.simuladorSvc.safeParseDate(g.fechaFin) : null;
+    let mesFinEfectivo: Date | null = null;
+    if (fechaFin) {
+      if (fechaCierreDia && fechaCierreDia > 0) {
+        if (inicio.getDate() <= fechaCierreDia) {
+          mesFinEfectivo = new Date(fechaFin.getFullYear(), fechaFin.getMonth(), 1);
+        } else {
+          mesFinEfectivo = new Date(fechaFin.getFullYear(), fechaFin.getMonth() + 1, 1);
+        }
+      } else {
+        mesFinEfectivo = new Date(fechaFin.getFullYear(), fechaFin.getMonth(), 1);
+      }
+    }
 
-    if (cuotaActual < 1) return null;
-    if (cuotaActual > g.cantidadCuotas) return null;
+    const mesProyeccion = new Date(fechaRef.getFullYear(), fechaRef.getMonth(), 1);
 
-    return `Cuota ${cuotaActual} de ${g.cantidadCuotas}`;
+    if (mesProyeccion < mesInicioEfectivo) return { activo: false, cuotaInfo: null };
+    if (mesFinEfectivo && mesProyeccion > mesFinEfectivo) return { activo: false, cuotaInfo: null };
+
+    if (!g.cantidadCuotas || g.cantidadCuotas <= 1) {
+      return { activo: true, cuotaInfo: null };
+    }
+
+    const mesesDiff = (mesProyeccion.getFullYear() - mesInicioEfectivo.getFullYear()) * 12 +
+      (mesProyeccion.getMonth() - mesInicioEfectivo.getMonth());
+
+    if (mesesDiff < 0) return { activo: false, cuotaInfo: null };
+
+    const cuotaActual = Math.min(mesesDiff + 1, g.cantidadCuotas);
+    if (cuotaActual > g.cantidadCuotas) return { activo: false, cuotaInfo: null };
+
+    return { activo: true, cuotaInfo: `Cuota ${cuotaActual} de ${g.cantidadCuotas}` };
   }
 
   private recalcTotales() {
@@ -265,18 +319,13 @@ export class PagosPage implements OnInit {
 
     try {
       await this.firebaseSVC.updateDocument(path, data);
-
-      if (nuevoEstado) {
-        await this.confirmarPago(item);
-      } else {
-        this.utilsSVC.presentToast({
-          message: 'Marcado como pendiente',
-          duration: 1200,
-          color: 'medium',
-          position: 'middle',
-          icon: 'ellipse-outline'
-        });
-      }
+      this.utilsSVC.presentToast({
+        message: nuevoEstado ? 'Marcado como pagado' : 'Marcado como pendiente',
+        duration: 1200,
+        color: nuevoEstado ? 'success' : 'medium',
+        position: 'middle',
+        icon: nuevoEstado ? 'checkmark-circle-outline' : 'ellipse-outline'
+      });
     } catch (err) {
       console.error('Error actualizando pago', err);
       item.pagado = !nuevoEstado;
@@ -291,130 +340,21 @@ export class PagosPage implements OnInit {
     }
   }
 
-  private async confirmarPago(item: ItemPago) {
-    const alert = await this.utilsSVC.alertasCtrl.create({
-      header: 'Confirmar pago',
-      message: `¿Cómo se pagó "${item.nombre}"?`,
-      inputs: [
-        { name: 'metodo', type: 'radio', label: 'Efectivo', value: 'Efectivo', checked: true },
-        { name: 'metodo', type: 'radio', label: 'Banco', value: 'Banco' },
-        { name: 'metodo', type: 'radio', label: 'Ambos', value: 'Ambos' }
-      ],
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Confirmar',
-          handler: async (metodo: string) => {
-            if (metodo === 'Ambos') {
-              this.pedidoMontoMixto(item);
-            } else {
-              this.registrarPagoMovimiento(item, metodo, item.importe, 0);
-            }
-          }
-        }
-      ]
-    });
-    await alert.present();
-  }
-
-  private async pedidoMontoMixto(item: ItemPago) {
-    const alert = await this.utilsSVC.alertasCtrl.create({
-      header: 'Pago mixto',
-      message: `Total: $${item.importe.toLocaleString('es-AR')}`,
-      inputs: [
-        { name: 'efectivo', type: 'number', placeholder: 'Monto en efectivo' },
-        { name: 'banco', type: 'number', placeholder: 'Monto en banco' }
-      ],
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Confirmar',
-          handler: (data: { efectivo: number; banco: number }) => {
-            const efectivo = Number(data.efectivo) || 0;
-            const banco = Number(data.banco) || 0;
-            if (efectivo + banco !== item.importe) {
-              this.utilsSVC.presentToast({
-                message: `Los montos deben sumar $${item.importe}`,
-                duration: 2500,
-                color: 'danger',
-                position: 'middle',
-                icon: 'alert-circle-outline'
-              });
-              return false;
-            }
-            this.registrarPagoMovimiento(item, 'Ambos', efectivo, banco);
-            return true;
-          }
-        }
-      ]
-    });
-    await alert.present();
-  }
-
-  private async registrarPagoMovimiento(item: ItemPago, metodo: string, efectivo: number, banco: number) {
-    const path = `users/${this.usuario.uid}/movimientos`;
-    const movimiento: Movimiento = {
-      id: this.firebaseSVC.crearId(),
-      fecha: new Date(),
-      importe: item.importe,
-      detalle: item.nombre,
-      rubro: item.categoria || 'Otros',
-      tipo: 'gasto',
-      genero: 'gasto',
-      pagado: true,
-      mesPagado: this.mesActual
-    };
-
-    try {
-      await this.firebaseSVC.addDocument(path, movimiento);
-      this.utilsSVC.agregarMovimiento(movimiento);
-      await this.actualizarSaldos(metodo, efectivo, banco);
-      this.utilsSVC.presentToast({
-        message: 'Pago registrado correctamente',
-        duration: 1500,
-        color: 'success',
-        position: 'middle',
-        icon: 'checkmark-circle-outline'
-      });
-    } catch (err) {
-      console.error('Error registrando pago', err);
-      this.utilsSVC.presentToast({
-        message: 'No se pudo registrar el pago',
-        duration: 2000,
-        color: 'danger',
-        position: 'middle',
-        icon: 'alert-circle-outline'
-      });
+  getColorBanco(banco: string): string {
+    switch (banco.toLowerCase()) {
+      case 'santander': return '#c8102e';
+      case 'bbva': return '#0033a0';
+      case 'galicia': return '#ff6f00';
+      default: return '#4a5568';
     }
   }
 
-  private async actualizarSaldos(metodo: string, efectivo: number, banco: number) {
-    if (!this.usuario) return;
-    const user = this.utilsSVC.obtenerDatosLS('user');
-    if (!user) return;
-
-    let nuevoSaldoBco = user.saldo_banco || 0;
-    let nuevoSaldoEfe = user.saldo_efectivo || 0;
-
-    if (metodo === 'Efectivo') {
-      nuevoSaldoEfe -= efectivo;
-    } else if (metodo === 'Banco') {
-      nuevoSaldoBco -= banco;
-    } else {
-      nuevoSaldoEfe -= efectivo;
-      nuevoSaldoBco -= banco;
+  getColorBancoGradient(banco: string): string {
+    switch (banco.toLowerCase()) {
+      case 'santander': return 'linear-gradient(135deg, #ec1c24 0%, #c8102e 50%, #a00d23 100%)';
+      case 'bbva': return 'linear-gradient(135deg, #0066ff 0%, #0033a0 50%, #00267d 100%)';
+      case 'galicia': return 'linear-gradient(135deg, #ff8f00 0%, #ff6f00 50%, #e65100 100%)';
+      default: return 'linear-gradient(135deg, #6b7280 0%, #4a5568 50%, #374151 100%)';
     }
-
-    const path = `users/${user.uid}`;
-    await this.firebaseSVC.updateDocument(path, {
-      saldo_banco: nuevoSaldoBco,
-      saldo_efectivo: nuevoSaldoEfe
-    });
-
-    this.utilsSVC.setUser({
-      ...user,
-      saldo_banco: nuevoSaldoBco,
-      saldo_efectivo: nuevoSaldoEfe
-    });
   }
 }
