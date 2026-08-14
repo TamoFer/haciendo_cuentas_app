@@ -331,6 +331,61 @@
     &.proy { background: linear-gradient(135deg, var(--ion-color-warning) 0%, #f57c00 100%); color: white; }
     .total-monto { font-size: 1.1rem; font-weight: 700; }
   }
+
+  .tarjeta-grupo {
+    margin: 12px 16px;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+
+    .tarjeta-grupo-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      cursor: pointer;
+      user-select: none;
+      transition: filter 0.15s ease;
+
+      &:active { filter: brightness(0.93); }
+
+      &.sin-tarjeta { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+
+      .tarjeta-grupo-titulo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: white;
+
+        ion-icon { font-size: 1.25rem; color: white; }
+        span { font-size: 0.95rem; font-weight: 600; }
+
+        .tarjeta-digits {
+          font-size: 0.8rem;
+          font-weight: 500;
+          opacity: 0.85;
+        }
+      }
+
+      .tarjeta-grupo-resumen {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: white;
+        font-size: 0.82rem;
+        font-weight: 600;
+        opacity: 0.95;
+
+        ion-icon { font-size: 1.1rem; transition: transform 0.18s ease; }
+      }
+    }
+
+    .gastos-list {
+      margin: 0;
+      padding: 4px 0;
+      background: var(--ion-color-white);
+    }
+  }
 }
 
 .proyecciones-section {

@@ -14,6 +14,13 @@ import { MaskitoDirective } from '@maskito/angular';
 import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import { MaskitoElementPredicate } from '@maskito/core';
 import { Tarjeta } from 'src/app/models/tarjeta.model';
+
+interface TarjetaGrupoSim {
+  tarjeta: Tarjeta;
+  gastos: GastoSimulador[];
+  total: number;
+  expandido: boolean;
+}
 @Component({
   selector: 'app-simulador-financiero',
   templateUrl: './simulador-financiero.page.html',
@@ -36,6 +43,9 @@ export class SimuladorFinancieroPage implements OnInit {
 
   gastosFijos: GastoSimulador[] = [];
   gastosTemporales: GastoSimulador[] = [];
+  tarjetas: Tarjeta[] = [];
+  tarjetasGrupos: TarjetaGrupoSim[] = [];
+  cuotificadosSinTarjeta: GastoSimulador[] = [];
 
   mostrarDetalle: boolean = false;
   mesDetalle?: ProyeccionMes;
@@ -219,8 +229,65 @@ export class SimuladorFinancieroPage implements OnInit {
     this.gastosFijos = gastos.filter(g => g.tipo === 'fijo').sort((a, b) => a.nombre.localeCompare(b.nombre));
     this.gastosTemporales = gastos.filter(g => g.tipo === 'temporal').sort((a, b) => a.nombre.localeCompare(b.nombre));
 
+    await this.cargarTarjetasYCargarGrupos();
+
     if (forceRecalculate || this.ingresoMensualControl.value) {
       this.calcularProyeccion();
+    }
+  }
+
+  private async cargarTarjetasYCargarGrupos() {
+    const usuario = this.utilsSvc.obtenerDatosLS('user');
+    if (!usuario) return;
+
+    const tarjetas = await new Promise<Tarjeta[]>((resolve) => {
+      this.firebaseSVC.getCollectionData(`users/${usuario.uid}/tarjetas`).subscribe({
+        next: (data: Tarjeta[]) => resolve(data || []),
+        error: () => resolve([])
+      });
+    });
+
+    this.tarjetas = tarjetas;
+    this.utilsSvc.setTarjetas(tarjetas);
+    this.actualizarGruposCuotificados();
+  }
+
+  private actualizarGruposCuotificados() {
+    const conTarjeta = this.gastosTemporales.filter(g => g.tarjetaId);
+    this.cuotificadosSinTarjeta = this.gastosTemporales.filter(g => !g.tarjetaId);
+
+    this.tarjetasGrupos = this.tarjetas
+      .map(t => {
+        const gastos = conTarjeta.filter(g => g.tarjetaId === t.id);
+        return {
+          tarjeta: t,
+          gastos,
+          total: gastos.reduce((s, g) => s + g.importe, 0),
+          expandido: gastos.length > 0
+        };
+      })
+      .filter(g => g.gastos.length > 0);
+  }
+
+  toggleGrupoTarjeta(grupo: TarjetaGrupoSim) {
+    grupo.expandido = !grupo.expandido;
+  }
+
+  getColorBanco(banco: string): string {
+    switch (banco.toLowerCase()) {
+      case 'santander': return '#c8102e';
+      case 'bbva': return '#0033a0';
+      case 'galicia': return '#ff6f00';
+      default: return '#4a5568';
+    }
+  }
+
+  getColorBancoGradient(banco: string): string {
+    switch (banco.toLowerCase()) {
+      case 'santander': return 'linear-gradient(135deg, #ec1c24 0%, #c8102e 50%, #a00d23 100%)';
+      case 'bbva': return 'linear-gradient(135deg, #0066ff 0%, #0033a0 50%, #00267d 100%)';
+      case 'galicia': return 'linear-gradient(135deg, #ff8f00 0%, #ff6f00 50%, #e65100 100%)';
+      default: return 'linear-gradient(135deg, #6b7280 0%, #4a5568 50%, #374151 100%)';
     }
   }
 

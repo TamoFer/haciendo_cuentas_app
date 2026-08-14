@@ -77,12 +77,12 @@
         <div class="summary-row secondary">
           <div class="summary-item">
             <span class="summary-dot fijo"></span>
-            <span class="summary-item-label">Fijos</span>
+            <span class="summary-item-label">Mensuales</span>
             <span class="summary-item-value">{{ formatearMonto(getTotalGastosFijos()) }}</span>
           </div>
           <div class="summary-item">
             <span class="summary-dot proy"></span>
-            <span class="summary-item-label">Proy.</span>
+            <span class="summary-item-label">Cuotif.</span>
             <span class="summary-item-value">{{ formatearMonto(getTotalGastosTemporales()) }}</span>
           </div>
         </div>
@@ -95,7 +95,7 @@
         <div class="section-title">
           <ion-icon [name]="expandirFijos ? 'chevron-down' : 'chevron-forward'"></ion-icon>
           <ion-icon name="receipt-outline"></ion-icon>
-          <span>Fijos</span>
+          <span>Mensuales</span>
           @if (gastosFijos.length > 0 && expandirFijos) {
           <span class="total-titulo">{{ formatearMonto(getTotalGastosFijos()) }}</span>
           }
@@ -119,7 +119,7 @@
       @if (gastosFijos.length === 0) {
       <div class="empty-state">
         <ion-icon name="link-outline"></ion-icon>
-        <p>No hay gastos fijos</p>
+        <p>No hay gastos mensuales</p>
       </div>
       } @else {
       <ion-list class="gastos-list">
@@ -149,7 +149,7 @@
         }
       </ion-list>
       <div class="total-bar fijo">
-        <span>Total Fijos</span>
+        <span>Mensuales</span>
         <span class="total-monto">{{ formatearMonto(getTotalGastosFijos()) }}</span>
       </div>
       }
@@ -159,7 +159,7 @@
         <div class="section-title">
           <ion-icon [name]="expandirTemporales ? 'chevron-down' : 'chevron-forward'"></ion-icon>
           <ion-icon name="receipt-outline"></ion-icon>
-          <span>Futuros</span>
+          <span>Cuotificados</span>
           @if (gastosTemporales.length > 0 && expandirTemporales) {
           <span class="total-titulo">{{ formatearMonto(getTotalGastosTemporales()) }}</span>
           }
@@ -183,44 +183,108 @@
       @if (gastosTemporales.length === 0) {
       <div class="empty-state">
         <ion-icon name="time-outline"></ion-icon>
-        <p>No hay gastos proyectados</p>
+        <p>No hay gastos cuotificados</p>
       </div>
       } @else {
-      <ion-list class="gastos-list">
-        @for (gasto of gastosTemporales; track gasto.id) {
-        <ion-item-sliding class="gasto-slide">
-          <ion-item class="gasto-item" (click)="verInfoGasto(gasto)">
-            <div class="gasto-content">
-              <div class="gasto-icon proy">
-                <ion-icon [name]="getIconoPorCategoria(gasto.categoria)"></ion-icon>
+
+      @for (grupo of tarjetasGrupos; track grupo.tarjeta.id) {
+      <div class="tarjeta-grupo">
+        <div class="tarjeta-grupo-head" (click)="toggleGrupoTarjeta(grupo)"
+          [style.background]="getColorBancoGradient(grupo.tarjeta.banco)">
+          <div class="tarjeta-grupo-titulo">
+            <ion-icon name="card-outline"></ion-icon>
+            <span>{{ grupo.tarjeta.banco }} {{ grupo.tarjeta.tarjeta }}</span>
+            <span class="tarjeta-digits">{{ grupo.tarjeta.digitos }}</span>
+          </div>
+          <div class="tarjeta-grupo-resumen">
+            <span>{{ grupo.gastos.length }} {{ grupo.gastos.length === 1 ? 'gasto' : 'gastos' }} ·
+              {{ formatearMonto(grupo.total) }}</span>
+            <ion-icon [name]="grupo.expandido ? 'chevron-down' : 'chevron-forward'"></ion-icon>
+          </div>
+        </div>
+
+        @if (grupo.expandido) {
+        <ion-list class="gastos-list">
+          @for (gasto of grupo.gastos; track gasto.id) {
+          <ion-item-sliding class="gasto-slide">
+            <ion-item class="gasto-item" (click)="verInfoGasto(gasto)">
+              <div class="gasto-content">
+                <div class="gasto-icon proy">
+                  <ion-icon [name]="getIconoPorCategoria(gasto.categoria)"></ion-icon>
+                </div>
+                <div class="gasto-body">
+                  <h3>{{ gasto.nombre | uppercase }}</h3>
+                  <p>
+                    {{ gasto.categoria }}
+                    @if (gasto.cantidadCuotas) {
+                    <span class="cuota-badge">{{ gasto.cantidadCuotas }} cuotas</span>
+                    }
+                  </p>
+                </div>
+                <span class="gasto-monto">{{ formatearMonto(gasto.importe) }}</span>
               </div>
-              <div class="gasto-body">
-                <h3>{{ gasto.nombre | uppercase }}</h3>
-                <p>
-                  {{ gasto.categoria }}
-                  @if (gasto.cantidadCuotas) {
-                  <span class="cuota-badge">{{ gasto.cantidadCuotas }} cuotas</span>
-                  }
-                </p>
-              </div>
-              <span class="gasto-monto">{{ formatearMonto(gasto.importe) }}</span>
-            </div>
-          </ion-item>
-          <ion-item-options side="end">
-            <ion-item-option (click)="abrirModalGasto('temporal', null, gasto)" color="primary">
-              <ion-icon name="create-outline"></ion-icon>
-            </ion-item-option>
-            <ion-item-option (click)="confirmarEliminarGasto(gasto, 'temporal')" color="danger">
-              <ion-icon name="trash-outline"></ion-icon>
-            </ion-item-option>
-          </ion-item-options>
-        </ion-item-sliding>
+            </ion-item>
+            <ion-item-options side="end">
+              <ion-item-option (click)="abrirModalGasto('temporal', null, gasto)" color="primary">
+                <ion-icon name="create-outline"></ion-icon>
+              </ion-item-option>
+              <ion-item-option (click)="confirmarEliminarGasto(gasto, 'temporal')" color="danger">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-item-option>
+            </ion-item-options>
+          </ion-item-sliding>
+          }
+        </ion-list>
         }
-      </ion-list>
-      <div class="total-bar proy">
-        <span>Total Proyectados</span>
-        <span class="total-monto">{{ formatearMonto(getTotalGastosTemporales()) }}</span>
       </div>
+      }
+
+      @if (cuotificadosSinTarjeta.length > 0) {
+      <div class="tarjeta-grupo">
+        <div class="tarjeta-grupo-head sin-tarjeta">
+          <div class="tarjeta-grupo-titulo">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            <span>Sin tarjeta</span>
+          </div>
+          <div class="tarjeta-grupo-resumen">
+            <span>{{ cuotificadosSinTarjeta.length }} {{ cuotificadosSinTarjeta.length === 1 ? 'gasto' : 'gastos' }}</span>
+            <ion-icon name="chevron-down"></ion-icon>
+          </div>
+        </div>
+        <ion-list class="gastos-list">
+          @for (gasto of cuotificadosSinTarjeta; track gasto.id) {
+          <ion-item-sliding class="gasto-slide">
+            <ion-item class="gasto-item" (click)="verInfoGasto(gasto)">
+              <div class="gasto-content">
+                <div class="gasto-icon proy">
+                  <ion-icon [name]="getIconoPorCategoria(gasto.categoria)"></ion-icon>
+                </div>
+                <div class="gasto-body">
+                  <h3>{{ gasto.nombre | uppercase }}</h3>
+                  <p>
+                    {{ gasto.categoria }}
+                    @if (gasto.cantidadCuotas) {
+                    <span class="cuota-badge">{{ gasto.cantidadCuotas }} cuotas</span>
+                    }
+                  </p>
+                </div>
+                <span class="gasto-monto">{{ formatearMonto(gasto.importe) }}</span>
+              </div>
+            </ion-item>
+            <ion-item-options side="end">
+              <ion-item-option (click)="abrirModalGasto('temporal', null, gasto)" color="primary">
+                <ion-icon name="create-outline"></ion-icon>
+              </ion-item-option>
+              <ion-item-option (click)="confirmarEliminarGasto(gasto, 'temporal')" color="danger">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-item-option>
+            </ion-item-options>
+          </ion-item-sliding>
+          }
+        </ion-list>
+      </div>
+      }
+
       }
       }
     </div>
