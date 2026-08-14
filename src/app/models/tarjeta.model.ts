@@ -6,5 +6,6 @@ export interface Tarjeta {
     fecha_cierre: Date;
     banco: string;
     tarjeta: string;
+    favorita?: boolean;
 
 }

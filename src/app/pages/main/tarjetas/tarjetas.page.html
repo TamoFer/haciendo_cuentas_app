@@ -70,6 +70,9 @@
               </div>
               <div class="card-datos">
                 <span class="card-label">{{ t.banco }}</span>
+                <ion-icon class="fav-star" [class.fav-active]="t.favorita"
+                          [name]="t.favorita ? 'star' : 'star-outline'"
+                          (click)="toggleFavorita(t); $event.stopPropagation()"></ion-icon>
               </div>
             </div>
           </div>

@@ -172,6 +172,23 @@ export class TarjetasPage implements OnInit {
     await modal.present();
   }
 
+  async toggleFavorita(tarjeta: Tarjeta) {
+    const path = `users/${this.usuario.uid}/tarjetas`;
+    const favActiva = this.tarjetas.find(t => t.favorita);
+
+    if (favActiva && favActiva.id === tarjeta.id) {
+      await this.firebaseSVC.updateDocument(`${path}/${tarjeta.id}`, { favorita: false });
+      this.utilsSVC.actualizarTarjeta({ ...tarjeta, favorita: false });
+    } else {
+      if (favActiva) {
+        await this.firebaseSVC.updateDocument(`${path}/${favActiva.id}`, { favorita: false });
+        this.utilsSVC.actualizarTarjeta({ ...favActiva, favorita: false });
+      }
+      await this.firebaseSVC.updateDocument(`${path}/${tarjeta.id}`, { favorita: true });
+      this.utilsSVC.actualizarTarjeta({ ...tarjeta, favorita: true });
+    }
+  }
+
   getColorBanco(banco: string): string {
     switch (banco.toLowerCase()) {
       case 'santander': return '#c8102e';

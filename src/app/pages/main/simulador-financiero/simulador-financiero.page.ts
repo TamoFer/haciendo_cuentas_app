@@ -9,9 +9,11 @@ import { GastoSimulador, GastoConCuota, ProyeccionMes, ProyeccionConfig } from '
 import { AgregarGastoComponent } from './agregar-gasto/agregar-gasto.component';
 import { VerGastoComponent } from './ver-gasto/ver-gasto.component';
 import { UtilsService } from 'src/app/services/utils.service';
+import { FirebaseService } from 'src/app/services/firebase.service';
 import { MaskitoDirective } from '@maskito/angular';
 import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import { MaskitoElementPredicate } from '@maskito/core';
+import { Tarjeta } from 'src/app/models/tarjeta.model';
 @Component({
   selector: 'app-simulador-financiero',
   templateUrl: './simulador-financiero.page.html',
@@ -22,6 +24,7 @@ export class SimuladorFinancieroPage implements OnInit {
 
   simuladorSvc = inject(SimuladorService);
   utilsSvc = inject(UtilsService);
+  firebaseSVC = inject(FirebaseService);
 
   ingresoMensual: number = 0;
   ingresoMensualControl = new FormControl(null);
@@ -53,6 +56,7 @@ export class SimuladorFinancieroPage implements OnInit {
   async ngOnInit() {
     this.cargarEstadoSecciones();
     await this.cargarConfig();
+    await this.cargarFechaCierreFromFavorita();
     await this.cargarGastos();
   }
 
@@ -90,15 +94,46 @@ export class SimuladorFinancieroPage implements OnInit {
       this.mesesProyeccion = config.mesesProyeccion;
       if (config.fechaCierre) {
         this.fechaCierreControl.setValue(config.fechaCierre);
-        const now = new Date();
-        const ultimoDia = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-        const dia = Math.min(config.fechaCierre, ultimoDia);
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const dayStr = String(dia).padStart(2, '0');
-        this.fechaCierre = `${year}-${month}-${dayStr}`;
+        this.actualizarFechaCierreStr(config.fechaCierre);
       }
     }
+  }
+
+  async cargarFechaCierreFromFavorita() {
+    const usuario = this.utilsSvc.obtenerDatosLS('user');
+    if (!usuario) return;
+    const path = `users/${usuario.uid}/tarjetas`;
+    this.firebaseSVC.getCollectionData(path).subscribe((tarjetas: Tarjeta[]) => {
+      const fav = tarjetas.find(t => t.favorita);
+      if (fav && fav.fecha_cierre) {
+        let dia: number;
+        const f = fav.fecha_cierre;
+        if (f && typeof (f as any).toDate === 'function') {
+          dia = (f as any).toDate().getDate();
+        } else if (f instanceof Date) {
+          dia = f.getDate();
+        } else {
+          const str = String(f as any);
+          const d = new Date(str.includes('T') ? str : str + 'T00:00:00');
+          dia = d.getDate();
+        }
+        if (dia) {
+          this.fechaCierreControl.setValue(dia);
+          this.actualizarFechaCierreStr(dia);
+          this.calcularProyeccion();
+        }
+      }
+    });
+  }
+
+  actualizarFechaCierreStr(dia: number) {
+    const now = new Date();
+    const ultimoDia = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const diaReal = Math.min(dia, ultimoDia);
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const dayStr = String(diaReal).padStart(2, '0');
+    this.fechaCierre = `${year}-${month}-${dayStr}`;
   }
 
   async guardarConfig() {
