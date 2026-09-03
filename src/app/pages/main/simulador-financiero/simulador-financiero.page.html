@@ -11,32 +11,32 @@
 
 
       <div class="input-card">
-        <div class="income-group">
-          <div class="income-label">
+        <div class="config-row main">
+          <div class="config-icon">
             <ion-icon name="wallet-outline"></ion-icon>
-            <span>Ingreso mensual</span>
           </div>
-          <div class="income-input-wrap">
-            <span class="income-symbol">$</span>
-            <ion-input [formControl]="ingresoMensualControl" [maskito]="mascara" [maskitoElement]="maskPredicate"
-              inputmode="decimal" type="text" placeholder="0,00" (ionInput)="calcularProyeccion()"></ion-input>
+          <div class="config-content">
+            <span class="config-label">Ingreso mensual</span>
+            <div class="income-input-wrap">
+              <span class="income-symbol">$</span>
+              <ion-input [formControl]="ingresoMensualControl" [maskito]="mascara" [maskitoElement]="maskPredicate"
+                inputmode="decimal" type="text" placeholder="0,00" (ionInput)="calcularProyeccion()"></ion-input>
+            </div>
           </div>
         </div>
 
-        <div class="input-row split">
-          <div class="input-item">
-            <ion-label position="stacked">Meses</ion-label>
+        <div class="summary-divider"></div>
+
+        <div class="config-row secondary">
+          <div class="config-item">
+            <span class="config-dot"></span>
+            <span class="config-item-label">Proyección</span>
             <ion-select [(ngModel)]="mesesProyeccion" (ionChange)="calcularProyeccion()" interface="popover">
               <ion-select-option [value]="3">3 meses</ion-select-option>
               <ion-select-option [value]="6">6 meses</ion-select-option>
               <ion-select-option [value]="12">12 meses</ion-select-option>
               <ion-select-option [value]="24">24 meses</ion-select-option>
             </ion-select>
-          </div>
-
-          <div class="input-item">
-            <ion-label position="stacked">Día cierre</ion-label>
-            <ion-input type="date" [(ngModel)]="fechaCierre" (ionChange)="onFechaCierreChange($event)"></ion-input>
           </div>
         </div>
 
@@ -78,12 +78,12 @@
           <div class="summary-item">
             <span class="summary-dot fijo"></span>
             <span class="summary-item-label">Fijos</span>
-            <span class="summary-item-value">{{ formatearMonto(getTotalGastosFijos()) }}</span>
+            <span class="summary-item-value">{{ formatearMonto(getTotalFijosMesVigente()) }}</span>
           </div>
           <div class="summary-item">
             <span class="summary-dot proy"></span>
             <span class="summary-item-label">Proy.</span>
-            <span class="summary-item-value">{{ formatearMonto(getTotalGastosTemporales()) }}</span>
+            <span class="summary-item-value">{{ formatearMonto(getTotalFuturosMesVigente()) }}</span>
           </div>
         </div>
       </div>

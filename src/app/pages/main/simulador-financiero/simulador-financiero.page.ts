@@ -6,6 +6,7 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 import { SimuladorService } from 'src/app/services/simulador.service';
 import { GastoSimulador, GastoConCuota, ProyeccionMes, ProyeccionConfig } from 'src/app/models/gasto-simulador.model';
+import { Tarjeta } from 'src/app/models/tarjeta.model';
 import { AgregarGastoComponent } from './agregar-gasto/agregar-gasto.component';
 import { VerGastoComponent } from './ver-gasto/ver-gasto.component';
 import { UtilsService } from 'src/app/services/utils.service';
@@ -25,14 +26,13 @@ export class SimuladorFinancieroPage implements OnInit {
 
   ingresoMensual: number = 0;
   ingresoMensualControl = new FormControl(null);
-  fechaCierreControl = new FormControl(null);
-  fechaCierre: string = '';
   mesesProyeccion: number = 6;
   proyecciones: ProyeccionMes[] = [];
   configId: string = 'config_principal';
 
   gastosFijos: GastoSimulador[] = [];
   gastosTemporales: GastoSimulador[] = [];
+  tarjetas: Tarjeta[] = [];
 
   mostrarDetalle: boolean = false;
   mesDetalle?: ProyeccionMes;
@@ -52,6 +52,11 @@ export class SimuladorFinancieroPage implements OnInit {
 
   async ngOnInit() {
     this.cargarEstadoSecciones();
+    this.utilsSvc.tarjetas$.subscribe(tarjetas => {
+      this.tarjetas = tarjetas || [];
+      this.calcularProyeccion();
+    });
+    this.simuladorSvc.obtenerTarjetas();
     await this.cargarConfig();
     await this.cargarGastos();
   }
@@ -88,16 +93,6 @@ export class SimuladorFinancieroPage implements OnInit {
     if (config) {
       this.ingresoMensualControl.setValue(config.ingresoMensual.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
       this.mesesProyeccion = config.mesesProyeccion;
-      if (config.fechaCierre) {
-        this.fechaCierreControl.setValue(config.fechaCierre);
-        const now = new Date();
-        const ultimoDia = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-        const dia = Math.min(config.fechaCierre, ultimoDia);
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const dayStr = String(dia).padStart(2, '0');
-        this.fechaCierre = `${year}-${month}-${dayStr}`;
-      }
     }
   }
 
@@ -118,7 +113,7 @@ export class SimuladorFinancieroPage implements OnInit {
       id: this.configId,
       ingresoMensual: ingresoValor,
       mesesProyeccion: this.mesesProyeccion,
-      fechaCierre: this.fechaCierreControl.value ? Number(this.fechaCierreControl.value) : null,
+      fechaCierre: null,
       fechaActualizacion: new Date()
     };
 
@@ -146,7 +141,7 @@ export class SimuladorFinancieroPage implements OnInit {
       ...config,
       ingresoMensual: ingresoValor,
       mesesProyeccion: this.mesesProyeccion,
-      fechaCierre: this.fechaCierreControl.value ? Number(this.fechaCierreControl.value) : null,
+      fechaCierre: null,
       fechaActualizacion: new Date()
     };
 
@@ -164,8 +159,6 @@ export class SimuladorFinancieroPage implements OnInit {
   async borrarConfig() {
     await this.simuladorSvc.eliminarConfig();
     this.ingresoMensualControl.setValue(null);
-    this.fechaCierreControl.setValue(null);
-    this.fechaCierre = '';
     this.mesesProyeccion = 6;
     this.proyecciones = [];
     this.utilsSvc.presentToast({
@@ -191,7 +184,6 @@ export class SimuladorFinancieroPage implements OnInit {
 
   calcularProyeccion() {
     const ingresoValor = this.ingresoMensualControl.value ? Number(this.ingresoMensualControl.value.replace(/\./g, '').replace(',', '.')) : 0;
-    const fechaCierre = this.fechaCierreControl.value ? Number(this.fechaCierreControl.value) : null;
 
     if (ingresoValor <= 0) {
       this.proyecciones = [];
@@ -204,19 +196,9 @@ export class SimuladorFinancieroPage implements OnInit {
       this.mesesProyeccion,
       this.gastosFijos,
       this.gastosTemporales,
-      fechaCierre,
+      g => this.getDiaCierreTarjeta(g),
       offsetMeses
     );
-  }
-
-  onFechaCierreChange(event: any) {
-    if (event.detail.value) {
-      const fecha = new Date(event.detail.value);
-      this.fechaCierreControl.setValue(fecha.getDate());
-    } else {
-      this.fechaCierreControl.setValue(null);
-    }
-    this.calcularProyeccion();
   }
 
   async abrirModalGasto(tipo: 'fijo' | 'temporal', event?: Event, gasto?: GastoSimulador) {
@@ -300,7 +282,31 @@ export class SimuladorFinancieroPage implements OnInit {
     const ingresoValor = this.ingresoMensualControl.value
       ? Number(this.ingresoMensualControl.value.replace(/\./g, '').replace(',', '.'))
       : 0;
-    return ingresoValor - this.getTotalGastosFijos() - this.getTotalGastosTemporales();
+    return ingresoValor - this.getTotalFijosMesVigente() - this.getTotalFuturosMesVigente();
+  }
+
+  private getProyeccionMesVigente(): ProyeccionMes | null {
+    return this.simuladorSvc.calcularProyeccion(0, 1, this.gastosFijos, this.gastosTemporales, () => null, 0)[0] ?? null;
+  }
+
+  getDiaCierreTarjeta(gasto: GastoSimulador): number | null {
+    if (!gasto.tarjetaId) return null;
+    const tarjeta = this.tarjetas.find(t => t.id === gasto.tarjetaId);
+    if (!tarjeta?.fecha_cierre) return null;
+    const fc: any = tarjeta.fecha_cierre;
+    if (typeof fc === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(fc)) {
+      return Number(fc.slice(8, 10));
+    }
+    const d = this.simuladorSvc.safeParseDate(fc);
+    return d ? d.getDate() : null;
+  }
+
+  getTotalFijosMesVigente(): number {
+    return this.getProyeccionMesVigente()?.totalGastosFijos ?? 0;
+  }
+
+  getTotalFuturosMesVigente(): number {
+    return this.getProyeccionMesVigente()?.totalGastosProyectados ?? 0;
   }
 
   async confirmarEliminarTodosFijos() {
@@ -403,12 +409,11 @@ export class SimuladorFinancieroPage implements OnInit {
   }
 
   async verInfoGasto(gasto: GastoSimulador) {
-    const fechaCierre = this.fechaCierreControl.value ? Number(this.fechaCierreControl.value) : null;
     const modal = await this.utilsSvc.modalsCtrl.create({
       component: VerGastoComponent,
       componentProps: {
         gasto,
-        fechaCierre,
+        fechaCierre: this.getDiaCierreTarjeta(gasto),
         cerrar: () => this.utilsSvc.dismissModal()
       }
     });
@@ -462,7 +467,7 @@ export class SimuladorFinancieroPage implements OnInit {
     const fechaInicio = this.simuladorSvc.safeParseDate(gasto.fechaInicio);
     if (!fechaInicio) return null;
 
-    const fechaCierre = this.fechaCierreControl.value ? Number(this.fechaCierreControl.value) : null;
+    const fechaCierre = this.getDiaCierreTarjeta(gasto);
     const mesInicioEfectivo = this.getMesInicioEfectivo(fechaInicio, fechaCierre);
     const mesProyeccion = new Date(fechaMes.getFullYear(), fechaMes.getMonth(), 1);
 
@@ -489,7 +494,7 @@ export class SimuladorFinancieroPage implements OnInit {
     const fechaInicio = this.simuladorSvc.safeParseDate(gasto.fechaInicio);
     if (!fechaInicio) return null;
 
-    const fechaCierre = this.fechaCierreControl.value ? Number(this.fechaCierreControl.value) : null;
+    const fechaCierre = this.getDiaCierreTarjeta(gasto);
     const mesInicioEfectivo = this.getMesInicioEfectivo(fechaInicio, fechaCierre);
     const mesProyeccion = new Date(fechaMes.getFullYear(), fechaMes.getMonth(), 1);
 
