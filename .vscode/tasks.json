@@ -4,7 +4,7 @@
         {
             "label": "compilar",
             "type": "shell",
-            "command": "ionic build && npx cap copy android && npx cap open android",
+            "command": "ionic build ; npx cap copy android ; npx cap open android",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
@@ -14,7 +14,7 @@
         {
             "label": "deploy-firebase",
             "type": "shell",
-            "command": "npm run build && npx firebase-tools deploy --only hosting --project haciendo-cuentas-app",
+            "command": "npm run build ; npx firebase-tools deploy --only hosting --project haciendo-cuentas-app",
             "problemMatcher": [],
             "group": "test",
             "presentation": {
