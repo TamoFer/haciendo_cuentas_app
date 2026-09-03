@@ -4,76 +4,110 @@
   padding: 16px;
   background: var(--ion-color-white);
 
-  .input-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--ion-color-light);
-
-    ion-icon { font-size: 1.4rem; color: var(--ion-color-primary); }
-    span { font-size: 1.1rem; font-weight: 600; color: var(--ion-color-dark); }
-  }
-
   .input-card {
-    background: var(--ion-color-light);
-    border-radius: 12px;
+    background: var(--ion-color-white);
+    border-radius: 16px;
     padding: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 
-    .income-group {
-      margin-bottom: 16px;
+    .config-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
 
-      .income-label {
+      &.main { margin-bottom: 12px; }
+
+      .config-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: var(--ion-color-primary);
         display: flex;
         align-items: center;
-        gap: 6px;
-        margin-bottom: 8px;
+        justify-content: center;
+        flex-shrink: 0;
 
-        ion-icon { font-size: 1.1rem; color: var(--ion-color-primary); }
-        span { font-size: 0.8rem; font-weight: 600; color: var(--ion-color-medium); text-transform: uppercase; letter-spacing: 0.5px; }
+        ion-icon { font-size: 1.4rem; color: white; }
       }
 
-      .income-input-wrap {
+      .config-content {
+        flex: 1;
         display: flex;
-        align-items: center;
-        background: var(--ion-color-white);
-        border: 2px solid var(--ion-color-light);
-        border-radius: 14px;
-        padding: 2px 2px 2px 18px;
-        transition: border-color 0.2s ease;
+        flex-direction: column;
 
-        &:focus-within { border-color: var(--ion-color-primary); }
-
-        .income-symbol {
-          font-size: 1.6rem;
-          font-weight: 300;
+        .config-label {
+          font-size: 0.85rem;
           color: var(--ion-color-medium);
-          margin-right: 6px;
         }
 
-        ion-input {
-          flex: 1;
-          --padding-start: 0;
-          --padding-end: 12px;
-          --padding-top: 14px;
-          --padding-bottom: 14px;
-          --background: transparent;
-          --border-color: transparent;
-          --highlight-height: 0;
-          --box-shadow: none;
-          font-size: 1.6rem;
-          font-weight: 700;
-          color: var(--ion-color-dark);
+        .income-input-wrap {
+          display: flex;
+          align-items: center;
 
-          input { caret-color: var(--ion-color-primary); }
+          .income-symbol {
+            font-size: 1.4rem;
+            font-weight: 300;
+            color: var(--ion-color-medium);
+            margin-right: 6px;
+          }
+
+          ion-input {
+            flex: 1;
+            --padding-start: 0;
+            --padding-end: 12px;
+            --padding-top: 6px;
+            --padding-bottom: 6px;
+            --background: transparent;
+            --highlight-height: 0;
+            --box-shadow: none;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ion-color-dark);
+
+            input { caret-color: var(--ion-color-primary); }
+          }
+        }
+      }
+
+      &.secondary {
+        .config-item {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          .config-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--ion-color-primary);
+            flex-shrink: 0;
+          }
+
+          .config-item-label {
+            font-size: 0.85rem;
+            color: var(--ion-color-medium);
+            white-space: nowrap;
+          }
+
+          ion-select {
+            flex: 1;
+            --background: var(--ion-color-light);
+            --padding-start: 12px;
+            --padding-end: 8px;
+            border-radius: 8px;
+            min-height: 44px;
+            font-weight: 600;
+            color: var(--ion-color-dark);
+          }
         }
       }
     }
 
-    .input-row {
-      &.split { display: flex; gap: 12px; .input-item { flex: 1; } }
-      &.full { width: 100%; }
+    .summary-divider {
+      height: 1px;
+      background: var(--ion-color-light);
+      margin: 12px 0;
     }
 
     .botones-config {
@@ -86,9 +120,6 @@
         --border-radius: 8px;
       }
     }
-
-    ion-label[position="stacked"] { font-size: 0.8rem; color: var(--ion-color-medium); margin-bottom: 4px; }
-    ion-select, ion-input { --background: var(--ion-color-white); --padding-start: 12px; --padding-end: 12px; border-radius: 8px; min-height: 44px; }
   }
 }
 

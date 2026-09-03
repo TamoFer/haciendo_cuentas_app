@@ -46,7 +46,7 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
     id: new FormControl(null),
     fecha: new FormControl(null, [Validators.required, Validators.min(0)]),
     importe_total: new FormControl(null, [Validators.required, Validators.min(0)]),
-    cuotificacion: new FormControl(null, [Validators.required]),
+    cuotificacion: new FormControl(null, [Validators.required, Validators.pattern('^[0-9]+$')]),
     detalle: new FormControl(null, [Validators.required, Validators.minLength(1)]),
     tarjeta: new FormControl(null, [Validators.required]),
     moneda: new FormControl('Pesos', [Validators.required]),
@@ -139,14 +139,16 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
 
     let importeParseado = Number(this.formulario.value.importe_total!.replace(/\./g, '').replace(',', '.'))
 
-    this.firebaseSVC.addDocument(path, this.formulario.value).then(async res => {
+    const datos = { ...this.formulario.value, cuotificacion: Number(this.formulario.value.cuotificacion!) };
+
+    this.firebaseSVC.addDocument(path, datos).then(async res => {
 
       const consumo: Consumo = {
         id: this.formulario.value.id!,
         fecha: this.formulario.value.fecha!,
         importe_total: importeParseado,
         detalle: this.formulario.value.detalle!,
-        cuotificacion: this.formulario.value.cuotificacion!,
+        cuotificacion: Number(this.formulario.value.cuotificacion!),
         tarjeta_asociada: this.tarjetaRelacionada,
         moneda: this.formulario.value.moneda!,
         mes_inicio: new Date(this.formulario.value.fecha!)
@@ -193,14 +195,16 @@ export class AddUpdateDeleteConsumosComponent implements OnInit {
 
     let importeParseado = Number(this.formulario.value.importe_total!.replace(/\./g, '').replace(',', '.'))
 
-    this.firebaseSVC.updateDocument(path, this.formulario.value).then(async res => {
+    const datos = { ...this.formulario.value, cuotificacion: Number(this.formulario.value.cuotificacion!) };
+
+    this.firebaseSVC.updateDocument(path, datos).then(async res => {
 
       const consumo: Consumo = {
         id: this.consumo.id,
         fecha: this.formulario.value.fecha!,
         importe_total: importeParseado,
         detalle: this.formulario.value.detalle!,
-        cuotificacion: this.formulario.value.cuotificacion!,
+        cuotificacion: Number(this.formulario.value.cuotificacion!),
         tarjeta_asociada: this.tarjetaRelacionada,
         moneda: this.formulario.value.moneda!,
         mes_inicio: new Date(this.formulario.value.fecha!)

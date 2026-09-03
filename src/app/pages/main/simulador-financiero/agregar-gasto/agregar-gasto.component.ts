@@ -112,7 +112,7 @@ import { FirebaseService } from 'src/app/services/firebase.service';
               <div class="field-head">
                 <span>Cuotas / meses</span>
               </div>
-              <ion-input type="number" min="1" [(ngModel)]="cantidadCuotas" placeholder="Ej: 12" class="field-input"></ion-input>
+              <ion-input type="text" inputmode="numeric" [(ngModel)]="cantidadCuotas" placeholder="Ej: 12" class="field-input"></ion-input>
             </div>
 
             @if (cantidadCuotas && cantidadCuotas > 0) {

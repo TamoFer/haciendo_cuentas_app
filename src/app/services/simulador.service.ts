@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { GastoSimulador, GastoConCuota, ProyeccionMes, ProyeccionConfig } from '../models/gasto-simulador.model';
+import { Tarjeta } from '../models/tarjeta.model';
 import { FirebaseService } from './firebase.service';
 import { UtilsService } from './utils.service';
 
@@ -85,6 +86,16 @@ export class SimuladorService {
     return gastos;
   }
 
+  obtenerTarjetas() {
+    const user = this.utilsSvc.obtenerDatosLS('user');
+    if (!user?.uid) return;
+    const path = `users/${user.uid}/tarjetas`;
+    this.firebaseSvc.getCollectionData(path).subscribe({
+      next: (res: Tarjeta[]) => this.utilsSvc.setTarjetas(res),
+      error: err => console.error('Error obteniendo tarjetas', err)
+    });
+  }
+
   async actualizarGasto(gastoId: string, data: Partial<GastoSimulador>): Promise<void> {
     const user = this.utilsSvc.obtenerDatosLS('user');
     if (!user?.uid) return;
@@ -129,7 +140,7 @@ export class SimuladorService {
     meses: number,
     gastosFijos: GastoSimulador[],
     gastosTemporales: GastoSimulador[],
-    fechaCierreDia: number | null = null,
+    cierrePorGasto: (gasto: GastoSimulador) => number | null = () => null,
     offsetMeses: number = 0
   ): ProyeccionMes[] {
     const proyecciones: ProyeccionMes[] = [];
@@ -148,9 +159,9 @@ export class SimuladorService {
       }
 
       try {
-        const tempGastos = gastosTemporales.filter(g => this.esGastoValidoParaMes(g, fechaMes, fechaCierreDia));
+        const tempGastos = gastosTemporales.filter(g => this.esGastoValidoParaMes(g, fechaMes, cierrePorGasto(g)));
         gastosTemporalesMes = tempGastos.map(gasto => {
-          const cuotaInfo = this.calcularInfoCuota(gasto, fechaMes, i, fechaCierreDia);
+          const cuotaInfo = this.calcularInfoCuota(gasto, fechaMes, i, cierrePorGasto(gasto));
           return { ...gasto, ...cuotaInfo };
         });
       } catch (e) {

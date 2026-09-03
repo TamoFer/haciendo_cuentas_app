@@ -43,7 +43,7 @@
       @if (tipo === 'temporal') {
         <ion-item>
           <ion-label position="stacked">Cantidad de cuotas</ion-label>
-          <ion-input type="number" min="1" [(ngModel)]="cantidadCuotas" placeholder="Ej: 12"></ion-input>
+          <ion-input type="text" inputmode="numeric" [(ngModel)]="cantidadCuotas" placeholder="Ej: 12"></ion-input>
         </ion-item>
 
         @if (cantidadCuotas && cantidadCuotas > 0) {
