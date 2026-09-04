@@ -1,5 +1,5 @@
 import { NgIf } from '@angular/common';
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { MaskitoDirective } from '@maskito/angular';
@@ -22,7 +22,7 @@ interface Rubro {
   imports: [IonicModule, ReactiveFormsModule, MaskitoDirective, NgIf]
 
 })
-export class AddUpdtDeleteGastoComponent {
+export class AddUpdtDeleteGastoComponent implements OnInit {
 
 
   @Input() gasto: Movimiento;

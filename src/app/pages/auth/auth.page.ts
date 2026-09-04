@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { HeaderComponent } from "../../shared/components/header/header.component";
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -16,7 +16,7 @@ import { NgIf } from '@angular/common';
   imports: [IonicModule, HeaderComponent, IngresoDatosComponent, ReactiveFormsModule, RouterLink, NgIf]
 })
 
-export class AuthPage implements OnInit {
+export class AuthPage {
 
   formulario = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -25,9 +25,6 @@ export class AuthPage implements OnInit {
 
   firebaseSv = inject(FirebaseService);
   utilsSv = inject(UtilsService);
-
-  ngOnInit() {
-  }
 
   async submit() {
     if (this.formulario.valid) {

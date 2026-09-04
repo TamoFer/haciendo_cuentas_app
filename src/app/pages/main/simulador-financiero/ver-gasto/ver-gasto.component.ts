@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { GastoSimulador } from 'src/app/models/gasto-simulador.model';
@@ -208,15 +208,13 @@ import { GastoSimulador } from 'src/app/models/gasto-simulador.model';
   `],
   imports: [IonicModule, CommonModule]
 })
-export class VerGastoComponent implements OnInit {
+export class VerGastoComponent {
   @Input() gasto!: GastoSimulador;
   @Input() cerrar!: () => void;
   @Input() fechaCierre: number | null = null;
 
   private mesesNombres = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-
-  ngOnInit() {}
 
   formatearMonto(monto: number): string {
     return '$' + monto.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });

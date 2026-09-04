@@ -1,5 +1,5 @@
 import { NgIf } from '@angular/common';
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { MaskitoDirective } from '@maskito/angular';
@@ -21,7 +21,7 @@ interface Rubro {
   styleUrls: ['./add-updt-delete-ingresos.component.scss'],
   imports: [IonicModule, NgIf, ReactiveFormsModule, MaskitoDirective]
 })
-export class AddUpdtDeleteIngresosComponent {
+export class AddUpdtDeleteIngresosComponent implements OnInit {
 
   @Input() ingreso: Movimiento;
   @Input() rubros: Rubro[] = [];

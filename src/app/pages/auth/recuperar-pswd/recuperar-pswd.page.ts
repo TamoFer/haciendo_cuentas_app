@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { IonicModule, NavController } from '@ionic/angular';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FirebaseService } from 'src/app/services/firebase.service';
@@ -23,7 +23,7 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
   standalone: true
 })
 
-export class RecuperarPswdPage implements OnInit {
+export class RecuperarPswdPage {
 
   formulario = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -33,9 +33,6 @@ export class RecuperarPswdPage implements OnInit {
   utilsSv = inject(UtilsService);
 
   constructor(private navCtrl: NavController) { }
-
-  ngOnInit() {
-  }
 
   retroceder() {
     this.navCtrl.back();

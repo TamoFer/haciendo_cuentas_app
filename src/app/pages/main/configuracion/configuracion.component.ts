@@ -1,5 +1,5 @@
 import { NgIf } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { MaskitoDirective } from '@maskito/angular';
@@ -18,7 +18,7 @@ import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/i
   imports: [IonicModule, FooterComponent, IngresoDatosComponent, NgIf, ReactiveFormsModule, MaskitoDirective],
   standalone: true
 })
-export class ConfiguracionComponent {
+export class ConfiguracionComponent implements OnInit {
 
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);

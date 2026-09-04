@@ -1,5 +1,5 @@
 import { NgIf } from '@angular/common';
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { MaskitoDirective } from '@maskito/angular';
@@ -21,7 +21,7 @@ import { Meta } from 'src/app/models/metas.model';
   styleUrls: ['./add-updt-delete-metas.component.scss'],
   imports: [IonicModule, HeaderComponent, FooterComponent, IngresoDatosComponent, NgIf, ReactiveFormsModule, MaskitoDirective]
 })
-export class AddUpdtDeleteMetasComponent {
+export class AddUpdtDeleteMetasComponent implements OnInit {
 
   @Input() meta: Meta;
 

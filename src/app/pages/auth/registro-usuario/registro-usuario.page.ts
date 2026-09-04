@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { IonicModule, NavController } from '@ionic/angular';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IngresoDatosComponent } from 'src/app/shared/components/ingreso-datos/ingreso-datos.component';
@@ -19,7 +19,7 @@ import { NgIf } from '@angular/common';
 
 
 
-export class RegistroUsuarioPage implements OnInit {
+export class RegistroUsuarioPage {
 
   constructor(private navCtrl: NavController) { }
 
@@ -35,9 +35,6 @@ export class RegistroUsuarioPage implements OnInit {
 
   firebaseSv = inject(FirebaseService);
   utilsSv = inject(UtilsService);
-
-  ngOnInit() {
-  }
 
   async submit() {
     if (this.formulario.valid) {

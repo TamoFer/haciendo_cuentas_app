@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 
 @Component({
@@ -8,11 +8,8 @@ import { IonicModule } from '@ionic/angular';
   imports: [IonicModule]
 
 })
-export class MainPage implements OnInit {
+export class MainPage {
 
   constructor() { }
-
-  ngOnInit() {
-  }
 
 }

@@ -6,7 +6,6 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 import { SimuladorService } from 'src/app/services/simulador.service';
 import { GastoSimulador, GastoConCuota, ProyeccionMes, ProyeccionConfig } from 'src/app/models/gasto-simulador.model';
-import { Tarjeta } from 'src/app/models/tarjeta.model';
 import { AgregarGastoComponent } from './agregar-gasto/agregar-gasto.component';
 import { VerGastoComponent } from './ver-gasto/ver-gasto.component';
 import { UtilsService } from 'src/app/services/utils.service';
@@ -36,6 +35,8 @@ export class SimuladorFinancieroPage implements OnInit {
 
   ingresoMensual: number = 0;
   ingresoMensualControl = new FormControl(null);
+  fechaCierreControl = new FormControl(null);
+  fechaCierre: string = '';
   mesesProyeccion: number = 6;
   proyecciones: ProyeccionMes[] = [];
   configId: string = 'config_principal';
@@ -43,11 +44,8 @@ export class SimuladorFinancieroPage implements OnInit {
   gastosFijos: GastoSimulador[] = [];
   gastosTemporales: GastoSimulador[] = [];
   tarjetas: Tarjeta[] = [];
-<<<<<<< HEAD
   tarjetasGrupos: TarjetaGrupoSim[] = [];
   cuotificadosSinTarjeta: GastoSimulador[] = [];
-=======
->>>>>>> 3129338 (modificando_teclado-numerico)
 
   mostrarDetalle: boolean = false;
   mesDetalle?: ProyeccionMes;
@@ -109,13 +107,10 @@ export class SimuladorFinancieroPage implements OnInit {
     if (config) {
       this.ingresoMensualControl.setValue(config.ingresoMensual.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
       this.mesesProyeccion = config.mesesProyeccion;
-<<<<<<< HEAD
       if (config.fechaCierre) {
         this.fechaCierreControl.setValue(config.fechaCierre);
         this.actualizarFechaCierreStr(config.fechaCierre);
       }
-=======
->>>>>>> 3129338 (modificando_teclado-numerico)
     }
   }
 

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit, OnDestroy } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { Tarjeta } from 'src/app/models/tarjeta.model';
@@ -238,7 +238,7 @@ import { AgregarGastoComponent } from '../simulador-financiero/agregar-gasto/agr
   `],
   imports: [IonicModule, HeaderComponent, CommonModule]
 })
-export class ConsumosComponent implements OnInit {
+export class ConsumosComponent implements OnInit, OnDestroy {
 
   firebaseSVC = inject(FirebaseService);
   utilsSVC = inject(UtilsService);
