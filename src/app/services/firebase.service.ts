@@ -105,6 +105,7 @@ export class FirebaseService {
     gasto.fechaFin = gasto.fechaFin || null;
     gasto.cantidadCuotas = gasto.cantidadCuotas || null;
     gasto.detalles = gasto.detalles || null;
+    gasto.mesInicioCuotas = gasto.mesInicioCuotas || null;
     return this.addDocument(path, gasto);
   }
 
@@ -127,6 +128,7 @@ export class FirebaseService {
     data.fechaFin = data.fechaFin || null;
     data.cantidadCuotas = data.cantidadCuotas || null;
     data.detalles = data.detalles || null;
+    data.mesInicioCuotas = data.mesInicioCuotas || null;
     data.nombre = data.nombre || '';
     data.categoria = data.categoria || 'Otros';
     data.importe = Number(data.importe) || 0;

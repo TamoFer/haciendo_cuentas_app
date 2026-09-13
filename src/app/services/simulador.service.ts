@@ -110,29 +110,50 @@ export class SimuladorService {
     await this.firebaseSvc.deleteGastoSimulador(user.uid, gastoId);
   }
 
-  async eliminarGastosVencidos(): Promise<void> {
-    const gastos = await this.obtenerGastos();
+  async eliminarGastosVencidos(gastos?: GastoSimulador[]): Promise<GastoSimulador[]> {
+    const lista = gastos && gastos.length ? gastos : await this.obtenerGastos();
     const hoy = new Date();
     const limite = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+    const sobrevivientes: GastoSimulador[] = [];
 
-    for (const gasto of gastos) {
+    for (const gasto of lista) {
+      let eliminar = false;
+
       if (gasto.fechaFin && gasto.tipo === 'temporal') {
         const fechaFin = this.safeParseDate(gasto.fechaFin);
         if (fechaFin && fechaFin < limite) {
           if (gasto.cantidadCuotas && gasto.cantidadCuotas > 0) {
-            const fechaInicio = this.safeParseDate(gasto.fechaInicio);
-            if (fechaInicio) {
-              const cuotaActual = (hoy.getFullYear() - fechaInicio.getFullYear()) * 12 + (hoy.getMonth() - fechaInicio.getMonth()) + 1;
-              if (cuotaActual > gasto.cantidadCuotas) {
-                await this.eliminarGasto(gasto.id);
+            const ancla = this.obtenerMesAncla(gasto);
+            let mesBase: Date | null = ancla;
+            if (!mesBase) {
+              const fechaInicio = this.safeParseDate(gasto.fechaInicio);
+              if (fechaInicio) {
+                mesBase = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), 1);
               }
             }
+            if (mesBase) {
+              const cuotaActual = this.mesesEntre(mesBase, new Date(hoy.getFullYear(), hoy.getMonth(), 1)) + 1;
+              eliminar = cuotaActual > gasto.cantidadCuotas;
+            }
           } else {
-            await this.eliminarGasto(gasto.id);
+            eliminar = true;
           }
         }
       }
+
+      if (eliminar) {
+        try {
+          await this.eliminarGasto(gasto.id);
+        } catch (e) {
+          console.error('Error eliminando gasto vencido', e);
+          sobrevivientes.push(gasto);
+        }
+      } else {
+        sobrevivientes.push(gasto);
+      }
     }
+
+    return sobrevivientes;
   }
 
   calcularProyeccion(
@@ -208,61 +229,156 @@ export class SimuladorService {
     try {
       if (dateValue instanceof Date) return dateValue;
       if (typeof dateValue === 'string') {
+        const s = dateValue.trim();
+        if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+          return new Date(s + 'T00:00:00');
+        }
         const d = new Date(dateValue);
         return isNaN(d.getTime()) ? null : d;
       }
       if (typeof dateValue === 'number') {
         const d = new Date(dateValue);
-        return isNaN(d.getTime()) ? null : d;
+        return isNaN(d.getTime()) ? null : this.normalizarFechaGuardada(d);
       }
       if (dateValue && typeof dateValue === 'object' && dateValue.seconds) {
-        return new Date(dateValue.seconds * 1000);
+        const d = new Date(dateValue.seconds * 1000);
+        return isNaN(d.getTime()) ? null : this.normalizarFechaGuardada(d);
       }
       const d = new Date(dateValue);
-      return isNaN(d.getTime()) ? null : d;
+      return isNaN(d.getTime()) ? null : this.normalizarFechaGuardada(d);
     } catch {
       return null;
     }
   }
 
+  private normalizarFechaGuardada(d: Date): Date {
+    if (d.getUTCHours() === 0 && d.getUTCMinutes() === 0 && d.getUTCSeconds() === 0 && d.getUTCMilliseconds() === 0) {
+      return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+    }
+    return d;
+  }
+
+  fechaACalendarStr(value: any): string {
+    const d = this.safeParseDate(value);
+    if (!d) return '';
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  obtenerDiaCierre(tarjeta: Tarjeta | null): number | null {
+    if (!tarjeta || !tarjeta.fecha_cierre) return null;
+    const fc: any = tarjeta.fecha_cierre;
+    if (typeof fc === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(fc.trim())) {
+      return Number(fc.trim().slice(8, 10));
+    }
+    const d = this.safeParseDate(fc);
+    return d ? d.getDate() : null;
+  }
+
+  calcularMesInicioCuotas(fechaInicio: Date, cierreDia: number | null): string {
+    let offset = 0;
+    if (cierreDia && cierreDia > 0) {
+      offset = fechaInicio.getDate() <= cierreDia ? 1 : 2;
+    }
+    const d = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth() + offset, 1);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  obtenerMesAncla(gasto: GastoSimulador): Date | null {
+    if (gasto.tipo !== 'temporal' || !gasto.mesInicioCuotas) return null;
+    const partes = String(gasto.mesInicioCuotas).split('-').map(Number);
+    const anio = partes[0];
+    const mes = partes[1];
+    if (!anio || !mes || mes < 1 || mes > 12) return null;
+    return new Date(anio, mes - 1, 1);
+  }
+
+  obtenerMesInicioEfectivo(gasto: GastoSimulador, fechaInicio: Date, fechaCierreDia: number | null): Date {
+    const ancla = this.obtenerMesAncla(gasto);
+    if (ancla) return ancla;
+
+    if (gasto.tipo === 'temporal' && fechaCierreDia && fechaCierreDia > 0) {
+      if (fechaInicio.getDate() <= fechaCierreDia) {
+        return new Date(fechaInicio.getFullYear(), fechaInicio.getMonth() + 1, 1);
+      }
+      return new Date(fechaInicio.getFullYear(), fechaInicio.getMonth() + 2, 1);
+    }
+    return new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), 1);
+  }
+
+  obtenerRangoMesesCuotas(gasto: GastoSimulador, fechaCierreDia: number | null): { mesInicio: Date, mesFin: Date | null } | null {
+    const fechaInicio = this.safeParseDate(gasto.fechaInicio);
+    if (!fechaInicio) return null;
+    const fechaFin = gasto.fechaFin ? this.safeParseDate(gasto.fechaFin) : null;
+
+    const mesInicio = this.obtenerMesInicioEfectivo(gasto, fechaInicio, fechaCierreDia);
+    let mesFin: Date | null = null;
+
+    const ancla = this.obtenerMesAncla(gasto);
+    if (ancla) {
+      if (gasto.cantidadCuotas && gasto.cantidadCuotas > 0) {
+        mesFin = new Date(ancla.getFullYear(), ancla.getMonth() + gasto.cantidadCuotas - 1, 1);
+      } else if (fechaFin) {
+        const duracion = this.mesesEntre(fechaInicio, fechaFin) - 1;
+        mesFin = new Date(ancla.getFullYear(), ancla.getMonth() + duracion, 1);
+      }
+    } else if (gasto.tipo === 'temporal' && fechaCierreDia && fechaFin) {
+      if (fechaInicio.getDate() <= fechaCierreDia) {
+        mesFin = new Date(fechaFin.getFullYear(), fechaFin.getMonth(), 1);
+      } else {
+        mesFin = new Date(fechaFin.getFullYear(), fechaFin.getMonth() + 1, 1);
+      }
+    } else if (fechaFin) {
+      mesFin = new Date(fechaFin.getFullYear(), fechaFin.getMonth(), 1);
+    }
+
+    return { mesInicio, mesFin };
+  }
+
+  mesesEntre(desde: Date, hasta: Date): number {
+    return (hasta.getFullYear() - desde.getFullYear()) * 12 + (hasta.getMonth() - desde.getMonth());
+  }
+
+  async anclarGastosLegacy(gastos: GastoSimulador[], tarjetas: Tarjeta[]): Promise<GastoSimulador[]> {
+    if (!gastos || gastos.length === 0 || !tarjetas || tarjetas.length === 0) return gastos;
+
+    const user = this.utilsSvc.obtenerDatosLS('user');
+    const resultado = [...gastos];
+
+    for (let i = 0; i < resultado.length; i++) {
+      const gasto = resultado[i];
+      if (gasto.tipo !== 'temporal' || !gasto.tarjetaId || gasto.mesInicioCuotas) continue;
+
+      const tarjeta = tarjetas.find(t => t.id === gasto.tarjetaId);
+      const cierreDia = tarjeta ? this.obtenerDiaCierre(tarjeta) : null;
+      const fechaInicio = this.safeParseDate(gasto.fechaInicio);
+      if (!fechaInicio) continue;
+
+      const ancla = this.calcularMesInicioCuotas(fechaInicio, cierreDia);
+      resultado[i] = { ...gasto, mesInicioCuotas: ancla };
+
+      try {
+        if (user?.uid) {
+          await this.firebaseSvc.updateDocument(`users/${user.uid}/gastosSimulador/${gasto.id}`, { mesInicioCuotas: ancla });
+        }
+      } catch (e) {
+        console.error('Error anclando gasto legacy', e);
+      }
+    }
+
+    return resultado;
+  }
+
   private esGastoValidoParaMes(gasto: GastoSimulador, fechaMes: Date, fechaCierreDia: number | null): boolean {
     try {
-      const fechaInicio = this.safeParseDate(gasto.fechaInicio);
-      const fechaFin = gasto.fechaFin ? this.safeParseDate(gasto.fechaFin) : null;
-
-      if (!fechaInicio) {
-        return false;
-      }
-
-      let mesAnioGasto: Date;
-      let mesAnioFin: Date | null = null;
-
-      if (gasto.tipo === 'temporal' && fechaCierreDia) {
-        if (fechaInicio.getDate() <= fechaCierreDia) {
-          mesAnioGasto = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth() + 1, 1);
-        } else {
-          mesAnioGasto = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth() + 2, 1);
-        }
-        if (fechaFin) {
-          if (fechaInicio.getDate() <= fechaCierreDia) {
-            mesAnioFin = new Date(fechaFin.getFullYear(), fechaFin.getMonth(), 1);
-          } else {
-            mesAnioFin = new Date(fechaFin.getFullYear(), fechaFin.getMonth() + 1, 1);
-          }
-        }
-      } else {
-        mesAnioGasto = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), 1);
-        if (fechaFin) {
-          mesAnioFin = new Date(fechaFin.getFullYear(), fechaFin.getMonth(), 1);
-        }
-      }
+      const rango = this.obtenerRangoMesesCuotas(gasto, fechaCierreDia);
+      if (!rango) return false;
 
       const mesAnioProyeccion = new Date(fechaMes.getFullYear(), fechaMes.getMonth(), 1);
 
-      if (mesAnioProyeccion < mesAnioGasto) {
+      if (mesAnioProyeccion < rango.mesInicio) {
         return false;
       }
-      if (mesAnioFin && mesAnioProyeccion > mesAnioFin) {
+      if (rango.mesFin && mesAnioProyeccion > rango.mesFin) {
         return false;
       }
 
@@ -300,21 +416,10 @@ export class SimuladorService {
     const fechaInicio = this.safeParseDate(gasto.fechaInicio);
     if (!fechaInicio) return {};
 
-    let mesAnioGasto: Date;
-    if (fechaCierreDia && fechaCierreDia > 0) {
-      if (fechaInicio.getDate() <= fechaCierreDia) {
-        mesAnioGasto = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth() + 1, 1);
-      } else {
-        mesAnioGasto = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth() + 2, 1);
-      }
-    } else {
-      mesAnioGasto = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), 1);
-    }
-
+    const mesAnioGasto = this.obtenerMesInicioEfectivo(gasto, fechaInicio, fechaCierreDia);
     const mesAnioProyeccion = new Date(fechaMes.getFullYear(), fechaMes.getMonth(), 1);
 
-    const mesesDesdeInicio = (mesAnioProyeccion.getFullYear() - mesAnioGasto.getFullYear()) * 12 +
-      (mesAnioProyeccion.getMonth() - mesAnioGasto.getMonth());
+    const mesesDesdeInicio = this.mesesEntre(mesAnioGasto, mesAnioProyeccion);
 
     if (mesesDesdeInicio < 0) return {};
 

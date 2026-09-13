@@ -137,7 +137,7 @@ export class PagosPage implements OnInit {
     if (!this.usuario) return;
     try {
       const gastos = await this.firebaseSVC.getGastosSimulador(this.usuario.uid) as GastoSimulador[];
-      const todos = gastos || [];
+      const todos = await this.simuladorSvc.anclarGastosLegacy(gastos || [], this.tarjetas);
       this.utilsSVC.setGastosSimulador(todos);
 
       const fijos = todos.filter(g => g.tipo === 'fijo');
@@ -211,48 +211,22 @@ export class PagosPage implements OnInit {
   }
 
   private evaluarGastoEnMes(g: GastoSimulador, fechaCierreDia: number | null): { activo: boolean, cuotaInfo: string | null } {
-    const inicio = this.simuladorSvc.safeParseDate(g.fechaInicio);
-    if (!inicio) return { activo: false, cuotaInfo: null };
+    const rango = this.simuladorSvc.obtenerRangoMesesCuotas(g, fechaCierreDia);
+    if (!rango) return { activo: false, cuotaInfo: null };
 
     const hoy = new Date();
     const fechaRef = new Date(hoy.getFullYear(), hoy.getMonth() + this.mesOffset, 1);
-
-    let mesInicioEfectivo: Date;
-    if (fechaCierreDia && fechaCierreDia > 0) {
-      if (inicio.getDate() <= fechaCierreDia) {
-        mesInicioEfectivo = new Date(inicio.getFullYear(), inicio.getMonth() + 1, 1);
-      } else {
-        mesInicioEfectivo = new Date(inicio.getFullYear(), inicio.getMonth() + 2, 1);
-      }
-    } else {
-      mesInicioEfectivo = new Date(inicio.getFullYear(), inicio.getMonth(), 1);
-    }
-
-    const fechaFin = g.fechaFin ? this.simuladorSvc.safeParseDate(g.fechaFin) : null;
-    let mesFinEfectivo: Date | null = null;
-    if (fechaFin) {
-      if (fechaCierreDia && fechaCierreDia > 0) {
-        if (inicio.getDate() <= fechaCierreDia) {
-          mesFinEfectivo = new Date(fechaFin.getFullYear(), fechaFin.getMonth(), 1);
-        } else {
-          mesFinEfectivo = new Date(fechaFin.getFullYear(), fechaFin.getMonth() + 1, 1);
-        }
-      } else {
-        mesFinEfectivo = new Date(fechaFin.getFullYear(), fechaFin.getMonth(), 1);
-      }
-    }
-
     const mesProyeccion = new Date(fechaRef.getFullYear(), fechaRef.getMonth(), 1);
 
-    if (mesProyeccion < mesInicioEfectivo) return { activo: false, cuotaInfo: null };
-    if (mesFinEfectivo && mesProyeccion > mesFinEfectivo) return { activo: false, cuotaInfo: null };
+    if (mesProyeccion < rango.mesInicio) return { activo: false, cuotaInfo: null };
+    if (rango.mesFin && mesProyeccion > rango.mesFin) return { activo: false, cuotaInfo: null };
 
     if (!g.cantidadCuotas || g.cantidadCuotas <= 1) {
       return { activo: true, cuotaInfo: null };
     }
 
-    const mesesDiff = (mesProyeccion.getFullYear() - mesInicioEfectivo.getFullYear()) * 12 +
-      (mesProyeccion.getMonth() - mesInicioEfectivo.getMonth());
+    const mesesDiff = (mesProyeccion.getFullYear() - rango.mesInicio.getFullYear()) * 12 +
+      (mesProyeccion.getMonth() - rango.mesInicio.getMonth());
 
     if (mesesDiff < 0) return { activo: false, cuotaInfo: null };
 
@@ -279,9 +253,13 @@ export class PagosPage implements OnInit {
     if (!tarjeta) return;
 
     const path = `users/${this.usuario.uid}/gastosSimulador/${item.id}`;
+    const fechaInicio = this.simuladorSvc.safeParseDate(item.gastoOriginal.fechaInicio);
+    const cierreDia = this.getFechaCierreDia(tarjeta);
+    const mesInicioCuotas = fechaInicio ? this.simuladorSvc.calcularMesInicioCuotas(fechaInicio, cierreDia) : null;
     const data = {
       tarjetaId: tarjeta.id,
-      tarjetaNombre: `${tarjeta.banco} ${tarjeta.tarjeta} ${tarjeta.digitos}`
+      tarjetaNombre: `${tarjeta.banco} ${tarjeta.tarjeta} ${tarjeta.digitos}`,
+      mesInicioCuotas
     };
 
     try {

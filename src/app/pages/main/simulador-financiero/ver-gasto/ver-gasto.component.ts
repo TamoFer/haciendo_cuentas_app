@@ -1,7 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { GastoSimulador } from 'src/app/models/gasto-simulador.model';
+import { SimuladorService } from 'src/app/services/simulador.service';
 
 @Component({
   selector: 'app-ver-gasto',
@@ -213,6 +214,8 @@ export class VerGastoComponent {
   @Input() cerrar!: () => void;
   @Input() fechaCierre: number | null = null;
 
+  simuladorSvc = inject(SimuladorService);
+
   private mesesNombres = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
@@ -221,25 +224,7 @@ export class VerGastoComponent {
   }
 
   safeParseDate(dateValue: any): Date | null {
-    if (!dateValue) return null;
-    try {
-      if (dateValue instanceof Date) return dateValue;
-      if (typeof dateValue === 'string') {
-        const d = new Date(dateValue);
-        return isNaN(d.getTime()) ? null : d;
-      }
-      if (typeof dateValue === 'number') {
-        const d = new Date(dateValue);
-        return isNaN(d.getTime()) ? null : d;
-      }
-      if (dateValue && typeof dateValue === 'object' && dateValue.seconds) {
-        return new Date(dateValue.seconds * 1000);
-      }
-      const d = new Date(dateValue);
-      return isNaN(d.getTime()) ? null : d;
-    } catch {
-      return null;
-    }
+    return this.simuladorSvc.safeParseDate(dateValue);
   }
 
   formatDate(date: Date | string | any): string {
@@ -257,6 +242,13 @@ export class VerGastoComponent {
     if (!fechaInicio) return 'Fecha inválida';
 
     const cuotas = this.gasto.cantidadCuotas;
+
+    const ancla = this.simuladorSvc.obtenerMesAncla(this.gasto);
+    if (ancla) {
+      const mesFin = new Date(ancla.getFullYear(), ancla.getMonth() + cuotas - 1, 1);
+      return `${this.mesesNombres[mesFin.getMonth()]} ${mesFin.getFullYear()}`;
+    }
+
     const diaCreacion = fechaInicio.getDate();
     let mesesOffset: number;
 
@@ -281,6 +273,9 @@ export class VerGastoComponent {
   }
 
   getMesInicioEfectivo(fechaInicio: Date): Date {
+    const ancla = this.simuladorSvc.obtenerMesAncla(this.gasto);
+    if (ancla) return ancla;
+
     if (!this.fechaCierre || this.fechaCierre <= 0) {
       return new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), 1);
     }

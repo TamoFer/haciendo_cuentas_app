@@ -341,7 +341,7 @@ export class AgregarGastoComponent implements OnInit {
   nombre: string = '';
   categoria: string = '';
   importeControl = new FormControl('');
-  fechaInicio: string = new Date().toISOString().split('T')[0];
+  fechaInicio: string = '';
   fechaFin: string = '';
   cantidadCuotas: number | null = null;
   detalles: string = '';
@@ -359,6 +359,7 @@ export class AgregarGastoComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.fechaInicio = this.hoyLocalStr();
     this.utilsSvc.tarjetas$.subscribe(tarjetas => {
       this.tarjetas = tarjetas || [];
       if (this.gasto?.tarjetaId) {
@@ -400,13 +401,13 @@ export class AgregarGastoComponent implements OnInit {
     this.tarjetaSeleccionada = t;
   }
 
+  private hoyLocalStr(): string {
+    const h = new Date();
+    return `${h.getFullYear()}-${String(h.getMonth() + 1).padStart(2, '0')}-${String(h.getDate()).padStart(2, '0')}`;
+  }
+
   private toDateStr(value: any): string {
-    if (!value) return '';
-    if (value instanceof Date) return value.toISOString().split('T')[0];
-    if (value && typeof value.toDate === 'function') return value.toDate().toISOString().split('T')[0];
-    if (value && value.seconds) return new Date(value.seconds * 1000).toISOString().split('T')[0];
-    const d = new Date(value);
-    return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
+    return this.simuladorSvc.fechaACalendarStr(value);
   }
 
   guardar() {
@@ -446,17 +447,29 @@ export class AgregarGastoComponent implements OnInit {
       return;
     }
 
-    const fechaInicioFinal = this.fechaInicio ? new Date(this.fechaInicio) : new Date();
+    const fechaInicioFinal = this.fechaInicio ? new Date(this.fechaInicio + 'T00:00:00') : new Date();
     const cuotas = this.cantidadCuotas ? Number(this.cantidadCuotas) : 0;
     let fechaFinDate: Date | null = null;
+    let mesInicioCuotas: string | null = null;
 
-    if (this.tipo === 'temporal' && this.fechaFin) {
-      fechaFinDate = new Date(this.fechaFin);
-    } else if (this.tipo === 'temporal' && cuotas > 0) {
-      const fecha = new Date(fechaInicioFinal);
-      fecha.setDate(1);
-      fecha.setMonth(fecha.getMonth() + cuotas);
-      fechaFinDate = fecha;
+    if (this.tipo === 'temporal') {
+      const cierreDia = this.tarjetaSeleccionada ? this.simuladorSvc.obtenerDiaCierre(this.tarjetaSeleccionada) : null;
+
+      const fechaInicioOriginal = this.gasto ? this.simuladorSvc.fechaACalendarStr(this.gasto.fechaInicio) : '';
+      const cambioFecha = this.fechaInicio !== fechaInicioOriginal;
+      const cambioTarjeta = (this.tarjetaSeleccionada?.id || null) !== (this.gasto?.tarjetaId || null);
+      const conservarAncla = this.esEdicion && !!this.gasto?.mesInicioCuotas && !cambioFecha && !cambioTarjeta;
+
+      mesInicioCuotas = conservarAncla
+        ? this.gasto!.mesInicioCuotas!
+        : this.simuladorSvc.calcularMesInicioCuotas(fechaInicioFinal, cierreDia);
+
+      if (cuotas > 0) {
+        const partes = mesInicioCuotas.split('-').map(Number);
+        fechaFinDate = new Date(partes[0], partes[1] - 1 + (cuotas - 1), 1);
+      } else if (this.fechaFin) {
+        fechaFinDate = new Date(this.fechaFin + 'T00:00:00');
+      }
     }
 
     const tarjetaData = this.tarjetaSeleccionada ? {
@@ -474,6 +487,7 @@ export class AgregarGastoComponent implements OnInit {
         fechaInicio: fechaInicioFinal,
         fechaFin: fechaFinDate,
         cantidadCuotas: cuotas > 0 ? cuotas : null,
+        mesInicioCuotas: this.tipo === 'temporal' ? mesInicioCuotas : null,
         detalles: this.detalles.trim() || null,
         ...tarjetaData,
         existente: true
@@ -489,6 +503,7 @@ export class AgregarGastoComponent implements OnInit {
         fechaInicio: fechaInicioFinal,
         fechaFin: fechaFinDate,
         cantidadCuotas: cuotas > 0 ? cuotas : null,
+        mesInicioCuotas: this.tipo === 'temporal' ? mesInicioCuotas : null,
         detalles: this.detalles.trim() || null,
         fechaCreacion: new Date(),
         ...tarjetaData

@@ -102,11 +102,22 @@ export class HomePage implements OnInit, OnDestroy {
     }
   }
 
+  private parseFechaLocal(fecha: any): Date {
+    if (typeof fecha === 'string') {
+      const s = fecha.trim();
+      return new Date(/^\d{4}-\d{2}-\d{2}$/.test(s) ? s + 'T00:00:00' : s);
+    }
+    if (fecha && typeof fecha.toDate === 'function') {
+      return (fecha as any).toDate() as Date;
+    }
+    return new Date(fecha);
+  }
+
   private recalcUltimosMov() {
     const items: MovimientoItem[] = [];
 
     for (const m of this.movimientosCuenta) {
-      const fecha = new Date(m.fecha);
+      const fecha = this.parseFechaLocal(m.fecha);
       const montoStr = this.utilsSVC.formatARS(m.importe);
       const esGasto = m.genero === 'gasto';
       items.push({
@@ -120,7 +131,7 @@ export class HomePage implements OnInit, OnDestroy {
     }
 
     for (const c of this.movimientosCambios) {
-      const fecha = new Date(c.fecha);
+      const fecha = this.parseFechaLocal(c.fecha);
       items.push({
         tipoMov: 'cambio',
         concepto: c.desde === 'efectivo' ? 'Depósito a banco' : 'Retiro de efectivo',

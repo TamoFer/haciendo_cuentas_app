@@ -13,6 +13,7 @@ export interface GastoSimulador {
   mesPagado?: string;
   tarjetaId?: string;
   tarjetaNombre?: string;
+  mesInicioCuotas?: string;
 }
 
 export interface GastoConCuota extends GastoSimulador {
